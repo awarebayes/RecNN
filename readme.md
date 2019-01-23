@@ -3,14 +3,14 @@
 
 RecNN is reinforecement learning project for personalized news reccomendation written in pytorch. It follows [this paper](https://arxiv.org/pdf/1810.12027.pdf).
 
-# Medium Articles
+### Medium Articles
 I wrote some medium articles explaining how this works:
   -  [Deep Reinforcement Learning for News Recommendation. Part 1: Architecture.](https://towardsdatascience.com/deep-reinforcement-learning-for-news-recommendation-part-1-architecture-5741b1a6ed56)
   -  (In Progress) Deep Reinforcement Learning for News Recommendation. Part 2: Simple implementation, DDPG with HER.
   -  (In Progress) Deep Reinforcement Learning for News Recommendation. Part 3: Scaling up. A3C and learning with multimpe GPUs.
   - (In Progress) Deep Reinforcement Learning for News Recommendation. Part 4: D4PG. Bayesian exploration.
 
-# Key Notes
+### Key Notes
   - Written in Pytorch 1.0
   - Multiprocessing GPU support. Asyncronous Learning.
   - DDPG with D4PG support.
