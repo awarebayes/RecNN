@@ -3,6 +3,10 @@
 
 RecNN is reinforecement learning project for personalized news reccomendation written in pytorch. It follows [this paper](https://arxiv.org/pdf/1810.12027.pdf).
 
+Couple of notes: Hey, I have been absent for quiet some time. I'd been learning new things. Now I can continue work on the project.
+Most of the stuff is deprecated and will be rewritten (primarily data preprocessing)
+I have started movie parser which I am going to use for normal movie embeddigns
+
 ### Medium Articles (Deep Reinforcement Learning for News Recommendation)
 I wrote some medium articles explaining how this works:
   -  [ Part 1: Architecture.](https://towardsdatascience.com/deep-reinforcement-learning-for-news-recommendation-part-1-architecture-5741b1a6ed56)
