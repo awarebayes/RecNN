@@ -3,9 +3,34 @@
 
 RecNN is reinforecement learning project for personalized news reccomendation written in pytorch. It follows [this paper](https://arxiv.org/pdf/1810.12027.pdf).
 
-Couple of notes: Hey, I have been absent for quiet some time. I'd been learning new things. Now I can continue work on the project.
-Most of the stuff is deprecated and will be rewritten (primarily data preprocessing)
-I have started movie parser which I am going to use for normal movie embeddigns
+This project is built for MovieLens 20M dataset, but support for other datasets is in perspective.
+I have parsed all the movies in the '/links.csv' to get all auxiliary data. Text information was fed into Google's BERT/ OpenAI GPT2 models to get text embeddings. All the data can be found [here](https://drive.google.com/file/d/1a4aiN5vNRXdRLt8DMmgc5tgWb1TEGZ0U/view?usp=sharing)
+
+All text information is located in `texts_bert.p / texts_gpt2.p` in dict {movie_id: numpy_array} format.
+
+All of cat features had been label encoded, numerical standardized.
+
+```python
+{'adult': False,
+ 'collection': 210,
+ 'genres': [14, 1, 11],
+ 'original_language': 0,
+ 'overview': "",
+ 'popularity': 5.218749755002595,
+ 'production_companies': [96],
+ 'production_countries': [0],
+ 'release_year': 1995,
+ 'release_month': 10,
+ 'revenue': 4.893588591235185,
+ 'runtime': -0.5098445413830461,
+ 'spoken_languages': [0],
+ 'tagline': '',
+ 'title': 'Toy Story',
+ 'vote_average': 1.2557064312220563,
+ 'vote_count': 1.8032194192281197,
+ 'budget': 1.1843770075921112,
+ 'revenue_d': 5.626649137875692}
+```
 
 ### Medium Articles (Deep Reinforcement Learning for News Recommendation)
 I wrote some medium articles explaining how this works:
