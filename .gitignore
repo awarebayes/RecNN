@@ -1,4 +1,4 @@
-data/ml-20m
+data/
 .ipynb_checkpoints/
 *pt
 *csv
