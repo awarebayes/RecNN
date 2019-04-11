@@ -4,18 +4,19 @@
 RecNN is reinforecement learning project for personalized news reccomendation written in pytorch. It follows [this paper](https://arxiv.org/pdf/1810.12027.pdf).
 
 This project is built for MovieLens 20M dataset, but support for other datasets is in perspective.
-I have parsed all the movies in the '/links.csv' to get all auxiliary data. Text information was fed into Google's BERT/ OpenAI GPT2 models to get text embeddings. All the data can be found [here](https://drive.google.com/file/d/1a4aiN5vNRXdRLt8DMmgc5tgWb1TEGZ0U/view?usp=sharing)
+I have parsed all the movies in the '/links.csv' to get all auxiliary data. Text information was fed into Google's BERT/ OpenAI GPT2 models to get text embeddings. All the data can be found [here](https://drive.google.com/file/d/1TclEmCnZN_Xkl3TfUXL5ivPYmLnIjQSu/view?usp=sharing)
 
 All text information is located in `texts_bert.p / texts_gpt2.p` in dict {movie_id: numpy_array} format.
 
 All of cat features had been label encoded, numerical standardized.
+
+Here is an example of how the movie info looks like:
 
 ```python
 {'adult': False,
  'collection': 210,
  'genres': [14, 1, 11],
  'original_language': 0,
- 'overview': "",
  'popularity': 5.218749755002595,
  'production_companies': [96],
  'production_countries': [0],
@@ -24,7 +25,6 @@ All of cat features had been label encoded, numerical standardized.
  'revenue': 4.893588591235185,
  'runtime': -0.5098445413830461,
  'spoken_languages': [0],
- 'tagline': '',
  'title': 'Toy Story',
  'vote_average': 1.2557064312220563,
  'vote_count': 1.8032194192281197,
