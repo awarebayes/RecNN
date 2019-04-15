@@ -10,6 +10,8 @@ All text information is located in `texts_bert.p / texts_gpt2.p` in dict {movie_
 
 All of cat features had been label encoded, numerical standardized.
 
+Note: data is not frequently updated, but the notebook is designed to run each chapter independently. For instance, today I didn't add PCA movie embeddings, but you still can easily generate them yourself in a matter of 5 minutes or so.
+
 Here is an example of how the movie info looks like:
 
 ```python
