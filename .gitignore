@@ -1,5 +1,6 @@
 data/
 runs/
+models/
 .ipynb_checkpoints/
 *pt
 *csv
