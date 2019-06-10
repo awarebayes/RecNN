@@ -34,6 +34,12 @@ Here is an example of how the movie info looks like:
  'revenue_d': 5.626649137875692}
 ```
 
+Quick update: despite all my efforts of trying to get it to work, it still remains quiet dump spitting -1 tensor actions. I am planning on using a non-dl approach and observe how it will behave. I also  added some cool graphics so you can watch it fail itself stuck in a perpettual struggle with class and fancies. The metrics are for both networks (learing and target, see DDPG for more explanaition) include: chosen action covariance matrices pics, some metrics for chosen action (std, mean, variance). Also it features an embedding projector for tensorboard (with points labeled watched and generated, accordingly).
+
+![hello there weary coder](./res/graphs.png)
+![a curse must have been placed upon thee soul](./res/cov.png)
+![for otherwise you woulldnt have cometh here](./res/embeddings.png)
+
 ### Medium Articles (Deep Reinforcement Learning for News Recommendation)
 I wrote some medium articles explaining how this works:
   -  [ Part 1: Architecture.](https://towardsdatascience.com/deep-reinforcement-learning-for-news-recommendation-part-1-architecture-5741b1a6ed56)
