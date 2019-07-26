@@ -6,6 +6,8 @@ RecNN is reinforecement learning project for personalized news reccomendation wr
 This project is built for MovieLens 20M dataset, but support for other datasets is in perspective.
 I have parsed all the movies in the '/links.csv' to get all auxiliary data. Text information was fed into Google's BERT/ OpenAI GPT2 models to get text embeddings. All the data can be found [here](https://drive.google.com/file/d/1TclEmCnZN_Xkl3TfUXL5ivPYmLnIjQSu/view?usp=sharing)
 
+I added static dataset support so it takes ~10 minutes to get through the dataset. Dynamically built it used to take about 2 hours! You can generate the static data yourself, I dont want to upload 40GB of uncompressed data. Just play around with the numbers in batch and you'll be fine.
+
 All text information is located in `texts_bert.p / texts_gpt2.p` in dict {movie_id: numpy_array} format.
 
 All of cat features had been label encoded, numerical standardized.
