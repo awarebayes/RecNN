@@ -1,20 +1,63 @@
-# RecNN
-
-
-RecNN is reinforecement learning project for personalized news reccomendation written in pytorch. It follows [this paper](https://arxiv.org/pdf/1810.12027.pdf).
+# RecNN: RL news recommendation
 
 This project is built for MovieLens 20M dataset, but support for other datasets is in perspective.
-I have parsed all the movies in the '/links.csv' to get all auxiliary data. Text information was fed into Google's BERT/ OpenAI GPT2 models to get text embeddings. All the data can be found [here](https://drive.google.com/file/d/1TclEmCnZN_Xkl3TfUXL5ivPYmLnIjQSu/view?usp=sharing)
+I have parsed all the movies in the '/links.csv' to get all auxiliary data from TMDB/IMDB. Text information was fed into Google's BERT/ OpenAI GPT2 models to get text embeddings. All the data can be found [here](https://drive.google.com/file/d/1TclEmCnZN_Xkl3TfUXL5ivPYmLnIjQSu/view?usp=sharing)
 
-I added static dataset support so it takes ~10 minutes to get through the dataset. Dynamically built it used to take about 2 hours! You can generate the static data yourself, I dont want to upload 40GB of uncompressed data. Just play around with the numbers in batch and you'll be fine.
 
-All text information is located in `texts_bert.p / texts_gpt2.p` in dict {movie_id: numpy_array} format.
+I also added static HDF5 dataset support so it takes ~7-10 minutes to get through al the ML20M dataset. Dynamically built it used to take about 2 hours but now you can iterate through 40GB od data in a matter of 10 minutes! You can generate the static data yourself, or download the existing one here. I will upload it this evening.
+
+## How to use static MovieLens Dataset in your project
+
+```
+import h5py
+
+# include the file
+f = h5py.File("*path to the static dataset*", "r")
+
+# set some constants
+batch = []
+batch_size = 5000
+n_batches = (f['state'].shape[0] // batch_size) + 1
+
+def prepare_batch(*args):
+	# device - torch.device cpu/cuda
+    args = [torch.tensor(np.array(arg).astype(np.float)).to(device) for arg in args]
+    return args
+
+def prepate_batch_keras():
+	
+
+# interate throught the batches
+for i in range(n_batches):
+	# get the batch
+    batch = [f[key][i*batch_size:(i+1)*batch_size] for key in
+             ['state', 'action', 'reward', 'next_state', 'done']]
+    
+    # do your framework-specific thing
+    batch = prepare_batch(*batch)
+	
+	# do whatever you want here
+	
+    batch = []
+```
+
+## Data description:
+
+All text information is located in `texts_bert.p / texts_gpt2.p` in a dict {movie_id: numpy_array} format.
 
 All of cat features had been label encoded, numerical standardized.
 
-Note: data is not frequently updated, but the notebook is designed to run each chapter independently. For instance, today I didn't add PCA movie embeddings, but you still can easily generate them yourself in a matter of 5 minutes or so.
+I also added the SARSA-like static HDF5 file with following datasets
+
+- State - [None, frame_size * (embed_size+1) ] - PCA encoded previous actions (watched movies) embedding + rewards (ratings). All flattered and connected together
+- Action - [None, embed_size] - PCA encoded current action embedding
+- Reward - [None] - Integer, indicates whether the user liked the action or not
+- Next state - look state - + Next state is basically the same but shifted +1 time step
+- Done - [None] - Boolean, needed for TD(1)
 
 Here is an example of how the movie info looks like:
+
+
 
 ```python
 {'adult': False,
@@ -36,7 +79,7 @@ Here is an example of how the movie info looks like:
  'revenue_d': 5.626649137875692}
 ```
 
-Quick update: despite all my efforts of trying to get it to work, it still remains quiet dump spitting -1 tensor actions. I am planning on using a non-dl approach and observe how it will behave. I also  added some cool graphics so you can watch it fail itself stuck in a perpettual struggle with class and fancies. The metrics are for both networks (learing and target, see DDPG for more explanaition) include: chosen action covariance matrices pics, some metrics for chosen action (std, mean, variance). Also it features an embedding projector for tensorboard (with points labeled watched and generated, accordingly).
+## Also added some debug information for the 
 
 ![hello there weary coder](./res/graphs.png)
 ![a curse must have been placed upon thee soul](./res/cov.png)
@@ -51,30 +94,20 @@ I wrote some medium articles explaining how this works:
 
 ### Key Notes
   - Written in Pytorch 1.0
-  - Multiprocessing GPU support. Asyncronous Learning.
-  - DDPG with D4PG support.
-  - A3C will only work in UNIX. Posix (Windows) is not supported for async learning. (VirtualBox and Docker will not help)
+  - DDPG with D4PG support (WIP).
   - Notebooks may be found /notes
   - Ready-to-ship project will be located in /build
 
-### Help and Commiting:   
-> I will be glad to any cooperation and commiting to the project. We have a discord server. 
 
-### Installation
-```sh
-$ git clone https://github.com/awarebayes/RecNN
-$ cd RecNN
-$ pip install requirements.txt
-```
+
 
 ### Todo (Not implemented)
 
 - Write Articles as I implement this
-- Train news embeddings
-- DDPG with HER
-- A3C and async learning
-- D4PG
 - Docker Support
+
+### Done:
+- H5Py support with static dataset
 
 License
 ----
