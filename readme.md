@@ -4,7 +4,7 @@ This project is built for MovieLens 20M dataset, but support for other datasets 
 I have parsed all the movies in the '/links.csv' to get all auxiliary data from TMDB/IMDB. Text information was fed into Google's BERT/ OpenAI GPT2 models to get text embeddings. All the data can be found [here](https://drive.google.com/file/d/1TclEmCnZN_Xkl3TfUXL5ivPYmLnIjQSu/view?usp=sharing)
 
 
-I also added static HDF5 dataset support so it takes ~7-10 minutes to get through al the ML20M dataset. Dynamically built it used to take about 2 hours but now you can iterate through 40GB od data in a matter of 10 minutes! You can generate the static data yourself, or download the existing one here. I will upload it this week because I don't have the permission to use ML dataset so I need encode the time series. It will also make the thing around 5-10GB.
+I also added static HDF5 dataset support so it takes ~7-10 minutes to get through al the ML20M dataset. Dynamically built it used to take about 2 hours but now you can iterate through 40GB od data in a matter of 10 minutes! You can generate the static data yourself, or download the existing one here. I will upload it this week because I don't have the permission to upload ML dataset so I need encode the time series using StateRepresentation or simple PCE. It will also make the thing around 5-10GB.
 
 ## How to use static MovieLens Dataset in your project
 
@@ -79,20 +79,26 @@ Here is an example of how the movie info looks like:
 ### DDPG is now working!
 Although I am still dealing with the overfitting problem, the actor is producing somewhat consistent results! They are shown below
 Here you can see the training process of the network:
-![Losses](./res/Losses.png)
 
-Here is a pairwise similarity matrix of the recommended embeddings ranked by using Euclidian
+<p align="center"> 
+<img src="./res/Losses.png">
+</p>
 
-![EUD](./res/Matrix EUD.png)
+Here is a pairwise similarity matrix of the recommended embeddings ranked by using Euclidian and Cosine distances
 
-And Cosine distances
+<p align="center"> 
+<img src="./res/Matrix_EUD.png">
+</p>
 
-![EUD](./res/Matrix COS.png)
+<p align="center"> 
+<img src="./res/Matrix_COS.png">
+</p>
 
+As I previously mentioned it tends to overfit a bit. I am working on fixing it. Here you can see the Kernel Density Estimation for Autoencoder Reconstruction scores. I use it as an anomaly detection metric. (Wasserstein Distance = ~50)
 
-As I previously mentioned it tends to overfit a bit. I am working on fixing it. Here you can see the Wasserstein Distance for Autoencoder Reconstruction scores. I use it as an anomaly detection metric. (WD = ~50)
-
-![WD](./res/Anomaly Detection.png)
+<p align="center"> 
+<img src="./res/Anomaly_Detection.png">
+</p>
 
 ### Medium Articles (Deep Reinforcement Learning for News Recommendation)
 I wrote some medium articles explaining how this works:
