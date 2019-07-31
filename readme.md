@@ -84,17 +84,18 @@ Here you can see the training process of the network:
 <img src="./res/Losses.png">
 </p>
 
-Here is a pairwise similarity matrix of the recommended embeddings ranked by using Euclidian and Cosine distances
+Here is a pairwise similarity matrix of real and generated actions (movie embeddings)
 
 <p align="center"> 
-<img src="./res/Matrix_EUD.png">
+<img src="./res/real_dist.png">
 </p>
+ 
 
 <p align="center"> 
-<img src="./res/Matrix_COS.png">
+<img src="./res/gen_dist.png">
 </p>
 
-As I previously mentioned it tends to overfit a bit. I am working on fixing it. Here you can see the Kernel Density Estimation for Autoencoder Reconstruction scores. I use it as an anomaly detection metric. (Wasserstein Distance = ~50)
+It doesnt seem to overfit much. Here you can see the Kernel Density Estimation for Autoencoder Reconstruction scores. I use it as an anomaly detection metric. (Wasserstein Distance = ~50)
 
 <p align="center"> 
 <img src="./res/Anomaly_Detection.png">
