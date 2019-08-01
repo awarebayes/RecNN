@@ -1,13 +1,14 @@
-# RecNN: RL news recommendation
+<p align="center"> 
+<img src="./res/logo.png">
+</p>
 
-This is my school project. It focuses on of Reinforcement Learning, but there are many other thing I learned during the development. Key topics: time series analisys, static dataset optimization, data preparation and EDA. It also features my code for ML20 dataset that allows to iterate through the dataset in a matter of 3 minutes. As well as my custom movie embeddings. DDPG doen't seem to be working because it exploits the Value Network by recommending the same movie over and over again. But TD3 seems to be working just fine! You can see the distance matrices for the generated actions [below](#td3-results)
+This is my school project. It focuses on Reinforcement Learning, but there are many other things I learned during the development. Key topics: time series analysis, static dataset optimization, data preparation, and EDA. It also features my code for ML20 dataset that allows iterating through the dataset in a matter of 3 minutes. As well as my custom movie embeddings. DDPG doesn't seem to be working because it exploits the Value Network by recommending the same movie over and over again. But TD3 seems to be working just fine! You can see the distance matrices for the generated actions[below](#td3-results)
 
 
 ## Dataset Description
-This project is built for MovieLens 20M dataset, but support for other datasets is in perspective.
-I have parsed all the movies in the '/links.csv' to get all auxiliary data from TMDB/IMDB. Text information was fed into Google's BERT/ OpenAI GPT2 models to get text embeddings. If you want do download anything, the links are down the description.
+This project is built for MovieLens 20M dataset, but support for other datasets is in perspective. I have parsed all the movies in the '/links.csv' to get all auxiliary data from TMDB/IMDB. Text information was fed into Google's BERT/ OpenAI GPT2 models to get text embeddings. If you want to download anything, the links are down the description.
 
-I also added static SARSA-like HDF5 dataset support so it takes ~3 minutes to get through all the ML20M dataset. Dynamically built it used to take about 2 hours but now you can iterate through 40GB of data in a matter of 3 minutes! You can generate the static data yourself. I cannot upload it due to the legal reasons and slow internet.
+I also added static SARSA-like HDF5 dataset support so it takes ~3 minutes to get through all the ML20M dataset. Dynamically built it used to take about 2 hours but now you can iterate through 40GB of data in a matter of 3 minutes! You can generate static data yourself. I cannot upload it due to the legal reasons and slow internet.
 
 Here is an overview:
 
@@ -19,11 +20,11 @@ Here is an overview:
 
 ## Misc Data
 
-Everything of misc sort is in the 'Misc Data' you can download in the downloads section, featuring all sorts of auxilary stuff. Primarily it is movie info. If you dont want to use the embeddings, or just want to have some debug info/data for application this is what you need. 
+Everything of the misc sort is in the 'Misc Data' you can download in the downloads section, featuring all sorts of auxiliary stuff. Primarily it is movie info. If you don't want to use the embeddings, or just want to have some debug info/data for application this is what you need.
 
-All text information is located in `texts_bert.p / texts_gpt2.p` in a dict {movie_id: numpy_array} format.
+All text information is located in texts_bert.p / texts_gpt2.p in a dict {movie_id: numpy_array} format.
 
-All of cat features had been label encoded, numerical standardized.
+All of the categorical features had been label encoded, numerical standardized.
 
 Here is an example of how the movie information looks like:
 
@@ -99,7 +100,7 @@ Here is a pairwise similarity matrix of real and generated actions (movie embedd
 <img src="./res/gen_dist.png">
 </p>
 
-It doesnt seem to overfit much. Here you can see the Kernel Density Estimation for Autoencoder Reconstruction scores. I use it as an anomaly detection metric. (Wasserstein Distance = ~50)
+It doesn't seem to overfit much. Here you can see the Kernel Density Estimation for Autoencoder Reconstruction scores. I use it as an anomaly detection metric. (Wasserstein Distance = ~50)
 
 <p align="center"> 
 <img src="./res/Anomaly_Detection.png">
@@ -107,14 +108,14 @@ It doesnt seem to overfit much. Here you can see the Kernel Density Estimation f
 
  # Downloads
 - [Movie Embeddings](https://drive.google.com/open?id=1kTyu05ZmtP2MA33J5hWdX8OyUYEDW4iI)
-- [State Representation](https://drive.google.com/open?id=1DuNvPQ8pIxmZEFGNtXRSRxRcoWXU_0cO) used to encode the movie embeddings with rewards into smaller dimensions.
+- [State Representation](https://drive.google.com/open?id=1DuNvPQ8pIxmZEFGNtXRSRxRcoWXU_0cO)
 - [Misc Data](https://drive.google.com/open?id=1TclEmCnZN_Xkl3TfUXL5ivPYmLnIjQSu)
 
 ## FAQ:
 
  **What is Big and Small (Lite) dataset?**
  
- For performance purposes I added pretrained state representation. It takes movie embeddings and ratings and encodes them into smaller 256 tensor. The Lite dataset utilizes this small trick whereas the big dataset does not. 
+For performance purposes, I added pre-trained state representation. It takes movie embeddings and ratings and encodes them into smaller 256 tensors. The Lite dataset utilizes this small trick whereas the big dataset does not.
  
 **How to use state represrentation?**
 
@@ -131,9 +132,7 @@ It doesnt seem to overfit much. Here you can see the Kernel Density Estimation f
  
  **Something in the RL Losses looks weird**
  
- It is fine for the RL losses. Keep in mind that RL algoritms utilize neural networks for calculating the loss functions (Policy) or some wacky stuff for Value. 
- 
-
+It is fine for the RL losses. Keep in mind that RL algorithms utilize neural networks for calculating the loss functions (Policy) or some wacky stuff for Value.
  
  **What is the size of ...?**
  
