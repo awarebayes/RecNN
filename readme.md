@@ -2,7 +2,7 @@
 <img src="./res/logo.png">
 </p>
 
-This is my school project. It focuses on Reinforcement Learning, but there are many other things I learned during the development. Key topics: time series analysis, static dataset optimization, data preparation, and EDA. It also features my code for ML20 dataset that allows iterating through the dataset in a matter of 3 minutes. As well as my custom movie embeddings. DDPG doesn't seem to be working because it exploits the Value Network by recommending the same movie over and over again. But TD3 seems to be working just fine! You can see the distance matrices for the generated actions[below](#td3-results)
+This is my school project. It focuses on Reinforcement Learning, but there are many other things I learned during the development. Key topics: time series analysis, static dataset optimization, data preparation, and EDA. It also features my code for ML20 dataset that allows iterating through the dataset in a matter of 3 minutes. As well as my custom movie embeddings. DDPG doesn't seem to be working because it exploits the Value Network by recommending the same movie over and over again. But TD3 seems to be working just fine! You can see the distance matrices for the generated actions [below](#td3-results)
 
 
 ## Dataset Description
@@ -82,7 +82,7 @@ for i in range(n_batches):
 
 
 
-### TD3 results
+## TD3 results
 Here you can see the training process of the network:
 
 <p align="center"> 
@@ -108,7 +108,7 @@ It doesn't seem to overfit much. Here you can see the Kernel Density Estimation 
 
  # Downloads
 - [Movie Embeddings](https://drive.google.com/open?id=1kTyu05ZmtP2MA33J5hWdX8OyUYEDW4iI)
-- [State Representation](https://drive.google.com/open?id=1DuNvPQ8pIxmZEFGNtXRSRxRcoWXU_0cO)
+- [State Representation Model](https://drive.google.com/open?id=1DuNvPQ8pIxmZEFGNtXRSRxRcoWXU_0cO)
 - [Misc Data](https://drive.google.com/open?id=1TclEmCnZN_Xkl3TfUXL5ivPYmLnIjQSu)
 
 ## FAQ:
