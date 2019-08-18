@@ -128,6 +128,10 @@ It doesn't seem to overfit much. Here you can see the Kernel Density Estimation 
 - [State Representation Model](https://drive.google.com/open?id=1DuNvPQ8pIxmZEFGNtXRSRxRcoWXU_0cO)
 - [Misc Data](https://drive.google.com/open?id=1TclEmCnZN_Xkl3TfUXL5ivPYmLnIjQSu)
 
+## Models
+
+- [3. DDPG Radam and Adam-Finetuned](https://drive.google.com/open?id=1s7ltM6ZQ3SHbCosjN6oGvVvdpfdegKWP)
+
 ## FAQ:
 
 **What are the films ids?**
