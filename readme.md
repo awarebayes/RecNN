@@ -6,9 +6,9 @@ This is my school project. It focuses on Reinforcement Learning, but there are m
 
 
 ## Dataset Description
-This project is built for MovieLens 20M dataset, but support for other datasets is in perspective. I have parsed all the movies in the '/links.csv' to get all auxiliary data from TMDB/IMDB. Text information was fed into Google's BERT/ OpenAI GPT2 models to get text embeddings. If you want to download anything, the links are down the description.
+This project is built for MovieLens 20M dataset, but support for other datasets is in perspective. I have parsed all the movies in the '/links.csv' to get all auxiliary data from TMDB/IMDB. Text information was fed into Google's BERT/ OpenAI GPT2 models to get text embeddings. If you want to download anything, the links are down the description. 
 
-I also added static SARSA-like HDF5 dataset support so it takes ~3 minutes to get through all the ML20M dataset. Dynamically built it used to take about 2 hours but now you can iterate through 40GB of data in a matter of 3 minutes! You can generate static data yourself. I cannot upload it due to the legal reasons and slow internet.
+I also added static SARSA-like HDF5 dataset support so it takes ~3 minutes to get through all the ML20M dataset. Dynamically built it used to take about 2 hours but now you can iterate through 40GB of data in a matter of 3 minutes! You can generate static data yourself or [download it here](https://drive.google.com/open?id=1pPf-7AmUVceVfgfmKEJ6ireEDKEJHw-7).
 
 Here is an overview:
 
@@ -54,7 +54,8 @@ Here is an example of how the movie information looks like:
 import h5py
 
 # include the file
-f = h5py.File("*path to the static dataset*", "r")
+f = h5py.File("*path to the static ml20m dataset*", "r")
+movie_ref = pickle.load("path to the pca/umap movie embeddings")
 
 # set some constants
 batch = []
@@ -67,22 +68,37 @@ def prepare_batch(*args):
     return args
 
 # iterate throught the batches
-for i in range(n_batches):
-    # get the batch
-    batch = [f[key][i*batch_size:(i+1)*batch_size] for key in
-             ['state', 'action', 'reward', 'next_state', 'done']]
+for i in tqdm(n_batches):
+    movies, ratings, done = [f[key][i*batch_size:(i+1)*batch_size] for key in
+             ['movies', 'ratings', 'done']]
     
-    # do your framework-specific thing
-    batch = prepare_batch(*batch)
-	
-    # do whatever you want here
-	
-    batch = []
+    movies, ratings, done = [torch.tensor(i.astype('float32')) for i in [movies, ratings, done]]
+    movies_tensor = torch.stack([torch.stack([movie_ref[int(i)] for i in ts]) for ts in movies])
+    
+    state = torch.cat([movies_tensor[:, :-1, :].view(state.size(0), -1),
+                       ratings[:, :-1]], 1)
+    next_state = torch.cat([movies_tensor[:, 1:, :].view(state.size(0), -1),
+                            ratings[:, 1:]], 1)
+    action = movies_tensor[:, -1]
+    reward = ratings[:, -1]
+    
+    batch = [state, action, reward, next_state, done]
+    
 ```
 
+## Getting started:
 
+1. Download the static ml20m dataset and the movie embeddings or generate yourself with the original ML20m (might take an hour)
+2. Clone this repo
+3. Place the static_ml20m.hdf5 and infos_pca128.pytorch (embeddings) into the RecNN/data folder
+4. Run notes/3. DDPG and see the results
 
-## TD3 results
+P.S. as for today TD3 is not working. I am focusing on the DDPG. I will work later.
+
+## DDPG results (WIP)
+
+Please, head over to notes/3.DDPG to see all the losses during the training, as well as other metrics. I often update the repo, so the results you see above are not always the best ones. 
+
 Here you can see the training process of the network:
 
 <p align="center"> 
@@ -107,42 +123,32 @@ It doesn't seem to overfit much. Here you can see the Kernel Density Estimation 
 </p>
 
  # Downloads
+- [Static ML20M dataset](https://drive.google.com/open?id=1pPf-7AmUVceVfgfmKEJ6ireEDKEJHw-7)
 - [Movie Embeddings](https://drive.google.com/open?id=1kTyu05ZmtP2MA33J5hWdX8OyUYEDW4iI)
 - [State Representation Model](https://drive.google.com/open?id=1DuNvPQ8pIxmZEFGNtXRSRxRcoWXU_0cO)
 - [Misc Data](https://drive.google.com/open?id=1TclEmCnZN_Xkl3TfUXL5ivPYmLnIjQSu)
 
 ## FAQ:
 
- **What is Big and Small (Lite) dataset?**
- 
-For performance purposes, I added pre-trained state representation. It takes movie embeddings and ratings and encodes them into smaller 256 tensors. The Lite dataset utilizes this small trick whereas the big dataset does not.
- 
-**How to use state represrentation?**
-
- ```
- film_ids = [*watched films ids*]
- embeds = np.stack([movies_embeds[i] for i in film_ids])
- ratings = np.array([*ratings here*])
- state = state_rep(torch.tensor(np.concatenate([embeds, ratings])).float())
- ```
- 
 **What are the films ids?**
  
  It uses movies.csv from ML20M. The field is movieId
  
  **Something in the RL Losses looks weird**
  
-It is fine for the RL losses. Keep in mind that RL algorithms utilize neural networks for calculating the loss functions (Policy) or some wacky stuff for Value.
+It is fine for the RL losses. Keep in mind that RL algorithms utilize neural networks for calculating the loss functions (Policy Loss) or some wacky stuff like Temporal Difference bootstapping with target network for Value Loss.
  
  **What is the size of ...?**
  
-| Name       | Dimensions Lite | Dimensions Big | Base Type |
-|------------|-----------------|----------------|-----------|
-| State      | 256             | 1290           | float     | 
-| Action     | 128             | 128            | float     | 
-| Reward     | 1               | 1              | int8      | 
-| Next_State | 256             | 1290           | float     | 
-| Done       | 1               | 1              | bool      | 
+| Name       || Dimensions  | Base Type |
+|------------||----------------|-----------|
+| State      || 1290           | float     | 
+| Action     || 128            | float     | 
+| Reward     || 1              | int8      | 
+| Next_State || 1290           | float     | 
+| Done       || 1              | bool      | 
+
+P.S. all types are downcasted to float32 in the PyTorch backend.
 
 ## Medium Articles (WIP)
 I wrote some medium articles explaining how this works:
