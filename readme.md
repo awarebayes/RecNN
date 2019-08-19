@@ -144,13 +144,13 @@ It is fine for the RL losses. Keep in mind that RL algorithms utilize neural net
  
  **What is the size of ...?**
  
-| Name       || Dimensions  | Base Type |
-|------------||----------------|-----------|
-| State      || 1290           | float     | 
-| Action     || 128            | float     | 
-| Reward     || 1              | int8      | 
-| Next_State || 1290           | float     | 
-| Done       || 1              | bool      | 
+| Name       | Dimensions  | Base Type |
+|------------|----------------|-----------|
+| State      | 1290           | float     | 
+| Action     | 128            | float     | 
+| Reward     | 1              | int8      | 
+| Next_State | 1290           | float     | 
+| Done       | 1              | bool      | 
 
 P.S. all types are downcasted to float32 in the PyTorch backend.
 
