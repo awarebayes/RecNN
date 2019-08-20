@@ -83,21 +83,18 @@ for i in tqdm(n_batches):
     reward = ratings[:, -1]
     
     batch = [state, action, reward, next_state, done]
+    batch = prepare_batch(*batch)
     
 ```
 
 ## Getting started:
 
-1. Download the static ml20m dataset and the movie embeddings or generate yourself with the original ML20m (might take an hour)
+1. Download the static ml20m dataset and the movie embeddings or generate yourself with the original ML20m (might take an hour) in the Embeddings generation section.
 2. Clone this repo
 3. Place the static_ml20m.hdf5 and infos_pca128.pytorch (embeddings) into the RecNN/data folder
 4. Run notes/3. DDPG and see the results
 
-P.S. as for today TD3 is not working. I am focusing on the DDPG. I will work later.
-
-## DDPG results (WIP)
-
-Please, head over to notes/3.DDPG to see all the losses during the training, as well as other metrics. I often update the repo, so the results you see above are not always the best ones. 
+## TD3 results
 
 Here you can see the training process of the network:
 
@@ -127,10 +124,12 @@ It doesn't seem to overfit much. Here you can see the Kernel Density Estimation 
 - [Movie Embeddings](https://drive.google.com/open?id=1kTyu05ZmtP2MA33J5hWdX8OyUYEDW4iI)
 - [State Representation Model](https://drive.google.com/open?id=1DuNvPQ8pIxmZEFGNtXRSRxRcoWXU_0cO)
 - [Misc Data](https://drive.google.com/open?id=1TclEmCnZN_Xkl3TfUXL5ivPYmLnIjQSu)
+- [Metadata for predictions](https://drive.google.com/open?id=1xjVI4uVQGsQ7tjOJ3594ZXmAEC_6yX0e)
 
 ## Models
 
-- [3. DDPG Radam and Adam-Finetuned](https://drive.google.com/open?id=1s7ltM6ZQ3SHbCosjN6oGvVvdpfdegKWP)
+- [3. DDPG Radam and Adam-Finetuned](https://drive.google.com/open?id=1eu0qhwkL-2ailsgoyM0gzjdlcNARJE3a)
+- [4. TD3 two checkpoints](https://drive.google.com/open?id=16sJGkCgo2JgFM5-5N-9spzI0jQrAfgX2)
 
 ## FAQ:
 
