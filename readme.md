@@ -4,6 +4,13 @@
 
 This is my school project. It focuses on Reinforcement Learning, but there are many other things I learned during the development. Key topics: time series analysis, static dataset optimization, data preparation, and EDA. It also features my code for ML20 dataset that allows iterating through the dataset in a matter of 3 minutes. As well as my custom movie embeddings. DDPG doesn't seem to be working because it exploits the Value Network by recommending the same movie over and over again. But TD3 seems to be working just fine! You can see the distance matrices for the generated actions [below](#td3-results)
 
+<p align="center"> 
+   <a href="https://towardsdatascience.com/reinforcement-learning-ddpg-and-td3-for-news-recommendation-d3cddec26011">
+        <img src="./res/Article.png">
+    </a>
+</p>
+
+P.S. I am using Higgsfield's RL Advemture 2 code adapted for torch 1. Here is his [repo](https://github.com/higgsfield/RL-Adventure-2)
 
 ## Dataset Description
 This project is built for MovieLens 20M dataset, but support for other datasets is in perspective. I have parsed all the movies in the '/links.csv' to get all auxiliary data from TMDB/IMDB. Text information was fed into Google's BERT/ OpenAI GPT2 models to get text embeddings. If you want to download anything, the links are down the description. 
@@ -154,10 +161,21 @@ It is fine for the RL losses. Keep in mind that RL algorithms utilize neural net
 P.S. all types are downcasted to float32 in the PyTorch backend.
 
 ## Medium Articles (WIP)
-I wrote some medium articles explaining how this works:
-  -  [ Part 1: Architecture.](https://towardsdatascience.com/deep-reinforcement-learning-for-news-recommendation-part-1-architecture-5741b1a6ed56)
-  - (In Progress) Part 2: Simple implementation DDPG. 
-  - (In Progress) Part 3: TD3.
+I wrote some medium articles explaining how this works: 
+
+<p align="center"> 
+   <a href="https://towardsdatascience.com/reinforcement-learning-ddpg-and-td3-for-news-recommendation-d3cddec26011">
+        <img src="./res/Article.png">
+    </a>
+</p>
+
+<p align="center"> 
+   <a href="https://towardsdatascience.com/deep-reinforcement-learning-for-news-recommendation-part-1-architecture-5741b1a6ed56">
+        <img src="./res/Article old.png">
+    </a>
+</p>
+
+
 
 License
 ----
