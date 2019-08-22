@@ -4,13 +4,22 @@
 
 This is my school project. It focuses on Reinforcement Learning, but there are many other things I learned during the development. Key topics: time series analysis, static dataset optimization, data preparation, and EDA. It also features my code for ML20 dataset that allows iterating through the dataset in a matter of 3 minutes. As well as my custom movie embeddings. DDPG doesn't seem to be working because it exploits the Value Network by recommending the same movie over and over again. But TD3 seems to be working just fine! You can see the distance matrices for the generated actions [below](#td3-results)
 
+First article, the code is under notes/1. Vanilla RL/, it covers basic Reinforcement Learning Approach:
+
 <p align="center"> 
    <a href="https://towardsdatascience.com/reinforcement-learning-ddpg-and-td3-for-news-recommendation-d3cddec26011">
         <img src="./res/Article.png">
     </a>
 </p>
 
-P.S. I am using Higgsfield's RL Advemture 2 code adapted for torch 1. Here is his [repo](https://github.com/higgsfield/RL-Adventure-2)
+I am working on the next article, but the code I am writing is under notes/2. BCQ/. It is about RL applications to the static dataset (i.e. a dataset without exploration). It features adversarial reinforcement learning techniques. Right now the DDPG implementation is working.
+
+Repos I used code from:
+- Higgsfield's [RL Advemture 2](https://github.com/higgsfield/RL-Adventure-2)
+
+- Sfujim's [BCQ](https://github.com/sfujim/BCQ)
+
+- LiyuanLucasLiu [Radam](https://github.com/LiyuanLucasLiu/RAdam)
 
 ## Dataset Description
 This project is built for MovieLens 20M dataset, but support for other datasets is in perspective. I have parsed all the movies in the '/links.csv' to get all auxiliary data from TMDB/IMDB. Text information was fed into Google's BERT/ OpenAI GPT2 models to get text embeddings. If you want to download anything, the links are down the description. 
