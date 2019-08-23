@@ -118,15 +118,15 @@ Here you can see the training process of the network:
 <img src="./res/Losses.png">
 </p>
 
-Here is a pairwise similarity matrix of real and generated actions (movie embeddings)
+Here is a pairwise similarity matrix of real (first image) and generated (second image) actions (movies)
+
 
 <p align="center"> 
-<img src="./res/real_dist.png">
+    <img src="./res/real_dist.png">
 </p>
- 
 
 <p align="center"> 
-<img src="./res/gen_dist.png">
+    <img src="./res/gen_dist.png">
 </p>
 
 It doesn't seem to overfit much. Here you can see the Kernel Density Estimation for Autoencoder Reconstruction scores. I use it as an anomaly detection metric. (Wasserstein Distance = ~50)
@@ -138,14 +138,12 @@ It doesn't seem to overfit much. Here you can see the Kernel Density Estimation 
  # Downloads
 - [Static ML20M dataset](https://drive.google.com/open?id=1pPf-7AmUVceVfgfmKEJ6ireEDKEJHw-7)
 - [Movie Embeddings](https://drive.google.com/open?id=1kTyu05ZmtP2MA33J5hWdX8OyUYEDW4iI)
-- [State Representation Model](https://drive.google.com/open?id=1DuNvPQ8pIxmZEFGNtXRSRxRcoWXU_0cO)
 - [Misc Data](https://drive.google.com/open?id=1TclEmCnZN_Xkl3TfUXL5ivPYmLnIjQSu)
 - [Metadata for predictions](https://drive.google.com/open?id=1xjVI4uVQGsQ7tjOJ3594ZXmAEC_6yX0e)
 
 ## Models
 
-- [3. DDPG Radam and Adam-Finetuned](https://drive.google.com/open?id=1eu0qhwkL-2ailsgoyM0gzjdlcNARJE3a)
-- [4. TD3 two checkpoints](https://drive.google.com/open?id=16sJGkCgo2JgFM5-5N-9spzI0jQrAfgX2)
+- [Articles 1,2: DDPG, TD3, BCQ](https://drive.google.com/open?id=1a15mvtXZwOOSj9aQJNCxNlPMYREYYDxg)
 
 ## FAQ:
 
