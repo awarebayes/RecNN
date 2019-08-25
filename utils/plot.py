@@ -13,11 +13,13 @@ def embed_show(embs):
     cax = ax.matshow(similarity_matrix_cos)
     fig.colorbar(cax)
     ax.set_title('Cosine')
+    ax.axis('off')
 
     ax = fig.add_subplot(122)
     cax = ax.matshow(similarity_matrix_euc)
     fig.colorbar(cax)
     ax.set_title('Euclidian')
+    ax.axis('off')
 
     fig.suptitle('Action pairwise distances')
     fig.show()
