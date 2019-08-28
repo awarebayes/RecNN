@@ -24,8 +24,6 @@ Repos I used code from:
 ## Dataset Description
 This project is built for MovieLens 20M dataset, but support for other datasets is in perspective. I have parsed all the movies in the '/links.csv' to get all auxiliary data from TMDB/IMDB. Text information was fed into Google's BERT/ OpenAI GPT2 models to get text embeddings. If you want to download anything, the links are down the description. 
 
-I also added static SARSA-like HDF5 dataset support so it takes ~3 minutes to get through all the ML20M dataset. Dynamically built it used to take about 2 hours but now you can iterate through 40GB of data in a matter of 3 minutes! You can generate static data yourself or [download it here](https://drive.google.com/open?id=1pPf-7AmUVceVfgfmKEJ6ireEDKEJHw-7).
-
 Here is an overview:
 
 - State - [None, frame_size * (embed_size+1) ] - PCA encoded previous actions (watched movies) embedding + rewards (ratings). All flattered and connected together
@@ -64,50 +62,11 @@ Here is an example of how the movie information looks like:
  'revenue_d': 5.626649137875692}
 ```
 
-## How to use static MovieLens Dataset in your project
-
-```
-import h5py
-
-# include the file
-f = h5py.File("*path to the static ml20m dataset*", "r")
-movie_ref = pickle.load("path to the pca/umap movie embeddings")
-
-# set some constants
-batch = []
-batch_size = 5000
-n_batches = (f['state'].shape[0] // batch_size) + 1
-
-def prepare_batch(*args):
-    # device - torch.device cpu/cuda
-    args = [torch.tensor(np.array(arg).astype(np.float)).to(device) for arg in args]
-    return args
-
-# iterate throught the batches
-for i in tqdm(n_batches):
-    movies, ratings, done = [f[key][i*batch_size:(i+1)*batch_size] for key in
-             ['movies', 'ratings', 'done']]
-    
-    movies, ratings, done = [torch.tensor(i.astype('float32')) for i in [movies, ratings, done]]
-    movies_tensor = torch.stack([torch.stack([movie_ref[int(i)] for i in ts]) for ts in movies])
-    
-    state = torch.cat([movies_tensor[:, :-1, :].view(state.size(0), -1),
-                       ratings[:, :-1]], 1)
-    next_state = torch.cat([movies_tensor[:, 1:, :].view(state.size(0), -1),
-                            ratings[:, 1:]], 1)
-    action = movies_tensor[:, -1]
-    reward = ratings[:, -1]
-    
-    batch = [state, action, reward, next_state, done]
-    batch = prepare_batch(*batch)
-    
-```
-
 ## Getting started:
 
-1. Download the static ml20m dataset and the movie embeddings or generate yourself with the original ML20m (might take an hour) in the Embeddings generation section.
+1. Download the static ml20m dataset and the movie embeddings
 2. Clone this repo
-3. Place the static_ml20m.hdf5 and infos_pca128.pytorch (embeddings) into the RecNN/data folder
+3. Infos_pca128.pytorch (embeddings) into the RecNN/data folder
 4. Run notes/3. DDPG and see the results
 
 ## TD3 results
@@ -136,7 +95,6 @@ It doesn't seem to overfit much. Here you can see the Kernel Density Estimation 
 </p>
 
  # Downloads
-- [Static ML20M dataset](https://drive.google.com/open?id=1pPf-7AmUVceVfgfmKEJ6ireEDKEJHw-7)
 - [Movie Embeddings](https://drive.google.com/open?id=1kTyu05ZmtP2MA33J5hWdX8OyUYEDW4iI)
 - [Misc Data](https://drive.google.com/open?id=1TclEmCnZN_Xkl3TfUXL5ivPYmLnIjQSu)
 - [Metadata for predictions](https://drive.google.com/open?id=1xjVI4uVQGsQ7tjOJ3594ZXmAEC_6yX0e)

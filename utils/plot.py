@@ -1,5 +1,5 @@
 from scipy.spatial import distance
-
+from scipy import ndimage
 import matplotlib.pyplot as plt
 
 def embed_show(embs):
@@ -23,3 +23,16 @@ def embed_show(embs):
 
     fig.suptitle('Action pairwise distances')
     fig.show()
+    
+def smooth(scalars, weight):  # Weight between 0 and 1
+    last = scalars[0]  # First value in the plot (first timestep)
+    smoothed = list()
+    for point in scalars:
+        smoothed_val = last * weight + (1 - weight) * point  # Calculate smoothed value
+        smoothed.append(smoothed_val)                        # Save it
+        last = smoothed_val                                  # Anchor the last smoothed value
+
+    return smoothed
+
+def smooth_gauss(arr, var):
+    return ndimage.gaussian_filter1d(arr, var)
