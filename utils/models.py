@@ -6,14 +6,14 @@ import torch.optim as optim
 import numpy as np
 
 class Actor(nn.Module):
-    def __init__(self, num_inputs, num_actions, hidden_size, init_w=2e-1):
+    def __init__(self, input_dim, action_dim, hidden_size, init_w=2e-1):
         super(Actor, self).__init__()
         
         self.drop_layer = nn.Dropout(p=0.5)
         
-        self.linear1 = nn.Linear(num_inputs, hidden_size)
+        self.linear1 = nn.Linear(input_dim, hidden_size)
         self.linear2 = nn.Linear(hidden_size, hidden_size)
-        self.linear3 = nn.Linear(hidden_size, num_actions)
+        self.linear3 = nn.Linear(hidden_size, action_dim)
         
         self.linear3.weight.data.uniform_(-init_w, init_w)
         self.linear3.bias.data.uniform_(-init_w, init_w)
@@ -56,12 +56,12 @@ class AnomalyDetector(nn.Module):
         return error.item()
     
 class Critic(nn.Module):
-    def __init__(self, num_inputs, num_actions, hidden_size, init_w=3e-5):
+    def __init__(self, input_dim, action_dim, hidden_size, init_w=3e-5):
         super(Critic, self).__init__()
         
         self.drop_layer = nn.Dropout(p=0.5)
         
-        self.linear1 = nn.Linear(num_inputs + num_actions, hidden_size)
+        self.linear1 = nn.Linear(input_dim + action_dim, hidden_size)
         self.linear2 = nn.Linear(hidden_size, hidden_size)
         self.linear3 = nn.Linear(hidden_size, 1)
         
