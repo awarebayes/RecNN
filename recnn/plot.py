@@ -2,7 +2,8 @@ from scipy.spatial import distance
 from scipy import ndimage
 import matplotlib.pyplot as plt
 
-def embed_show(embs):
+
+def pairwise_distances(embs):
     embs = embs.detach().cpu().numpy()
     similarity_matrix_cos = distance.cdist(embs, embs, 'cosine')
     similarity_matrix_euc = distance.cdist(embs, embs, 'euclidean')
@@ -23,7 +24,8 @@ def embed_show(embs):
 
     fig.suptitle('Action pairwise distances')
     fig.show()
-    
+
+
 def smooth(scalars, weight):  # Weight between 0 and 1
     last = scalars[0]  # First value in the plot (first timestep)
     smoothed = list()
@@ -34,5 +36,11 @@ def smooth(scalars, weight):  # Weight between 0 and 1
 
     return smoothed
 
+
 def smooth_gauss(arr, var):
     return ndimage.gaussian_filter1d(arr, var)
+
+
+class Plotter:
+    def __init__(self):
+        assert NotImplementedError
