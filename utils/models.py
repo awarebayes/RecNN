@@ -77,9 +77,9 @@ class Critic(nn.Module):
         x = self.linear3(x)
         return x
     
-class BCQ_Actor(nn.Module):
+class bcqPerturbator(nn.Module):
     def __init__(self, num_inputs, num_actions, hidden_size, init_w=3e-1):
-        super(BCQ_Actor, self).__init__()
+        super(bcqPerturbator, self).__init__()
         
         self.drop_layer = nn.Dropout(p=0.5)
         
@@ -99,9 +99,9 @@ class BCQ_Actor(nn.Module):
         a = self.linear3(a) 
         return a + action
     
-class BCQ_VAE(nn.Module):
+class bcqGenerator(nn.Module):
     def __init__(self, state_dim, action_dim, latent_dim):
-        super(BCQ_VAE, self).__init__()
+        super(bcqGenerator, self).__init__()
         #encoder
         self.e1 = nn.Linear(state_dim + action_dim, 750)
         self.e2 = nn.Linear(750, 750)
