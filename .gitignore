@@ -1,7 +1,7 @@
 data/
 runs/
 models/
-.idea/
+recnn/.idea/
 .ipynb_checkpoints/
 *pt
 *csv
