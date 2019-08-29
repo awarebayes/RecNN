@@ -5,6 +5,34 @@ import torch.nn.functional as F
 import torch.optim as optim
 import numpy as np
 
+
+class AnomalyDetector(nn.Module):
+    def __init__(self):
+        super(AnomalyDetector, self).__init__()
+        self.ae = nn.Sequential(
+            nn.Linear(128, 64),
+            nn.ReLU(),
+            nn.BatchNorm1d(64),
+            nn.Linear(64, 32),
+            nn.ReLU(),
+            nn.BatchNorm1d(32),
+            nn.Linear(32, 64),
+            nn.ReLU(),
+            nn.BatchNorm1d(64),
+            nn.Linear(64, 128),
+            nn.ReLU(),
+        )
+
+    def forward(self, x):
+        return self.ae(x)
+
+    def rec_error(self, x):
+        error = torch.sum((x - self.ae(x)) ** 2, 1)
+        if x.size(1) != 1:
+            return error.detach()
+        return error.item()
+
+
 class Actor(nn.Module):
     def __init__(self, input_dim, action_dim, hidden_size, init_w=2e-1):
         super(Actor, self).__init__()
@@ -28,33 +56,7 @@ class Actor(nn.Module):
         x = self.linear3(x) # in case embeds are standard scaled / wiped using PCA whitening
         # return state, x
         return x
-    
-class AnomalyDetector(nn.Module):
-    def __init__(self):
-        super(AnomalyDetector, self).__init__()
-        self.ae = nn.Sequential(
-            nn.Linear(128, 64),
-            nn.ReLU(),
-            nn.BatchNorm1d(64),
-            nn.Linear(64, 32),
-            nn.ReLU(),
-            nn.BatchNorm1d(32),
-            nn.Linear(32, 64),
-            nn.ReLU(),
-            nn.BatchNorm1d(64),
-            nn.Linear(64, 128),
-            nn.ReLU(),
-        )
-        
-    def forward(self, x):
-        return self.ae(x)
-    
-    def rec_error(self, x):
-        error = torch.sum((x - self.ae(x)) ** 2, 1)
-        if x.size(1) != 1:
-            return error.detach()
-        return error.item()
-    
+
 class Critic(nn.Module):
     def __init__(self, input_dim, action_dim, hidden_size, init_w=3e-5):
         super(Critic, self).__init__()
@@ -76,7 +78,8 @@ class Critic(nn.Module):
         x = self.drop_layer(x)
         x = self.linear3(x)
         return x
-    
+
+
 class bcqPerturbator(nn.Module):
     def __init__(self, num_inputs, num_actions, hidden_size, init_w=3e-1):
         super(bcqPerturbator, self).__init__()
@@ -98,25 +101,25 @@ class bcqPerturbator(nn.Module):
         a = self.drop_layer(a)
         a = self.linear3(a) 
         return a + action
-    
+
+
 class bcqGenerator(nn.Module):
     def __init__(self, state_dim, action_dim, latent_dim):
         super(bcqGenerator, self).__init__()
-        #encoder
+        # encoder
         self.e1 = nn.Linear(state_dim + action_dim, 750)
         self.e2 = nn.Linear(750, 750)
 
         self.mean = nn.Linear(750, latent_dim)
         self.log_std = nn.Linear(750, latent_dim)
         
-        #decoder
+        # decoder
         self.d1 = nn.Linear(state_dim + latent_dim, 750)
         self.d2 = nn.Linear(750, 750)
         self.d3 = nn.Linear(750, action_dim)
         
         self.latent_dim = latent_dim
         self.normal = torch.distributions.Normal(0, 1)
-
 
     def forward(self, state, action):
         # z is encoded state + action
@@ -139,7 +142,6 @@ class bcqGenerator(nn.Module):
         if z is None:
             z = self.normal.sample([state.size(0), self.latent_dim])
             z = z.clamp(-0.5, 0.5).to(next(self.parameters()).device)
-
 
         a = F.relu(self.d1(torch.cat([state, z], 1)))
         a = F.relu(self.d2(a))
