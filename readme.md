@@ -2,9 +2,9 @@
 <img src="./res/logo.png">
 </p>
 
-This is my school project. It focuses on Reinforcement Learning, but there are many other things I learned during the development. Key topics: time series analysis, static dataset optimization, data preparation, and EDA. It also features my code for ML20 dataset that allows iterating through the dataset in a matter of 3 minutes. As well as my custom movie embeddings. DDPG doesn't seem to be working because it exploits the Value Network by recommending the same movie over and over again. But TD3 seems to be working just fine! You can see the distance matrices for the generated actions [below](#td3-results)
+This is my school project. It focuses on Reinforcement Learning for personalized news recommendation. I wrote a couple of articles explaining how it works. 
 
-First article, the code is under notes/1. Vanilla RL/, it covers basic Reinforcement Learning Approach:
+First article, the code is under notes/1. Vanilla RL/, it's very beginner friendly and covers basic Reinforcement Learning Approach:
 
 <p align="center"> 
    <a href="https://towardsdatascience.com/reinforcement-learning-ddpg-and-td3-for-news-recommendation-d3cddec26011">
@@ -12,25 +12,28 @@ First article, the code is under notes/1. Vanilla RL/, it covers basic Reinforce
     </a>
 </p>
 
-I am working on the next article, but the code I am writing is under notes/2. BCQ/. It is about RL applications to the static dataset (i.e. a dataset without exploration). It features adversarial reinforcement learning techniques. Right now the DDPG implementation is working.
+
+| Algorithm                             | Paper                            | Code                       |
+|---------------------------------------|----------------------------------|----------------------------|
+| Deep Q Learning                       | https://arxiv.org/abs/1312.5602  | WIP                        |
+| Soft Actor Critic                     | https://arxiv.org/abs/1801.01290 | WIP                        |
+| Deep Deterministic Policy Gradients   | https://arxiv.org/abs/1509.02971 | examples/1.Vanilla RL/DDPG |
+| Twin Delayed DDPG (TD3)               | https://arxiv.org/abs/1802.09477 | examples/1.Vanilla RL/TD3  |
+| Batch Constrained Q-Learning          | https://arxiv.org/abs/1812.02900 | examples/1.BCQ/BCQ Pytorch |
+| REINFORCE Top-K Off-Policy Correction | https://arxiv.org/abs/1509.02971 | WIP                        |
 
 Repos I used code from:
-- Higgsfield's [RL Advemture 2](https://github.com/higgsfield/RL-Adventure-2)
 
 - Sfujim's [BCQ](https://github.com/sfujim/BCQ)
-
 - LiyuanLucasLiu [Radam](https://github.com/LiyuanLucasLiu/RAdam)
 
 ## Dataset Description
-This project is built for MovieLens 20M dataset, but support for other datasets is in perspective. I have parsed all the movies in the '/links.csv' to get all auxiliary data from TMDB/IMDB. Text information was fed into Google's BERT/ OpenAI GPT2 models to get text embeddings. If you want to download anything, the links are down the description. 
+This project is built for MovieLens 20M dataset. But you can use it with your data. You will need:
+1. Embeddings in {item_id: numpy.ndarray} format
+2. CSV dataset: user_id, item_id, rating, timestamp
 
-Here is an overview:
-
-- State - [None, frame_size * (embed_size+1) ] - PCA encoded previous actions (watched movies) embedding + rewards (ratings). All flattered and connected together
-- Action - [None, embed_size] - PCA encoded current action embedding
-- Reward - [None] - Integer, indicates whether the user liked the action or not
-- Next state - look state - + Next state is basically the same but shifted +1 time step
-- Done - [None] - Boolean, needed for TD(1)
+If you dont want to bother generating embeddings, use Descrete Action models (i.e., DQN)
+I also have parsed all the movies in the '/links.csv' to get all auxiliary data from TMDB/IMDB. Text information was fed into Google's BERT/ OpenAI GPT2 models to get text embeddings. If you want to download anything, the links are down the description. 
 
 ## Misc Data
 
@@ -64,7 +67,7 @@ Here is an example of how the movie information looks like:
 
 ## Getting started:
 
-1. Download the static ml20m dataset and the movie embeddings
+1. Download the ml20m dataset and the movie embeddings
 2. Clone this repo
 3. Infos_pca128.pytorch (embeddings) into the RecNN/data folder
 4. Run notes/3. DDPG and see the results
@@ -95,6 +98,7 @@ It doesn't seem to overfit much. Here you can see the Kernel Density Estimation 
 </p>
 
  # Downloads
+- [MovieLens 20M](https://grouplens.org/datasets/movielens/20m/)
 - [Movie Embeddings](https://drive.google.com/open?id=1kTyu05ZmtP2MA33J5hWdX8OyUYEDW4iI)
 - [Misc Data](https://drive.google.com/open?id=1TclEmCnZN_Xkl3TfUXL5ivPYmLnIjQSu)
 - [Metadata for predictions](https://drive.google.com/open?id=1xjVI4uVQGsQ7tjOJ3594ZXmAEC_6yX0e)

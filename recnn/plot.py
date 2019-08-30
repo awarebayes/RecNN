@@ -42,5 +42,27 @@ def smooth_gauss(arr, var):
 
 
 class Plotter:
-    def __init__(self):
-        assert NotImplementedError
+    def __init__(self, debugger, style):
+        self.debugger = debugger
+        self.style = style
+        self.smoothing = lambda x: smooth_gauss(x, 4)
+
+    def set_smoothing_func(self, f):
+        self.smoothing = f
+
+    def plot_loss(self):
+        for row in self.style:
+            fig, axes = plt.subplots(1, len(row), figsize=(16, 6))
+            if len(row) == 1: axes = [axes]
+            for col in range(len(row)):
+                key = row[col]
+                axes[col].set_title(key)
+                axes[col].plot(self.debugger.debug_dict['loss']['train']['step'],
+                               self.smoothing(self.debugger.debug_dict['loss']['train'][key]), 'b-',
+                               label='train')
+                axes[col].plot(self.debugger.debug_dict['loss']['test']['step'],
+                               self.debugger.debug_dict['loss']['test'][key], 'r-.',
+                               label='test')
+            plt.legend()
+        plt.show()
+

@@ -5,9 +5,16 @@ from scipy.special import kl_div
 from scipy import stats
 import torch
 
+
 class Debugger:
-    def __init__(self):
-        self.debug_dict = {'error': {}, 'obj': {}, 'mat': {}}
+    def __init__(self, layout, testf):
+        self.debug_dict = {'error': {}, 'obj': {}, 'mat': {}, 'loss': {}}
+        self.step = 0
+        assert type(layout['train']) == dict
+        assert type(layout['test']) == dict
+        self.debug_dict['loss'] = layout
+        self.testf = testf
+        self.layout = layout
 
     def log_error(self, name, x, test=False):
         if test:
@@ -27,6 +34,23 @@ class Debugger:
         if test:
             name = 'test ' + name
         self.debug_dict[key][name] = x
+
+    def log_loss(self, key, item, test=False):
+        kind = 'train'
+        if test:
+            kind = 'test'
+        self.debug_dict['loss'][kind][key].append(item)
+
+    def log_losses(self, loss_dict, test=False):
+        for key, val in loss_dict.items():
+            self.log_loss(key, val, test)
+
+    def log_step(self, step):
+        self.step = step
+
+    def test(self):
+        test_loss = self.testf()
+        self.log_losses(test_loss, test=True)
 
     def err_plot(self):
         for key, error in self.debug_dict['error'].items():
