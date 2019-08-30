@@ -3,7 +3,7 @@ from scipy import ndimage
 import matplotlib.pyplot as plt
 
 
-def pairwise_distances(embs):
+def pairwise_distances_fig(embs):
     embs = embs.detach().cpu().numpy()
     similarity_matrix_cos = distance.cdist(embs, embs, 'cosine')
     similarity_matrix_euc = distance.cdist(embs, embs, 'euclidean')
@@ -23,6 +23,11 @@ def pairwise_distances(embs):
     ax.axis('off')
 
     fig.suptitle('Action pairwise distances')
+    return fig
+
+
+def pairwise_distances(embs):
+    fig = pairwise_distances_fig(embs)
     fig.show()
 
 

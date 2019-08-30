@@ -7,14 +7,16 @@ import torch
 
 
 class Debugger:
-    def __init__(self, layout, testf):
-        self.debug_dict = {'error': {}, 'obj': {}, 'mat': {}, 'loss': {}}
+    def __init__(self, layout, testf, writer=False):
+        self.debug_dict = {'error': {}, 'obj': {}, 'emb': {}, 'mat': {}, 'loss': {}}
         self.step = 0
         assert type(layout['train']) == dict
         assert type(layout['test']) == dict
         self.debug_dict['loss'] = layout
         self.testf = testf
         self.layout = layout
+        self.writer = writer
+        self.to_log = []
 
     def log_error(self, name, x, test=False):
         if test:
@@ -30,20 +32,24 @@ class Debugger:
         target['std'].append(x.std().item())
         target['mean'].append(x.mean().item())
 
-    def log_object(self, name, x, key='mat', test=False):
+    def log_object(self, name, x, kind='mat', test=False):
         if test:
             name = 'test ' + name
-        self.debug_dict[key][name] = x
+        self.debug_dict[kind][name] = x
 
     def log_loss(self, key, item, test=False):
         kind = 'train'
         if test:
             kind = 'test'
         self.debug_dict['loss'][kind][key].append(item)
+        if self.writer and key != 'step':
+            self.writer.add_scalar(kind + '/'+ key, item, self.step)
 
     def log_losses(self, loss_dict, test=False):
         for key, val in loss_dict.items():
             self.log_loss(key, val, test)
+        if self.writer:
+            self.writer.close()
 
     def log_step(self, step):
         self.step = step

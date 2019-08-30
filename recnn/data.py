@@ -37,42 +37,64 @@ def rolling_window(a, window):
     return np.lib.stride_tricks.as_strided(a, shape=shape, strides=strides)
 
 
-# Main function that is used as torch.DataLoader->collate_fn
-# CollateFn docs:
-# https://pytorch.org/docs/stable/data.html#working-with-collate-fn
-def prepare_batch_static_size(batch, item_ref_tensor, frame_size=10):
-    
-    item_t, ratings_t, sizes_t = [], [], []
-    for i in range(len(batch)):
-        item_t.append(batch[i]['items'])
-        ratings_t.append(batch[i]['rates'])
-        sizes_t.append(batch[i]['sizes'])  
-
-    item_t = np.concatenate([rolling_window(i, frame_size+1) for i in item_t], 0)
-    ratings_t = np.concatenate([rolling_window(i, frame_size+1) for i in ratings_t], 0)
-    
-    item_t = torch.tensor(item_t)
-    ratings_t = torch.tensor(ratings_t).float()
-    sizes_t = torch.tensor(sizes_t)
-    
-    batch_size = ratings_t.size(0)
-    
-    items_tensor = item_ref_tensor[item_t.long()]
-    
-    items = items_tensor[:, :-1, :].view(batch_size, -1)
-    next_items = items_tensor[:, 1:, :].view(batch_size, -1)
+def batch_no_embeddings(batch, frame_size):
+    item_t, ratings_t, sizes_t = batch
+    b_size = ratings_t.size(0)
+    items = item_t[:, :-1]
+    next_items = item_t[:, 1:]
     ratings = ratings_t[:, :-1]
     next_ratings = ratings_t[:, 1:]
-    
+    action = item_t[:, -1]
+    reward = ratings_t[:, -1]
+    done = torch.zeros(b_size)
+    done[torch.cumsum(sizes_t - frame_size, dim=0) - 1] = 1
+    return items, next_items, ratings, next_ratings, action, reward, done
+
+
+def batch_tensor_embeddings(batch, item_embeddings_tensor, frame_size):
+    item_t, ratings_t, sizes_t = batch
+    items_tensor = item_embeddings_tensor[item_t.long()]
+    b_size = ratings_t.size(0)
+
+    items = items_tensor[:, :-1, :].view(b_size, -1)
+    next_items = items_tensor[:, 1:, :].view(b_size, -1)
+    ratings = ratings_t[:, :-1]
+    next_ratings = ratings_t[:, 1:]
+
     state = torch.cat([items, ratings], 1)
     next_state = torch.cat([next_items, next_ratings], 1)
     action = items_tensor[:, -1, :]
     reward = ratings_t[:, -1]
-    
-    done = torch.zeros(batch_size)
-    done[torch.cumsum(sizes_t-frame_size, dim=0)-1] = 1
+
+    done = torch.zeros(b_size)
+    done[torch.cumsum(sizes_t - frame_size, dim=0) - 1] = 1
 
     return state, action, reward, next_state, done
+
+
+# Main function that is used as torch.DataLoader->collate_fn
+# CollateFn docs:
+# https://pytorch.org/docs/stable/data.html#working-with-collate-fn
+def prepare_batch_static_size(batch, item_embeddings_tensor=False, frame_size=10):
+    item_t, ratings_t, sizes_t = [], [], []
+    for i in range(len(batch)):
+        item_t.append(batch[i]['items'])
+        ratings_t.append(batch[i]['rates'])
+        sizes_t.append(batch[i]['sizes'])
+
+    item_t = np.concatenate([rolling_window(i, frame_size + 1) for i in item_t], 0)
+    ratings_t = np.concatenate([rolling_window(i, frame_size + 1) for i in ratings_t], 0)
+
+    item_t = torch.tensor(item_t)
+    ratings_t = torch.tensor(ratings_t).float()
+    sizes_t = torch.tensor(sizes_t)
+
+    batch_size = ratings_t.size(0)
+
+    if type(item_embeddings_tensor) == bool:
+        return batch_no_embeddings([item_t, ratings_t, sizes_t], frame_size)
+    elif type(item_embeddings_tensor) == torch.Tensor:
+        return batch_tensor_embeddings([item_t, ratings_t, sizes_t], item_embeddings_tensor, frame_size)
 
 
 # Usually in data sets there item index is inconsistent (if you plot it doesn't look like a line)
@@ -86,6 +108,8 @@ def prepare_batch_static_size(batch, item_ref_tensor, frame_size=10):
 # items_embeddings_tensor - items_embeddings_dict compressed into tensor
 # key_to_id - dict key -> index
 # id_to_key - dict index -> key
+
+
 def make_items_tensor(items_embeddings_key_dict, include_zero=True):
     if include_zero:
         items_embeddings_key_dict[0] = torch.zeros(128)
