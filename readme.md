@@ -2,9 +2,9 @@
 <img src="./res/logo.png">
 </p>
 
-This is my school project. It focuses on Reinforcement Learning for personalized news recommendation. The main distinction is that it tries to solve online off-policy learning with dynamically generated item embeddings. Aslo, there is no exploration, since that we are working with a dataset. In the example section I use Google's BERT on the ML20M dataset to extract contextual infomation from movie description in order to form the latent vector representations. Later, you can use the same transormation on new new, previously unseen items (hence, the embeddings are dynamically generated). If you don't want to bother with embeddings pipeline, I have a DQN embeddings generator as a proof of concept.
+This is my school project. It focuses on Reinforcement Learning for personalized news recommendation. The main distinction is that it tries to solve online off-policy learning with dynamically generated item embeddings. Also, there is no exploration, since we are working with a dataset. In the example section, I use Google's BERT on the ML20M dataset to extract contextual information from the movie description to form the latent vector representations. Later, you can use the same transformation on new, previously unseen items (hence, the embeddings are dynamically generated). If you don't want to bother with embeddings pipeline, I have a DQN embeddings generator as a proof of concept.
 
-The repo consists of two parts: the library (./recnn) and the playgdound (./examples)  where I explain how to work with certain things. I wrote a couple of articles explaining how it functions. 
+The repo consists of two parts: the library (./recnn) and the playground (./examples)  where I explain how to work with certain things. I wrote a couple of articles explaining how it functions. 
 
 - First article, the code is under notes/1. Vanilla RL/, it's very beginner friendly and covers basic Reinforcement Learning Approach:
 
@@ -15,7 +15,7 @@ The repo consists of two parts: the library (./recnn) and the playgdound (./exam
 </p>
 
 
- <h2> Algotithms that are/will be added: </h2> 
+ <h2> Algorithms that are/will be added: </h2> 
 
 <p align="center"> 
     
