@@ -1,7 +1,9 @@
 from scipy.spatial import distance
 from scipy import ndimage
 import matplotlib.pyplot as plt
-
+import torch
+from scipy import stats
+import numpy as np
 
 def pairwise_distances_fig(embs):
     embs = embs.detach().cpu().numpy()
@@ -70,4 +72,32 @@ class Plotter:
                                label='test')
             plt.legend()
         plt.show()
+
+    @staticmethod
+    def kde_reconstruction_error(ad, gen_actions, gen_test_actions, true_actions, device=torch.device('cpu')):
+        true_scores = ad.rec_error(torch.tensor(true_actions).to(device).float()).detach().cpu().numpy()
+        gen_scores = ad.rec_error(torch.tensor(gen_actions).to(device).float()).detach().cpu().numpy()
+        gen_test_scores = ad.rec_error(torch.tensor(gen_test_actions).to(device).float()).detach().cpu().numpy()
+
+        true_kernel = stats.gaussian_kde(true_scores)
+        gen_kernel = stats.gaussian_kde(gen_scores)
+        gen_test_kernel = stats.gaussian_kde(gen_test_scores)
+
+        x = np.linspace(0, 250, 100)
+        probs_true = true_kernel(x)
+        probs_gen = gen_kernel(x)
+        probs_gen_test = gen_test_kernel(x)
+
+        fig = plt.figure(figsize=(16, 10))
+        ax = fig.add_subplot(111)
+        ax.plot(x, probs_true, '-b', label='true dist')
+        ax.plot(x, probs_gen, '-r', label='generated dist')
+        ax.plot(x, probs_gen_test, '-g', label='generated test dist')
+        ax.legend()
+        return fig
+
+    @staticmethod
+    def plot_kde_reconstruction_error(*args, **kwargs):
+        fig = Plotter.kde_reconstruction_error(*args, **kwargs)
+        fig.show()
 

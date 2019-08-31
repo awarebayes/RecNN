@@ -57,6 +57,7 @@ class Actor(nn.Module):
         # return state, x
         return x
 
+
 class Critic(nn.Module):
     def __init__(self, input_dim, action_dim, hidden_size, init_w=3e-5):
         super(Critic, self).__init__()

@@ -2,9 +2,11 @@
 <img src="./res/logo.png">
 </p>
 
-This is my school project. It focuses on Reinforcement Learning for personalized news recommendation. I wrote a couple of articles explaining how it works. 
+This is my school project. It focuses on Reinforcement Learning for personalized news recommendation. The main distinction is that it tries to solve online off-policy learning with dynamically generated item embeddings. Aslo, there is no exploration, since that we are working with a dataset. In the example section I use Google's BERT on the ML20M dataset to extract contextual infomation from movie description in order to form the latent vector representations. Later, you can use the same transormation on new new, previously unseen items (hence, the embeddings are dynamically generated). If you don't want to bother with embeddings pipeline, I have a DQN embeddings generator as a proof of concept.
 
-First article, the code is under notes/1. Vanilla RL/, it's very beginner friendly and covers basic Reinforcement Learning Approach:
+The repo consists of two parts: the library (./recnn) and the playgdound (./examples)  where I explain how to work with certain things. I wrote a couple of articles explaining how it functions. 
+
+- First article, the code is under notes/1. Vanilla RL/, it's very beginner friendly and covers basic Reinforcement Learning Approach:
 
 <p align="center"> 
    <a href="https://towardsdatascience.com/reinforcement-learning-ddpg-and-td3-for-news-recommendation-d3cddec26011">
@@ -13,26 +15,34 @@ First article, the code is under notes/1. Vanilla RL/, it's very beginner friend
 </p>
 
 
+ <h2> Algotithms that are/will be added: </h2> 
+
+<p align="center"> 
+    
 | Algorithm                             | Paper                            | Code                       |
 |---------------------------------------|----------------------------------|----------------------------|
-| Deep Q Learning                       | https://arxiv.org/abs/1312.5602  | WIP                        |
-| Soft Actor Critic                     | https://arxiv.org/abs/1801.01290 | WIP                        |
+| Deep Q Learning (PoC)                 | https://arxiv.org/abs/1312.5602  | examples/0. Embeddings/ 1.DQN                  |
 | Deep Deterministic Policy Gradients   | https://arxiv.org/abs/1509.02971 | examples/1.Vanilla RL/DDPG |
 | Twin Delayed DDPG (TD3)               | https://arxiv.org/abs/1802.09477 | examples/1.Vanilla RL/TD3  |
-| Batch Constrained Q-Learning          | https://arxiv.org/abs/1812.02900 | examples/1.BCQ/BCQ Pytorch |
+| Soft Actor Critic                     | https://arxiv.org/abs/1801.01290 |examples/1.Vanilla RL/SAC         |
+| Batch Constrained Q-Learning          | https://arxiv.org/abs/1812.02900 | examples/2.BCQ/BCQ Pytorch |
 | REINFORCE Top-K Off-Policy Correction | https://arxiv.org/abs/1509.02971 | WIP                        |
 
-Repos I used code from:
+</p>
+
+*** 
+### Repos I used code from:
 
 - Sfujim's [BCQ](https://github.com/sfujim/BCQ)
 - LiyuanLucasLiu [Radam](https://github.com/LiyuanLucasLiu/RAdam)
+- Higgsfield's [RL Adventure 2](https://github.com/higgsfield/RL-Adventure-2)
 
 ## Dataset Description
 This project is built for MovieLens 20M dataset. But you can use it with your data. You will need:
 1. Embeddings in {item_id: numpy.ndarray} format
 2. CSV dataset: user_id, item_id, rating, timestamp
 
-If you dont want to bother generating embeddings, use Descrete Action models (i.e., DQN)
+If you dont want to bother generating embeddings, use DQN in the 0./ Embeddings section.
 I also have parsed all the movies in the '/links.csv' to get all auxiliary data from TMDB/IMDB. Text information was fed into Google's BERT/ OpenAI GPT2 models to get text embeddings. If you want to download anything, the links are down the description. 
 
 ## Misc Data
@@ -106,16 +116,6 @@ It doesn't seem to overfit much. Here you can see the Kernel Density Estimation 
 ## Models
 
 - [Articles 1,2: DDPG, TD3, BCQ](https://drive.google.com/open?id=1a15mvtXZwOOSj9aQJNCxNlPMYREYYDxg)
-
-## FAQ:
-
-**What are the films ids?**
- 
- It uses movies.csv from ML20M. The field is movieId
- 
- **Something in the RL Losses looks weird**
- 
-It is fine for the RL losses. Keep in mind that RL algorithms utilize neural networks for calculating the loss functions (Policy Loss) or some wacky stuff like Temporal Difference bootstapping with target network for Value Loss.
  
  **What is the size of ...?**
  
@@ -143,11 +143,4 @@ I wrote some medium articles explaining how this works:
         <img src="./res/Article old.png">
     </a>
 </p>
-
-
-
-License
-----
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
