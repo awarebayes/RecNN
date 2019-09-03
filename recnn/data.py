@@ -1,6 +1,7 @@
 from torch.utils.data import Dataset, DataLoader
 import numpy as np
 import torch
+import pandas as pd
 
 
 class UserDataset(Dataset):
@@ -72,6 +73,30 @@ def batch_tensor_embeddings(batch, item_embeddings_tensor, frame_size):
     return state, action, reward, next_state, done
 
 
+# pads stuff to work with lstms
+def padder(x):
+    items_t = []
+    ratings_t = []
+    sizes_t = []
+    for i in range(len(x)):
+        items_t.append(torch.tensor(x[i]['items']))
+        ratings_t.append(torch.tensor(x[i]['rates']))
+        sizes_t.append(x[i]['sizes'])
+    items_t = torch.nn.utils.rnn.pad_sequence(items_t, batch_first=True).long()
+    ratings_t = torch.nn.utils.rnn.pad_sequence(ratings_t, batch_first=True).float()
+    sizes_t = torch.tensor(sizes_t).float()
+    return {'items': items_t, 'ratings': ratings_t, 'sizes': sizes_t}
+
+
+def sort_users_itemwise(user_dict, users):
+    return pd.Series(dict([(i, user_dict[i]['items'].shape[0]) for i in users])).sort_values(ascending=False).index
+
+
+def prepare_batch_dynamic_size(batch, item_embeddings_tensor):
+    item_idx, ratings_t, sizes_t = batch['items'], batch['ratings'], batch['sizes']
+    item_t = item_embeddings_tensor[item_idx]
+    return item_t, ratings_t, sizes_t
+
 # Main function that is used as torch.DataLoader->collate_fn
 # CollateFn docs:
 # https://pytorch.org/docs/stable/data.html#working-with-collate-fn
@@ -80,6 +105,7 @@ def prepare_batch_static_size(batch, item_embeddings_tensor=False, frame_size=10
     for i in range(len(batch)):
         item_t.append(batch[i]['items'])
         ratings_t.append(batch[i]['rates'])
+
         sizes_t.append(batch[i]['sizes'])
 
     item_t = np.concatenate([rolling_window(i, frame_size + 1) for i in item_t], 0)
@@ -143,11 +169,13 @@ def make_items_tensor(items_embeddings_key_dict, include_zero=True):
 """
 
 
-def prepare_dataset(df, key_to_id, frame_size, user_id='userId', rating='rating', item='movieId'):
+def prepare_dataset(df, key_to_id, frame_size, user_id='userId', rating='rating', item='movieId', sort_users=False):
     df[rating] = df[rating].progress_apply(lambda i: 2 * (i - 2.5))
     df[item] = df[item].progress_apply(key_to_id.get)
     users = df[[user_id, item]].groupby([user_id]).size()
     users = users[users > frame_size]
+    if sort_users:
+        users = users.sort_values(ascending=False)
     users = users.index
     ratings = df.sort_values(by='timestamp').set_index(user_id).drop("timestamp", axis=1).groupby(user_id)
 

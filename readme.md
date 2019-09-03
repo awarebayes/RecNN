@@ -30,6 +30,8 @@ The repo consists of two parts: the library (./recnn) and the playground (./exam
 
 </p>
 
+***
+ ### [My Trello with useful papers](https://trello.com/b/wnor4IZf/recnn)
 *** 
 ### Repos I used code from:
 
