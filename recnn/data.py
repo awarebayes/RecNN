@@ -2,6 +2,14 @@ from torch.utils.data import Dataset, DataLoader
 import numpy as np
 import torch
 import pandas as pd
+import warnings
+from importlib import reload  # Not needed in Python 2
+import logging
+import pickle
+reload(logging)
+logging.basicConfig(format='%(asctime)s %(levelname)s:%(message)s', level=logging.DEBUG)
+l = logging.getLogger()
+l.setLevel(logging.DEBUG)
 
 
 class UserDataset(Dataset):
@@ -97,9 +105,12 @@ def prepare_batch_dynamic_size(batch, item_embeddings_tensor):
     item_t = item_embeddings_tensor[item_idx]
     return item_t, ratings_t, sizes_t
 
+
 # Main function that is used as torch.DataLoader->collate_fn
 # CollateFn docs:
 # https://pytorch.org/docs/stable/data.html#working-with-collate-fn
+
+
 def prepare_batch_static_size(batch, item_embeddings_tensor=False, frame_size=10):
     item_t, ratings_t, sizes_t = [], [], []
     for i in range(len(batch)):
@@ -170,6 +181,10 @@ def make_items_tensor(items_embeddings_key_dict, include_zero=True):
 
 
 def prepare_dataset(df, key_to_id, frame_size, user_id='userId', rating='rating', item='movieId', sort_users=False):
+    import os.path
+    #if os.path.isfile('../data/.cache/users_udict.pkl'):
+    #   return pickle.load(open('../data/.cache/users_udict.pkl', "rb"))
+
     df[rating] = df[rating].progress_apply(lambda i: 2 * (i - 2.5))
     df[item] = df[item].progress_apply(key_to_id.get)
     users = df[[user_id, item]].groupby([user_id]).size()
@@ -189,4 +204,5 @@ def prepare_dataset(df, key_to_id, frame_size, user_id='userId', rating='rating'
         user_dict[int(userid)]['ratings'] = x[rating].values
 
     ratings.progress_apply(app)
+    #pickle.dump([user_dict, users], open('../data/.cache/users_udict.pkl', "wb"))
     return user_dict, users
