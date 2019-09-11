@@ -54,9 +54,8 @@ learn - whether to learn on this step (used for testing)
 
 def ddpg_update(batch, params, nets, optimizer, device, debugger=False, learn=True, step=-1):
     batch = [i.to(device) for i in batch]
-    state, action, reward, next_state, done = batch
-    reward = reward.unsqueeze(1)
-    # done = done.unsqueeze(1)
+    state, action, reward, next_state = batch
+    # reward = reward.unsqueeze(1)
 
     # --------------------------------------------------------#
     # Value Learning

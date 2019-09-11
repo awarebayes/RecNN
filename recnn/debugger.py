@@ -78,7 +78,7 @@ class Debugger:
         gen_kernel = stats.gaussian_kde(gen_scores)
         gen_test_kernel = stats.gaussian_kde(gen_test_scores)
 
-        x = np.linspace(0, 250, 100)
+        x = np.linspace(0, 1000, 100)
         probs_true = true_kernel(x)
         probs_gen = gen_kernel(x)
         probs_gen_test = gen_test_kernel(x)
