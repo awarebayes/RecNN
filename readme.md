@@ -44,38 +44,9 @@ This project is built for MovieLens 20M dataset. But you can use it with your da
 1. Embeddings in {item_id: numpy.ndarray} format
 2. CSV dataset: user_id, item_id, rating, timestamp
 
-If you dont want to bother generating embeddings, use DQN in the 0./ Embeddings section.
-I also have parsed all the movies in the '/links.csv' to get all auxiliary data from TMDB/IMDB. Text information was fed into Google's BERT/ OpenAI GPT2 models to get text embeddings. If you want to download anything, the links are down the description. 
+## Features
 
-## Misc Data
-
-Everything of the misc sort is in the 'Misc Data' you can download in the downloads section, featuring all sorts of auxiliary stuff. Primarily it is movie info. If you don't want to use the embeddings, or just want to have some debug info/data for application this is what you need.
-
-All text information is located in texts_bert.p / texts_gpt2.p in a dict {movie_id: numpy_array} format.
-
-All of the categorical features had been label encoded, numerical standardized.
-
-Here is an example of how the movie information looks like:
-
-```python
-{'adult': False,
- 'collection': 210,
- 'genres': [14, 1, 11],
- 'original_language': 0,
- 'popularity': 5.218749755002595,
- 'production_companies': [96],
- 'production_countries': [0],
- 'release_year': 1995,
- 'release_month': 10,
- 'revenue': 4.893588591235185,
- 'runtime': -0.5098445413830461,
- 'spoken_languages': [0],
- 'title': 'Toy Story',
- 'vote_average': 1.2557064312220563,
- 'vote_count': 1.8032194192281197,
- 'budget': 1.1843770075921112,
- 'revenue_d': 5.626649137875692}
-```
+Modular as you want it to be.
 
 ## Getting started:
 
