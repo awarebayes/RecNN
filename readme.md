@@ -2,9 +2,30 @@
 <img src="./res/logo.png">
 </p>
 
-This is my school project. It focuses on Reinforcement Learning for personalized news recommendation. The main distinction is that it tries to solve online off-policy learning with dynamically generated item embeddings. Also, there is no exploration, since we are working with a dataset. In the example section, I use Google's BERT on the ML20M dataset to extract contextual information from the movie description to form the latent vector representations. Later, you can use the same transformation on new, previously unseen items (hence, the embeddings are dynamically generated). If you don't want to bother with embeddings pipeline, I have a DQN embeddings generator as a proof of concept.
+<p align="center"> 
+This is my school project. It focuses on Reinforcement Learning for personalized news recommendation. The main distinction is that it tries to solve online off-policy learning with dynamically generated item embeddings. I want to create a library with SOTA algorithms for reinforcement learning recommendation, providing the level of abstraction you like.
+</p>
 
-The repo consists of two parts: the library (./recnn) and the playground (./examples)  where I explain how to work with certain things. I wrote a couple of articles explaining how it functions. 
+### All in all the features can be summed up to:
+
+- Abstract as you decide: you can import the entire algorthm (say DDPG) and tell it to ddpg.learn(batch), you can import networks and the learning function separately, create a custom loader for your task, or can define everything by yourself.
+
+- Examples do not contain any of the junk code or workarounds: pure model defenition and the algorithm itself in one file. I wrote a couple of articles explaining how it functions
+
+- The learning is built around sequential or frame environment that supports ML20M and like. Seq and Frame determine the length type of sequential data, seq is fully sequential dynamic size, while frame is just a static frame.
+
+- State Representation module with various methods. For sequential state representation you can use: basic LSTM/RNN/GRU, 
+Temporal Convolutional Networks, Echo State Networks and Chaos Free RNNs that are way faster that GRU.
+
+- Pytorch 1.2 support with Tensorboard visualization
+
+- New datasets will be added in the future.
+
+> As of now, the package is in it's early stages and is not available for download on PyPi. Use git fetch instead.
+
+## Medium Articles
+
+The repo consists of two parts: the library (./recnn) and the playground (./examples)  where I explain how to work with certain things. 
 
 - First article, the code is under notes/1. Vanilla RL/, it's very beginner friendly and covers basic Reinforcement Learning Approach:
 
@@ -15,7 +36,7 @@ The repo consists of two parts: the library (./recnn) and the playground (./exam
 </p>
 
 
- <h2> Algorithms that are/will be added: </h2> 
+## Algorithms that are/will be added:
 
 <p align="center"> 
     
@@ -39,21 +60,10 @@ The repo consists of two parts: the library (./recnn) and the playground (./exam
 - LiyuanLucasLiu [Radam](https://github.com/LiyuanLucasLiu/RAdam)
 - Higgsfield's [RL Adventure 2](https://github.com/higgsfield/RL-Adventure-2)
 
-## Dataset Description
-This project is built for MovieLens 20M dataset. But you can use it with your data. You will need:
-1. Embeddings in {item_id: numpy.ndarray} format
-2. CSV dataset: user_id, item_id, rating, timestamp
+## What is this?
 
-## Features
+This is my school project. It focuses on Reinforcement Learning for personalized news recommendation. The main distinction is that it tries to solve online off-policy learning with dynamically generated item embeddings. Also, there is no exploration, since we are working with a dataset. In the example section, I use Google's BERT on the ML20M dataset to extract contextual information from the movie description to form the latent vector representations. Later, you can use the same transformation on new, previously unseen items (hence, the embeddings are dynamically generated). If you don't want to bother with embeddings pipeline, I have a DQN embeddings generator as a proof of concept.
 
-Modular as you want it to be.
-
-## Getting started:
-
-1. Download the ml20m dataset and the movie embeddings
-2. Clone this repo
-3. Infos_pca128.pytorch (embeddings) into the RecNN/data folder
-4. Run notes/3. DDPG and see the results
 
 ## TD3 results
 
@@ -82,38 +92,12 @@ It doesn't seem to overfit much. Here you can see the Kernel Density Estimation 
 
  # Downloads
 - [MovieLens 20M](https://grouplens.org/datasets/movielens/20m/)
-- [Movie Embeddings](https://drive.google.com/open?id=1kTyu05ZmtP2MA33J5hWdX8OyUYEDW4iI)
+- [Movie Embeddings](https://drive.google.com/open?id=1EQ_zXBR3DKpmJR3jBgLvt-xoOvArGMsL)
 - [Misc Data](https://drive.google.com/open?id=1TclEmCnZN_Xkl3TfUXL5ivPYmLnIjQSu)
-- [Metadata for predictions](https://drive.google.com/open?id=1xjVI4uVQGsQ7tjOJ3594ZXmAEC_6yX0e)
+- [Parsed (omdb,tmdb)](https://drive.google.com/open?id=1t0LNCbqLjiLkAMFwtP8OIYU-zPUCNAjK)
 
 ## Models
 
 - [Articles 1,2: DDPG, TD3, BCQ](https://drive.google.com/open?id=1a15mvtXZwOOSj9aQJNCxNlPMYREYYDxg)
- 
- **What is the size of ...?**
- 
-| Name       | Dimensions  | Base Type |
-|------------|----------------|-----------|
-| State      | 1290           | float     | 
-| Action     | 128            | float     | 
-| Reward     | 1              | int8      | 
-| Next_State | 1290           | float     | 
-| Done       | 1              | bool      | 
 
-P.S. all types are downcasted to float32 in the PyTorch backend.
-
-## Medium Articles (WIP)
-I wrote some medium articles explaining how this works: 
-
-<p align="center"> 
-   <a href="https://towardsdatascience.com/reinforcement-learning-ddpg-and-td3-for-news-recommendation-d3cddec26011">
-        <img src="./res/Article.png">
-    </a>
-</p>
-
-<p align="center"> 
-   <a href="https://towardsdatascience.com/deep-reinforcement-learning-for-news-recommendation-part-1-architecture-5741b1a6ed56">
-        <img src="./res/Article old.png">
-    </a>
-</p>
 
