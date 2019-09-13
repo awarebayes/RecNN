@@ -1,5 +1,6 @@
 data/
 runs/
+! recnn/data/
 models/
 recnn/.idea/
 .ipynb_checkpoints/

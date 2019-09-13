@@ -1,10 +1,5 @@
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
-import torch.optim as optim
-from torch.utils.data import DataLoader
-import warnings
-from . import plot
+from recnn import utils
 
 """
 helper function for weight update
@@ -46,16 +41,16 @@ optimizer - {
 }
 
 device - torch.device (cpu/cuda)
-debugger - recnn.debugger instance for pretty plotting
+debug - dictionary where debug data about actions is saved
 learn - whether to learn on this step (used for testing)
+writer - torch.SummaryWriter
 
 """
 
 
-def ddpg_update(batch, params, nets, optimizer, device, debugger=False, learn=True, step=-1):
+def ddpg_update(batch, params, nets, optimizer, device, debug, writer=False, learn=True, step=-1):
     batch = [i.to(device) for i in batch]
     state, action, reward, next_state = batch
-    # reward = reward.unsqueeze(1)
 
     # --------------------------------------------------------#
     # Value Learning
@@ -76,12 +71,13 @@ def ddpg_update(batch, params, nets, optimizer, device, debugger=False, learn=Tr
         value_loss.backward(retain_graph=True)
         optimizer['value_optimizer'].step()
 
-    elif not learn and debugger:
-            debugger.writer.add_figure('next_action',
-                                        plot.pairwise_distances_fig(next_action[:50]), step)
-            debugger.writer.add_histogram('value', value, step)
-            debugger.writer.add_histogram('target_value', target_value, step)
-            debugger.writer.add_histogram('expected_value', expected_value, step)
+    elif not learn:
+        debug['next_action'] = next_action
+        writer.add_figure('next_action',
+                          utils.pairwise_distances_fig(next_action[:50]), step)
+        writer.add_histogram('value', value, step)
+        writer.add_histogram('target_value', target_value, step)
+        writer.add_histogram('expected_value', expected_value, step)
 
     # --------------------------------------------------------#
     # Policy learning
@@ -89,11 +85,11 @@ def ddpg_update(batch, params, nets, optimizer, device, debugger=False, learn=Tr
     gen_action = nets['policy_net'](state)
     policy_loss = -nets['value_net'](state, gen_action)
 
-    if not learn and debugger:
-        debugger.log_object('gen_action', gen_action, test=(not learn))
-        debugger.writer.add_histogram('policy_loss', policy_loss, step)
-        debugger.writer.add_figure('next_action',
-                          plot.pairwise_distances_fig(gen_action[:50]), step)
+    if not learn:
+        debug['gen_action'] = gen_action
+        writer.add_histogram('policy_loss', policy_loss, step)
+        writer.add_figure('next_action',
+                          utils.pairwise_distances_fig(gen_action[:50]), step)
     policy_loss = policy_loss.mean()
 
     if learn and step % params['policy_step'] == 0:
@@ -106,5 +102,6 @@ def ddpg_update(batch, params, nets, optimizer, device, debugger=False, learn=Tr
         soft_update(nets['policy_net'], nets['target_policy_net'], soft_tau=params['soft_tau'])
 
     losses = {'value': value_loss.item(), 'policy': policy_loss.item(), 'step': step}
+    utils.write_losses(writer, losses, kind='train' if learn else 'test')
     return losses
 

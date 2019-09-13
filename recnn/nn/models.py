@@ -1,9 +1,6 @@
 import torch
-from torch.utils.data import Dataset, DataLoader
 import torch.nn as nn
 import torch.nn.functional as F
-import torch.optim as optim
-import numpy as np
 
 
 class AnomalyDetector(nn.Module):

@@ -5,6 +5,7 @@ import torch
 from scipy import stats
 import numpy as np
 
+
 def pairwise_distances_fig(embs):
     embs = embs.detach().cpu().numpy()
     similarity_matrix_cos = distance.cdist(embs, embs, 'cosine')
@@ -49,8 +50,8 @@ def smooth_gauss(arr, var):
 
 
 class Plotter:
-    def __init__(self, debugger, style):
-        self.debugger = debugger
+    def __init__(self, loss, style):
+        self.loss = loss
         self.style = style
         self.smoothing = lambda x: smooth_gauss(x, 4)
 
@@ -64,35 +65,40 @@ class Plotter:
             for col in range(len(row)):
                 key = row[col]
                 axes[col].set_title(key)
-                axes[col].plot(self.debugger.debug_dict['loss']['train']['step'],
-                               self.smoothing(self.debugger.debug_dict['loss']['train'][key]), 'b-',
+                axes[col].plot(self.loss['train']['step'],
+                               self.smoothing(self.loss['train'][key]), 'b-',
                                label='train')
-                axes[col].plot(self.debugger.debug_dict['loss']['test']['step'],
-                               self.debugger.debug_dict['loss']['test'][key], 'r-.',
+                axes[col].plot(self.loss['test']['step'],
+                               self.loss['test'][key], 'r-.',
                                label='test')
             plt.legend()
         plt.show()
 
+    def log_loss(self, key, item, test=False):
+        kind = 'train'
+        if test:
+            kind = 'test'
+        self.loss[kind][key].append(item)
+
+    def log_losses(self, losses, test=False):
+        for key, val in losses.items():
+            self.log_loss(key, val, test)
+
     @staticmethod
-    def kde_reconstruction_error(ad, gen_actions, gen_test_actions, true_actions, device=torch.device('cpu')):
+    def kde_reconstruction_error(ad, gen_actions, true_actions, device=torch.device('cpu')):
         true_scores = ad.rec_error(torch.tensor(true_actions).to(device).float()).detach().cpu().numpy()
         gen_scores = ad.rec_error(torch.tensor(gen_actions).to(device).float()).detach().cpu().numpy()
-        gen_test_scores = ad.rec_error(torch.tensor(gen_test_actions).to(device).float()).detach().cpu().numpy()
 
         true_kernel = stats.gaussian_kde(true_scores)
         gen_kernel = stats.gaussian_kde(gen_scores)
-        gen_test_kernel = stats.gaussian_kde(gen_test_scores)
 
         x = np.linspace(0, 1000, 100)
         probs_true = true_kernel(x)
         probs_gen = gen_kernel(x)
-        probs_gen_test = gen_test_kernel(x)
-
         fig = plt.figure(figsize=(16, 10))
         ax = fig.add_subplot(111)
         ax.plot(x, probs_true, '-b', label='true dist')
         ax.plot(x, probs_gen, '-r', label='generated dist')
-        ax.plot(x, probs_gen_test, '-g', label='generated test dist')
         ax.legend()
         return fig
 

@@ -1,4 +1,5 @@
-from . import learning, models, optim, misc
+from recnn.utils import misc
+from recnn.nn import update, models
 import torch
 from torch import nn
 import numpy as np
@@ -57,8 +58,8 @@ class DDPG:
                     batch = [state, action, reward, next_state]
                     buffer.append(batch)
 
-        loss = learning.ddpg_update(batch, self.params, self.optimizer, self.device, self.debugger,
-                                    step=self.step, learn=False)
+        loss = update.ddpg_update(batch, self.params, self.optimizer, self.device, self.debugger,
+                                  step=self.step, learn=False)
         buffer.flush()
         return loss
 
@@ -83,8 +84,8 @@ class DDPG:
                     buffer.append(batch)
 
                 if buffer.len() >= max_buf_size:
-                    loss = learning.ddpg_update(batch, self.params, self.optimizer, self.device, self.debugger,
-                                                step=self.step, learn=False)
+                    loss = update.ddpg_update(batch, self.params, self.optimizer, self.device, self.debugger,
+                                              step=self.step, learn=False)
                     self.debugger.log_losses(loss)
                     self.step += 1
                     self.debugger.log_step(self.step)
@@ -132,4 +133,4 @@ class DDPG:
     def update(self, batch):
         if self.optimizer is None:
             raise ReferenceError('Optimizers are not provided! You need to register them!')
-        learning.ddpg_update(batch, self.params, self.optimizer, self.device, self.debugger)
+        update.ddpg_update(batch, self.params, self.optimizer, self.device, self.debugger)
