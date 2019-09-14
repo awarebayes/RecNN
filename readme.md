@@ -10,18 +10,18 @@ This is my school project. It focuses on Reinforcement Learning for personalized
 
 - Abstract as you decide: you can import the entire algorithm (say DDPG) and tell it to ddpg.learn(batch), you can import networks and the learning function separately, create a custom loader for your task, or can define everything by yourself.
 
-- Examples do not contain any of the junk code or workarounds: pure model definition and the algorithm itself in one file. I wrote a couple of articles explaining how it functions
+- Examples do not contain any of the junk code or workarounds: pure model definition and the algorithm itself in one file. I wrote a couple of articles explaining how it functions.
 
 - The learning is built around sequential or frame environment that supports ML20M and like. Seq and Frame determine the length type of sequential data, seq is fully sequential dynamic size, while the frame is just a static frame.
 
 - State Representation module with various methods. For sequential state representation, you can use basic LSTM/RNN/GRU, 
 Temporal Convolutional Networks, Echo State Networks and Chaos Free RNNs that are way faster than GRU.
 
-- Pytorch 1.2 support with Tensorboard visualization
+- Pytorch 1.2 support with Tensorboard visualization.
 
 - New datasets will be added in the future.
 
-> As of now, the package is in its early stages and is not available for download on PyPi. Use git fetch instead.
+- SOTA optimizers (RAdam, LookAhead, Ranger) come pre-packaged.
 
 ## Medium Articles
 
@@ -64,6 +64,15 @@ The repo consists of two parts: the library (./recnn) and the playground (./exam
 
 This is my school project. It focuses on Reinforcement Learning for personalized news recommendation. The main distinction is that it tries to solve online off-policy learning with dynamically generated item embeddings. Also, there is no exploration, since we are working with a dataset. In the example section, I use Google's BERT on the ML20M dataset to extract contextual information from the movie description to form the latent vector representations. Later, you can use the same transformation on new, previously unseen items (hence, the embeddings are dynamically generated). If you don't want to bother with embeddings pipeline, I have a DQN embeddings generator as a proof of concept.
 
+## Installation
+
+PyPi will be available soon!
+
+```
+git clone https://github.com/awarebayes/RecNN
+cd RecNN
+pip install .
+```
 
 ## TD3 results
 
@@ -101,5 +110,17 @@ It doesn't seem to overfit much. Here you can see the Kernel Density Estimation 
 - [Articles 1,2: DDPG, TD3, BCQ](https://drive.google.com/open?id=1a15mvtXZwOOSj9aQJNCxNlPMYREYYDxg)
 
 
+## Citing
+If you find RecNN useful for an academic publication, then please use the following BibTeX to cite it:
 
+```
+@misc{RecNN,
+  author = {M Scherbina},
+  title = {RecNN: RL Recommendation with PyTorch},
+  year = {2018},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/awarebayes/RecNN}},
+}
+```
 
