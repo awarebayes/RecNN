@@ -6,26 +6,57 @@ import torch
 import numpy as np
 from tqdm.auto import tqdm
 
+"""
+.. module:: env
+   :synopsis: Main abstraction of the library for datasets is called environment, similar to how other reinforcement
+    learning libraries name it. This interface is created to provide SARSA like input for your RL Models. When you are 
+    working with recommendation env, you have two choices: using static length inputs (say 10 items) or dynamic length 
+    time series with sequential encoders (many to one rnn). Static length is provided via FrameEnv, and dynamic length
+    along with sequential state representation encoder is implemented in SeqEnv. Let’s take a look at FrameEnv first:
+
+
+.. moduleauthor:: Mike Watts <awarebayes@gmail.com>
+
+
+"""
+
 
 class UserDataset(Dataset):
 
     """
-    torch.DataSet
-    users:arg - list of user id's
-    user_dict:arg - dict {user_id: {
-                                    'items': [item_id (np.ndarray)],
-                                    'ratings': [ratings (np.ndarray)]
-                                    } }
+    Low Level API: dataset class user: [items, ratings], Instance of torch.DataSet
     """
 
     def __init__(self, users, user_dict):
+        """
+
+        :param users: integer list of user_id. Useful for train/test splitting
+        :type users: list<int>.
+        :param user_dict: dictionary of users with user_id as key and [items, ratings] as value
+        :type user_dict: (dict{ user_id<int>: dict{'items': list<int>, 'ratings': list<int>} }).
+
+        """
+
         self.users = users
         self.user_dict = user_dict
 
     def __len__(self):
+        """
+        useful for tqdm, consists of a single line:
+        return len(self.users)
+        """
         return len(self.users)
 
     def __getitem__(self, idx):
+        """
+        getitem is a function where non linear user_id maps to a linear index. For instance in the ml20m dataset,
+        there are big gaps between neighbouring user_id. getitem removes these gaps, optimizing the speed.
+
+        :param idx: index drawn from range(0, len(self.users)). User id can be not linear, idx is.
+        :type idx: int
+
+        :returns:  dict{'items': list<int>, rates:list<int>, sizes: int}
+        """
         idx = self.users[idx]
         group = self.user_dict[idx]
         items = group['items'][:]
@@ -35,7 +66,29 @@ class UserDataset(Dataset):
 
 
 class Env:
+
+    """
+    Env abstract class
+    """
+
     def __init__(self, embeddings, ratings, train_ratio=0.95, min_seq_size=10, data_cols={}):
+
+        """
+        .. note::
+            embeddings need to be provided in {movie_id: torch.tensor} format!
+
+        :param embeddings: path to where item embeddings are stored.
+        :type embeddings: str
+        :param ratings: path to the dataset that is similar to the ml20m
+        :type ratings: str
+        :param train_ratio: ratio of users to use in training. Rest will be used for testing/validation
+        :type train_ratio: int
+        :param min_seq_size: filter users: len(user.items) > min seq size
+        :type min_seq_size: int
+        :param data_cols: used for column mapping in datasets different from ml20m.
+        :type data_cols: dict
+        """
+
         self.movie_embeddings_key_dict = pickle.load(open(embeddings, 'rb'))
         movies_embeddings_tensor, key_to_id, id_to_key = utils.make_items_tensor(self.movie_embeddings_key_dict)
         self.embeddings = movies_embeddings_tensor
@@ -44,7 +97,7 @@ class Env:
         self.ratings = pd.read_csv(ratings)
         user_dict, users = utils.prepare_dataset(self.ratings, self.key_to_id, min_seq_size, **data_cols)
         self.user_dict = user_dict
-        self.users = users
+        self.users = users  # filtered keys of user_dict
         train_ratio = int(len(users) * train_ratio)
         self.train_ratio = train_ratio
 
@@ -57,8 +110,21 @@ class Env:
 
 
 class FrameEnv(Env):
-    def __init__(self, embeddings, ratings, frame_size, batch_size):
-        super(FrameEnv, self).__init__(embeddings, ratings, min_seq_size=frame_size+1)
+    """
+    Static length user environment.
+    """
+    def __init__(self, embeddings, ratings, frame_size, batch_size, *args, **kwargs):
+
+        """
+        :param embeddings: path to where item embeddings are stored.
+        :type embeddings: str
+        :param ratings: path to the dataset that is similar to the ml20m
+        :type ratings: str
+        :param frame_size: len of a static sequence, frame
+        :type frame_size: int
+        """
+
+        super(FrameEnv, self).__init__(embeddings, ratings, min_seq_size=frame_size+1, *args, **kwargs)
 
         def prepare_batch_wrapper(x):
             batch = utils.prepare_batch_static_size(x, self.embeddings, frame_size=frame_size)
@@ -71,15 +137,40 @@ class FrameEnv(Env):
                                           shuffle=True, num_workers=1, collate_fn=prepare_batch_wrapper)
 
     def train_batch(self):
+        """ Get batch for training """
         return next(iter(self.train_dataloader))
 
     def test_batch(self):
+        """ Get batch for testing """
         return next(iter(self.test_dataloader))
 
 
 class SeqEnv(Env):
 
+    """
+    Dynamic length user environment.
+    Due to some complications, this module is implemented quiet differently from FrameEnv.
+    First of all, it relies on the replay buffer. Train/Test batch is a generator.
+    In batch generator, I iterate through the batch, and choose target action with certain probability.
+    Hence, ~95% is state that is encoded with state encoder and ~5% are actions.
+    If you have a better solution, your contribution is welcome
+    """
+
     def __init__(self, embeddings, ratings, batch_size, state_encoder, device, max_buf_size=1000):
+
+        """
+        :param embeddings: path to where item embeddings are stored.
+        :type embeddings: str
+        :param ratings: path to the dataset that is similar to the ml20m
+        :type ratings: str
+        :param state_encoder: state encoder of your choice
+        :type state_encoder: nn.Module
+        :param device: device of your choice
+        :type device: torch.device
+        :param max_buf_size: maximum size of a replay buffer
+        :type max_buf_size: int
+        """
+
         super(SeqEnv, self).__init__(embeddings, ratings, min_seq_size=10)
 
         def prepare_batch_wrapper(batch):

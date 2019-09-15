@@ -1,11 +1,11 @@
-Welcome to recreational's documentation!
+Welcome to recnn's documentation!
 ========================================
 
 
 
 .. toctree::
    :maxdepth: 2
-   :caption: Modules:
+   :caption: Reference:
 
       nn <nn>
 

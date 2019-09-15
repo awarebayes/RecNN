@@ -4,6 +4,12 @@ import torch.nn.functional as F
 
 
 class AnomalyDetector(nn.Module):
+
+    """
+    Anomaly detector used for debugging. Basically an auto encoder.
+    P.S. You need to use different weights for different embeddings.
+    """
+
     def __init__(self):
         super(AnomalyDetector, self).__init__()
         self.ae = nn.Sequential(
@@ -21,6 +27,7 @@ class AnomalyDetector(nn.Module):
         )
 
     def forward(self, x):
+        """"""
         return self.ae(x)
 
     def rec_error(self, x):
@@ -31,6 +38,11 @@ class AnomalyDetector(nn.Module):
 
 
 class Actor(nn.Module):
+
+    """
+    Vanilla actor. Takes state as an argument, returns action.
+    """
+
     def __init__(self, input_dim, action_dim, hidden_size, init_w=2e-1):
         super(Actor, self).__init__()
         
@@ -43,19 +55,28 @@ class Actor(nn.Module):
         self.linear3.weight.data.uniform_(-init_w, init_w)
         self.linear3.bias.data.uniform_(-init_w, init_w)
         
-    def forward(self, state):
-        # state = self.state_rep(state)
-        x = F.relu(self.linear1(state))
-        x = self.drop_layer(x)
-        x = F.relu(self.linear2(x))
-        x = self.drop_layer(x)
-        # x = torch.tanh(self.linear3(x)) # in case embeds are -1 1 normalized
-        x = self.linear3(x) # in case embeds are standard scaled / wiped using PCA whitening
-        # return state, x
-        return x
+    def forward(self, state, tanh=False):
+        """
+        :param state: state
+        :param tanh: whether to use tahn as action activation
+        :return: action
+        """
+        action = F.relu(self.linear1(state))
+        action = self.drop_layer(action)
+        action = F.relu(self.linear2(action))
+        action = self.drop_layer(action)
+        action = self.linear3(action)
+        if tanh:
+            action = F.tanh(action)
+        return action
 
 
 class Critic(nn.Module):
+
+    """
+    Vanilla critic. Takes state and action as an argument, returns value.
+    """
+
     def __init__(self, input_dim, action_dim, hidden_size, init_w=3e-5):
         super(Critic, self).__init__()
         
@@ -69,16 +90,22 @@ class Critic(nn.Module):
         self.linear3.bias.data.uniform_(-init_w, init_w)
         
     def forward(self, state, action):
-        x = torch.cat([state, action], 1)
-        x = F.relu(self.linear1(x))
-        x = self.drop_layer(x)
-        x = F.relu(self.linear2(x))
-        x = self.drop_layer(x)
-        x = self.linear3(x)
-        return x
+        """"""
+        value = torch.cat([state, action], 1)
+        value = F.relu(self.linear1(value))
+        value = self.drop_layer(value)
+        value = F.relu(self.linear2(value))
+        value = self.drop_layer(value)
+        value = self.linear3(value)
+        return value
 
 
 class bcqPerturbator(nn.Module):
+
+    """
+    Batch constrained perturbative actor. Takes action as an argument, adjusts it.
+    """
+
     def __init__(self, num_inputs, num_actions, hidden_size, init_w=3e-1):
         super(bcqPerturbator, self).__init__()
         
@@ -92,6 +119,7 @@ class bcqPerturbator(nn.Module):
         self.linear3.bias.data.uniform_(-init_w, init_w)
         
     def forward(self, state, action):
+        """"""
         a = torch.cat([state, action], 1)
         a = F.relu(self.linear1(a))
         a = self.drop_layer(a)
@@ -102,6 +130,11 @@ class bcqPerturbator(nn.Module):
 
 
 class bcqGenerator(nn.Module):
+
+    """
+    Batch constrained generator. Basically VAE
+    """
+
     def __init__(self, state_dim, action_dim, latent_dim):
         super(bcqGenerator, self).__init__()
         # encoder
@@ -120,6 +153,7 @@ class bcqGenerator(nn.Module):
         self.normal = torch.distributions.Normal(0, 1)
 
     def forward(self, state, action):
+        """"""
         # z is encoded state + action
         z = F.relu(self.e1(torch.cat([state, action], 1)))
         z = F.relu(self.e2(z))

@@ -13,42 +13,49 @@ def soft_update(net, target_net, soft_tau=1e-2):
             )
 
 
-"""
-batch - batch returned by DataLoader(data.UserDataset)
-params - {
-    'gamma'      : 0.99,
-    'min_value'  : -10,
-    'max_value'  : 10,
-    'policy_step': 3,
-    'soft_tau'   : 0.001,
-    
-    'policy_lr'  : 1e-5,
-    'value_lr'   : 1e-5,
-    'actor_weight_init': 3e-1,
-    'critic_weight_init': 6e-1,
-}
-
-nets - {
-    'value_net': models.Critic,
-    'target_value_net': models.Critic,
-    'policy_net': models.Actor,
-    'target_policy_net': models.Actor,
-}
-
-optimizer - {
-    'policy_optimizer': some optimizer 
-    'value_optimizer':  some optimizer
-}
-
-writer - torch.SummaryWriter
-device - torch.device (cpu/cuda)
-debug - dictionary where debug data about actions is saved
-learn - whether to learn on this step (used for testing)
-step - integer step for policy update
-"""
-
-
 def ddpg_update(batch, params, nets, optimizer, device, debug, writer=False, learn=True, step=-1):
+
+    """
+    :param batch: batch [state, action, reward, next_state] returned by environment.
+    :param params: dict of algorithm parameters.
+    :param nets: dict of networks.
+    :param optimizer: dict of optimizers
+    :param device: torch.device
+    :param debug: dictionary where debug data about actions is saved
+    :param writer: torch.SummaryWriter
+    :param learn: whether to learn on this step (used for testing)
+    :param step: integer step for policy update
+    :return: loss dictionary
+
+    How parameters should look like::
+
+        params = {
+            'gamma'      : 0.99,
+            'min_value'  : -10,
+            'max_value'  : 10,
+            'policy_step': 3,
+            'soft_tau'   : 0.001,
+
+            'policy_lr'  : 1e-5,
+            'value_lr'   : 1e-5,
+            'actor_weight_init': 3e-1,
+            'critic_weight_init': 6e-1,
+        }
+
+        nets = {
+            'value_net': models.Critic,
+            'target_value_net': models.Critic,
+            'policy_net': models.Actor,
+            'target_policy_net': models.Actor,
+        }
+
+        optimizer - {
+            'policy_optimizer': some optimizer
+            'value_optimizer':  some optimizer
+        }
+
+    """
+
     batch = [i.to(device) for i in batch]
     state, action, reward, next_state = batch
 
@@ -106,46 +113,54 @@ def ddpg_update(batch, params, nets, optimizer, device, debug, writer=False, lea
     return losses
 
 
-"""
-batch - batch returned by DataLoader(data.UserDataset)
-params = {
-    'gamma': 0.99,
-    'noise_std': 0.5,
-    'noise_clip': 3,
-    'soft_tau': 0.001,
-    'policy_update': 10,
-    
-    'policy_lr': 1e-5,
-    'value_lr': 1e-5,
-    
-    'actor_weight_init': 25e-2,
-    'critic_weight_init': 6e-1,
-
-
-nets - {
-    'value_net1': models.Critic,
-    'target_value_net1': models.Critic,
-    'value_net2': models.Critic,
-    'target_value_net2': models.Critic,
-    'policy_net': models.Actor,
-    'target_policy_net': models.Actor,
-}
-
-optimizer - {
-    'policy_optimizer': some optimizer 
-    'value_optimizer1':  some optimizer
-    'value_optimizer2':  some optimizer
-}
-
-writer - torch.SummaryWriter
-device - torch.device (cpu/cuda)
-debug - dictionary where debug data about actions is saved
-learn - whether to learn on this step (used for testing)
-step - integer step for policy update
-"""
-
-
 def td3_update(batch, params, nets, optimizer, writer, device, debug, learn=True, step=-1):
+    """
+    :param batch: batch [state, action, reward, next_state] returned by environment.
+    :param params: dict of algorithm parameters.
+    :param nets: dict of networks.
+    :param optimizer: dict of optimizers
+    :param device: torch.device
+    :param debug: dictionary where debug data about actions is saved
+    :param writer: torch.SummaryWriter
+    :param learn: whether to learn on this step (used for testing)
+    :param step: integer step for policy update
+    :return: loss dictionary
+
+    How parameters should look like::
+
+        params = {
+            'gamma': 0.99,
+            'noise_std': 0.5,
+            'noise_clip': 3,
+            'soft_tau': 0.001,
+            'policy_update': 10,
+
+            'policy_lr': 1e-5,
+            'value_lr': 1e-5,
+
+            'actor_weight_init': 25e-2,
+            'critic_weight_init': 6e-1,
+        }
+
+
+        nets = {
+            'value_net1': models.Critic,
+            'target_value_net1': models.Critic,
+            'value_net2': models.Critic,
+            'target_value_net2': models.Critic,
+            'policy_net': models.Actor,
+            'target_policy_net': models.Actor,
+        }
+
+        optimizer = {
+            'policy_optimizer': some optimizer
+            'value_optimizer1':  some optimizer
+            'value_optimizer2':  some optimizer
+        }
+
+
+    """
+
     batch = [i.to(device) for i in batch]
     state, action, reward, next_state, done = batch
 
