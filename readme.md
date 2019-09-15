@@ -1,10 +1,18 @@
 <p align="center"> 
 <img src="./res/logo big.png">
 </p>
+<p align="center"> 
 
+<a href='https://recnn.readthedocs.io/en/latest/?badge=latest'>
+    <img src='https://readthedocs.org/projects/recnn/badge/?version=latest' alt='Documentation Status' />
+</a>
+
+</p>
 <p align="center"> 
 This is my school project. It focuses on Reinforcement Learning for personalized news recommendation. The main distinction is that it tries to solve online off-policy learning with dynamically generated item embeddings. I want to create a library with SOTA algorithms for reinforcement learning recommendation, providing the level of abstraction you like.
 </p>
+
+
 
 ### All in all the features can be summed up to:
 
@@ -22,6 +30,9 @@ Temporal Convolutional Networks, Echo State Networks and Chaos Free RNNs that ar
 - New datasets will be added in the future.
 
 - SOTA optimizers (RAdam, LookAhead, Ranger) come pre-packaged.
+
+To find more about recnn, read the docs: 
+ <a href="https://readthedocs.org/projects/recnn/">recnn.readthedocs.io</a> 
 
 ## Medium Articles
 
@@ -52,7 +63,7 @@ The repo consists of two parts: the library (./recnn) and the playground (./exam
 </p>
 
 ***
- ### [My Trello with useful papers](https://trello.com/b/wnor4IZf/recnn)
+### [My Trello with useful papers](https://trello.com/b/wnor4IZf/recnn)
 *** 
 ### Repos I used code from:
 
