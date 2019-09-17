@@ -18,3 +18,19 @@ def write_losses(writer, loss_dict, kind='train'):
 
     writer.close()
 
+
+class DummyWriter:
+    def add_figure(self, *args, **kwargs):
+        pass
+
+    def add_histogram(self, *args, **kwargs):
+        pass
+
+    def add_scalar(self, *args, **kwargs):
+        pass
+
+    def add_scalars(self, *args, **kwargs):
+        pass
+
+    def close(self, *args, **kwargs):
+        pass

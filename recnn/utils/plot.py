@@ -26,6 +26,7 @@ def pairwise_distances_fig(embs):
     ax.axis('off')
 
     fig.suptitle('Action pairwise distances')
+    plt.close()
     return fig
 
 

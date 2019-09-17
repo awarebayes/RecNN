@@ -113,7 +113,7 @@ class FrameEnv(Env):
     """
     Static length user environment.
     """
-    def __init__(self, embeddings, ratings, frame_size, batch_size, *args, **kwargs):
+    def __init__(self, embeddings, ratings, frame_size=10, batch_size=25, *args, **kwargs):
 
         """
         :param embeddings: path to where item embeddings are stored.
@@ -122,6 +122,11 @@ class FrameEnv(Env):
         :type ratings: str
         :param frame_size: len of a static sequence, frame
         :type frame_size: int
+
+        p.s. you can also provide **pandas_conf in the arguments.
+        It is useful if you dataset columns are different from ml20::
+            pandas_conf = {user_id='userId', rating='rating', item='movieId', timestamp='timestamp'}
+            env = FrameEnv(embed_dir, rating_dir, **pandas_conf)
         """
 
         super(FrameEnv, self).__init__(embeddings, ratings, min_seq_size=frame_size+1, *args, **kwargs)
@@ -156,7 +161,8 @@ class SeqEnv(Env):
     If you have a better solution, your contribution is welcome
     """
 
-    def __init__(self, embeddings, ratings, batch_size, state_encoder, device, max_buf_size=1000):
+    def __init__(self, embeddings, ratings,  state_encoder, batch_size=25, device=torch.device('cuda'),
+                                                                    layout=None, max_buf_size=1000):
 
         """
         :param embeddings: path to where item embeddings are stored.
@@ -169,9 +175,18 @@ class SeqEnv(Env):
         :type device: torch.device
         :param max_buf_size: maximum size of a replay buffer
         :type max_buf_size: int
+        :param layout: how sizes in batch should look like
+        :type layout: list<torch.Size>
         """
 
         super(SeqEnv, self).__init__(embeddings, ratings, min_seq_size=10)
+
+        if layout is None:
+            # default ml20m layout for my (action=128) embeddings, (state=256)
+            layout = [torch.Size([max_buf_size, 256]),
+                      torch.Size([max_buf_size, 128]),
+                      torch.Size([max_buf_size, 1]),
+                      torch.Size([max_buf_size, 256])]
 
         def prepare_batch_wrapper(batch):
             batch = utils.padder(batch)
@@ -186,13 +201,10 @@ class SeqEnv(Env):
         self.test_dataloader = DataLoader(self.test_user_dataset, batch_size=batch_size,
                                           shuffle=False, num_workers=1, collate_fn=prepare_batch_wrapper)
 
-        self.buffer_layout = [torch.zeros(self.max_buf_size, 256),
-                              torch.zeros(self.max_buf_size, 128),
-                              torch.zeros(self.max_buf_size, 1),
-                              torch.zeros(self.max_buf_size, 256)]
+        self.buffer_layout = layout
 
-        self.train_buffer = utils.ReplayBuffer(self.max_buf_size)
-        self.test_buffer  = utils.ReplayBuffer(self.max_buf_size)
+        self.train_buffer = utils.ReplayBuffer(self.max_buf_size, layout=self.buffer_layout)
+        self.test_buffer = utils.ReplayBuffer(self.max_buf_size, layout=self.buffer_layout)
 
     def train_batch(self):
         while 1:

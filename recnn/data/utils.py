@@ -169,7 +169,7 @@ def prepare_dataset(df, key_to_id, frame_size, user_id='userId', rating='rating'
     return user_dict, users
 
 
-class ReplayBufferOld:
+class ReplayBuffer:
     def __init__(self, buffer_size, layout):
         self.buffer = None
         self.idx = 0
@@ -179,7 +179,8 @@ class ReplayBufferOld:
 
     def flush(self):
         # state, action, reward, next_state
-        self.buffer = self.layout
+        del self.buffer
+        self.buffer = [torch.zeros(i) for i in self.layout]
         self.idx = 0
 
     def append(self, batch):
@@ -198,35 +199,3 @@ class ReplayBufferOld:
     def len(self):
         return self.idx
 
-
-# todo some weird stuff is happening here
-class ReplayBuffer:
-    def __init__(self, buffer_size):
-        self.buffer = None
-        self.idx = 0
-        self.size = buffer_size
-        self.flush()
-
-    def flush(self):
-        # state, action, reward, next_state
-        self.buffer = [torch.zeros(self.size, 256),
-                       torch.zeros(self.size, 128),
-                       torch.zeros(self.size, 1),
-                       torch.zeros(self.size, 256)]
-        self.idx = 0
-
-    def append(self, batch):
-        state, action, reward, next_state = batch
-        lower = self.idx
-        upper = state.size(0) + lower
-        self.buffer[0][lower:upper] = state
-        self.buffer[1][lower:upper] = action
-        self.buffer[2][lower:upper] = reward
-        self.buffer[3][lower:upper] = next_state
-        self.idx = upper
-
-    def get(self):
-        return self.buffer
-
-    def len(self):
-        return self.idx
