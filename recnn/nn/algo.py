@@ -1,4 +1,3 @@
-from .models import Critic, Actor
 from .. import utils, optim
 from . import update
 
