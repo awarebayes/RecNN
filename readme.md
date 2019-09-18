@@ -75,42 +75,46 @@ The repo consists of two parts: the library (./recnn) and the playground (./exam
 
 This is my school project. It focuses on Reinforcement Learning for personalized news recommendation. The main distinction is that it tries to solve online off-policy learning with dynamically generated item embeddings. Also, there is no exploration, since we are working with a dataset. In the example section, I use Google's BERT on the ML20M dataset to extract contextual information from the movie description to form the latent vector representations. Later, you can use the same transformation on new, previously unseen items (hence, the embeddings are dynamically generated). If you don't want to bother with embeddings pipeline, I have a DQN embeddings generator as a proof of concept.
 
-## Installation
+## Getting Started
 
-PyPi will be available soon!
+<p align="center"> 
+<a href="https://colab.research.google.com/drive/1qGjgLYuTpJTiW_P1pbs0zEgRa9BhZckw"><img src="./res/get_started.png"></a>
+</p>
+
+p.s. Image is clickable. here is [direct link](https://colab.research.google.com/drive/1qGjgLYuTpJTiW_P1pbs0zEgRa9BhZckw).
+
+### Code snippet for simplest setup:
 
 ```
+import torch
+import recnn
+
+env = recnn.data.env.FrameEnv('ml20_pca128.pkl','ml-20m/ratings.csv')
+
+value_net  = recnn.nn.Critic(1290, 128, 256, 54e-2)
+policy_net = recnn.nn.Actor(1290, 128, 256, 6e-1)
+
+cuda = torch.device('cuda')
+ddpg = recnn.nn.DDPG(policy_net, value_net)
+ddpg = ddpg.to(cuda)
+
+for batch in env.train_dataloader:
+    ddpg.update(batch, learn=True)
+```
+
+### Installing
+
+```
+pip install git+git://github.com/awarebayes/RecNN.git
+
+
+
 git clone https://github.com/awarebayes/RecNN
-cd RecNN
-pip install .
+pip install ./RecNN
+
 ```
 
-## TD3 results
-
-Here you can see the training process of the network:
-
-<p align="center"> 
-<img src="./res/Losses.png">
-</p>
-
-Here is a pairwise similarity matrix of real (first image) and generated (second image) actions (movies)
-
-
-<p align="center"> 
-    <img src="./res/real_dist.png">
-</p>
-
-<p align="center"> 
-    <img src="./res/gen_dist.png">
-</p>
-
-It doesn't seem to overfit much. Here you can see the Kernel Density Estimation for Autoencoder Reconstruction scores. I use it as an anomaly detection metric. (Wasserstein Distance = ~50)
-
-<p align="center"> 
-<img src="./res/Anomaly_Detection.png">
-</p>
-
- # Downloads
+## Downloads
 - [MovieLens 20M](https://grouplens.org/datasets/movielens/20m/)
 - [Movie Embeddings](https://drive.google.com/open?id=1EQ_zXBR3DKpmJR3jBgLvt-xoOvArGMsL)
 - [Misc Data](https://drive.google.com/open?id=1TclEmCnZN_Xkl3TfUXL5ivPYmLnIjQSu)
