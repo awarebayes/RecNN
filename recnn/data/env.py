@@ -62,7 +62,7 @@ class UserDataset(Dataset):
         items = group['items'][:]
         rates = group['ratings'][:]
         size = items.shape[0]
-        return {'items': items, 'rates': rates, 'sizes': size}
+        return {'items': items, 'rates': rates, 'sizes': size, 'users': idx}
 
 
 class Env:
@@ -189,6 +189,7 @@ class SeqEnv(Env):
                       torch.Size([max_buf_size, 256])]
 
         def prepare_batch_wrapper(batch):
+
             batch = utils.padder(batch)
             batch = utils.prepare_batch_dynamic_size(batch, self.embeddings)
             return batch
@@ -209,10 +210,11 @@ class SeqEnv(Env):
     def train_batch(self):
         while 1:
             for batch in tqdm(self.train_dataloader):
-                batch = [i.to(self.device) for i in batch]
-                items, ratings, sizes = batch
+                items, ratings, sizes, users = batch['items'], batch['ratings'], batch['sizes'], batch['users']
+                items, ratings, sizes = [i.to(self.device) for i in [items, ratings, sizes]]
                 hidden = None
                 state = None
+                self.train_buffer.meta.update({'sizes': sizes, 'users': users})
                 for t in range(int(sizes.min().item()) - 1):
                     action = items[:, t]
                     reward = ratings[:, t].unsqueeze(-1)
@@ -221,7 +223,8 @@ class SeqEnv(Env):
                     next_state = next_state.squeeze()
 
                     if np.random.random() > 0.95 and state is not None:
-                        batch = [state, action, reward, next_state]
+                        batch = {'state': state, 'action': action, 'reward': reward,
+                                 'next_state': next_state, 'step': t}
                         self.train_buffer.append(batch)
 
                     if self.train_buffer.len() >= self.max_buf_size:

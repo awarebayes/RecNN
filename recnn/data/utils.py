@@ -12,41 +12,45 @@ def rolling_window(a, window):
 
 
 def batch_no_embeddings(batch, frame_size):
-    item_t, ratings_t, sizes_t = batch['item_t'], batch['ratings_t'], batch['sizes_t']
+    items_t, ratings_t, sizes_t, users_t = batch['items'], batch['ratings'], \
+                                         batch['sizes'], batch['users']
     b_size = ratings_t.size(0)
-    items = item_t[:, :-1]
-    next_items = item_t[:, 1:]
+    items = items_t[:, :-1]
+    next_items = items_t[:, 1:]
     ratings = ratings_t[:, :-1]
     next_ratings = ratings_t[:, 1:]
-    action = item_t[:, -1]
+    action = items_t[:, -1]
     reward = ratings_t[:, -1]
     done = torch.zeros(b_size)
     done[torch.cumsum(sizes_t - frame_size, dim=0) - 1] = 1
     batch = {'items': items, 'next_items': next_items,
              ratings: 'ratings', 'next_ratings': next_ratings,
-             'action': action, 'reward': reward, 'done': done}
+             'action': action, 'reward': reward, 'done': done,
+             'meta': {'users': users_t, 'sizes': sizes_t}}
     return batch
 
 
 def batch_tensor_embeddings(batch, item_embeddings_tensor, frame_size):
-    item_t, ratings_t, sizes_t = batch
-    items_tensor = item_embeddings_tensor[item_t.long()]
+    items_t, ratings_t, sizes_t, users_t = batch['items'], batch['ratings'],\
+                                         batch['sizes'], batch['users']
+    items_emb = item_embeddings_tensor[items_t.long()]
     b_size = ratings_t.size(0)
 
-    items = items_tensor[:, :-1, :].view(b_size, -1)
-    next_items = items_tensor[:, 1:, :].view(b_size, -1)
+    items = items_emb[:, :-1, :].view(b_size, -1)
+    next_items = items_emb[:, 1:, :].view(b_size, -1)
     ratings = ratings_t[:, :-1]
     next_ratings = ratings_t[:, 1:]
 
     state = torch.cat([items, ratings], 1)
     next_state = torch.cat([next_items, next_ratings], 1)
-    action = items_tensor[:, -1, :]
+    action = items_emb[:, -1, :]
     reward = ratings_t[:, -1]
 
     done = torch.zeros(b_size)
     done[torch.cumsum(sizes_t - frame_size, dim=0) - 1] = 1
 
-    batch = {'state': state, 'action': action, 'reward': reward, 'next_state': next_state, 'done': done}
+    batch = {'state': state, 'action': action, 'reward': reward, 'next_state': next_state, 'done': done,
+             'meta': {'users': users_t, 'sizes': sizes_t}}
     return batch
 
 
@@ -55,14 +59,16 @@ def padder(x):
     items_t = []
     ratings_t = []
     sizes_t = []
+    users_t = []
     for i in range(len(x)):
         items_t.append(torch.tensor(x[i]['items']))
         ratings_t.append(torch.tensor(x[i]['rates']))
         sizes_t.append(x[i]['sizes'])
+        users_t.append(x[i]['users'])
     items_t = torch.nn.utils.rnn.pad_sequence(items_t, batch_first=True).long()
     ratings_t = torch.nn.utils.rnn.pad_sequence(ratings_t, batch_first=True).float()
     sizes_t = torch.tensor(sizes_t).float()
-    return {'items': items_t, 'ratings': ratings_t, 'sizes': sizes_t}
+    return {'items': items_t, 'ratings': ratings_t, 'sizes': sizes_t, 'users': users_t}
 
 
 def sort_users_itemwise(user_dict, users):
@@ -70,9 +76,10 @@ def sort_users_itemwise(user_dict, users):
 
 
 def prepare_batch_dynamic_size(batch, item_embeddings_tensor):
-    item_idx, ratings_t, sizes_t = batch['items'], batch['ratings'], batch['sizes']
+    item_idx, ratings_t, sizes_t, users_t = batch['items'], batch['ratings'], batch['sizes'], batch['users']
     item_t = item_embeddings_tensor[item_idx]
-    return item_t, ratings_t, sizes_t
+    batch = {'items': item_t, 'users': users_t, 'ratings': ratings_t, 'sizes': sizes_t}
+    return batch
 
 
 # Main function that is used as torch.DataLoader->collate_fn
@@ -81,26 +88,28 @@ def prepare_batch_dynamic_size(batch, item_embeddings_tensor):
 
 
 def prepare_batch_static_size(batch, item_embeddings_tensor=False, frame_size=10):
-    item_t, ratings_t, sizes_t = [], [], []
+    item_t, ratings_t, sizes_t, users_t = [], [], [], []
     for i in range(len(batch)):
         item_t.append(batch[i]['items'])
         ratings_t.append(batch[i]['rates'])
-
         sizes_t.append(batch[i]['sizes'])
+        users_t.append(batch[i]['users'])
 
     item_t = np.concatenate([rolling_window(i, frame_size + 1) for i in item_t], 0)
     ratings_t = np.concatenate([rolling_window(i, frame_size + 1) for i in ratings_t], 0)
 
     item_t = torch.tensor(item_t)
+    users_t = torch.tensor(users_t)
     ratings_t = torch.tensor(ratings_t).float()
     sizes_t = torch.tensor(sizes_t)
 
+    batch = {'items': item_t, 'users': users_t, 'ratings': ratings_t, 'sizes': sizes_t}
     batch_size = ratings_t.size(0)
 
     if type(item_embeddings_tensor) == bool:
-        return batch_no_embeddings([item_t, ratings_t, sizes_t], frame_size)
+        return batch_no_embeddings(batch, frame_size)
     elif type(item_embeddings_tensor) == torch.Tensor:
-        return batch_tensor_embeddings([item_t, ratings_t, sizes_t], item_embeddings_tensor, frame_size)
+        return batch_tensor_embeddings(batch, item_embeddings_tensor, frame_size)
 
 
 # Usually in data sets there item index is inconsistent (if you plot it doesn't look like a line)
@@ -179,6 +188,7 @@ class ReplayBuffer:
         self.idx = 0
         self.size = buffer_size
         self.layout = layout
+        self.meta = {'step': []}
         self.flush()
 
     def flush(self):
@@ -186,9 +196,12 @@ class ReplayBuffer:
         del self.buffer
         self.buffer = [torch.zeros(i) for i in self.layout]
         self.idx = 0
+        self.meta['step'] = []
 
     def append(self, batch):
-        state, action, reward, next_state = batch
+        state, action, reward, next_state, step = batch['state'], batch['action'], \
+                                                  batch['reward'], batch['next_state'], batch['step']
+        self.meta['step'].append(step)
         lower = self.idx
         upper = state.size(0) + lower
         self.buffer[0][lower:upper] = state
@@ -199,7 +212,8 @@ class ReplayBuffer:
 
     def get(self):
         state, action, reward, next_state = self.buffer
-        batch = {'state': state, 'action': action, 'reward': reward, 'next_state': next_state}
+        batch = {'state': state, 'action': action, 'reward': reward, 'next_state': next_state,
+                 'meta': self.meta}
         return batch
 
     def len(self):
