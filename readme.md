@@ -107,11 +107,10 @@ for batch in env.train_dataloader:
 ```
 pip install git+git://github.com/awarebayes/RecNN.git
 
-
+or
 
 git clone https://github.com/awarebayes/RecNN
 pip install ./RecNN
-
 ```
 
 ## Downloads

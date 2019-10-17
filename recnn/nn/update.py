@@ -1,5 +1,6 @@
 import torch
 from recnn import utils
+from recnn import data
 
 """
 helper function for weight update
@@ -56,8 +57,7 @@ def ddpg_update(batch, params, nets, optimizer, device, debug, writer=False, lea
 
     """
 
-    batch = [i.to(device) for i in batch]
-    state, action, reward, next_state = batch
+    state, action, reward, next_state = data.get_base_batch(batch, done=False)
 
     # --------------------------------------------------------#
     # Value Learning

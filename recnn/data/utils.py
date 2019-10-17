@@ -12,7 +12,7 @@ def rolling_window(a, window):
 
 
 def batch_no_embeddings(batch, frame_size):
-    item_t, ratings_t, sizes_t = batch
+    item_t, ratings_t, sizes_t = batch['item_t'], batch['ratings_t'], batch['sizes_t']
     b_size = ratings_t.size(0)
     items = item_t[:, :-1]
     next_items = item_t[:, 1:]
@@ -22,7 +22,10 @@ def batch_no_embeddings(batch, frame_size):
     reward = ratings_t[:, -1]
     done = torch.zeros(b_size)
     done[torch.cumsum(sizes_t - frame_size, dim=0) - 1] = 1
-    return items, next_items, ratings, next_ratings, action, reward, done
+    batch = {'items': items, 'next_items': next_items,
+             ratings: 'ratings', 'next_ratings': next_ratings,
+             'action': action, 'reward': reward, 'done': done}
+    return batch
 
 
 def batch_tensor_embeddings(batch, item_embeddings_tensor, frame_size):
@@ -43,7 +46,8 @@ def batch_tensor_embeddings(batch, item_embeddings_tensor, frame_size):
     done = torch.zeros(b_size)
     done[torch.cumsum(sizes_t - frame_size, dim=0) - 1] = 1
 
-    return state, action, reward, next_state, done
+    batch = {'state': state, 'action': action, 'reward': reward, 'next_state': next_state, 'done': done}
+    return batch
 
 
 # pads stuff to work with lstms
@@ -194,8 +198,18 @@ class ReplayBuffer:
         self.idx = upper
 
     def get(self):
-        return self.buffer
+        state, action, reward, next_state = self.buffer
+        batch = {'state': state, 'action': action, 'reward': reward, 'next_state': next_state}
+        return batch
 
     def len(self):
         return self.idx
+
+
+def get_base_batch(batch, device=torch.device('cuda'), done=True):
+    b = [batch['state'], batch['action'], batch['reward'].unsqueeze(1), batch['next_state'], ]
+    if done:
+        b.append(batch['done'].unsqueeze(1))
+    return [i.to(device) for i in b]
+
 
