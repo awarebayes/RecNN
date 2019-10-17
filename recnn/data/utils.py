@@ -224,6 +224,8 @@ def get_base_batch(batch, device=torch.device('cuda'), done=True):
     b = [batch['state'], batch['action'], batch['reward'].unsqueeze(1), batch['next_state'], ]
     if done:
         b.append(batch['done'].unsqueeze(1))
+    else:
+        batch.append(torch.zeros_like(batch['reward']))
     return [i.to(device) for i in b]
 
 
