@@ -15,7 +15,7 @@ import sys
 sys.path.append("../../")
 import recnn
 
-autodoc_mock_imports = ['torch']
+autodoc_mock_imports = ['torch', 'tqdm']
 
 # sys.path.insert(0, os.path.abspath('.'))
 
