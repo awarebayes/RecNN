@@ -90,7 +90,7 @@ This is my school project. It focuses on Reinforcement Learning for personalized
 ## Getting Started
 
 <p align="center"> 
-<a href="https://colab.research.google.com/drive/1qGjgLYuTpJTiW_P1pbs0zEgRa9BhZckw"><img src="./res/get_started.png"></a>
+<a href="https://colab.research.google.com/drive/1xWX4JQvlcx3mizwL4gB0THEyxw6LsXTL"><img src="./res/get_started.png"></a>
 </p>
 
 p.s. Image is clickable. here is [direct link](https://colab.research.google.com/drive/1qGjgLYuTpJTiW_P1pbs0zEgRa9BhZckw).
