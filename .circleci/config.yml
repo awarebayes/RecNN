@@ -37,7 +37,7 @@ jobs:
           name: run tests
           command: |
             . venv/bin/activate
-            pytest -v -s /.circleci/tests/__main__.py
+            pytest -v -s ./.circleci/tests/main.py
 
       - store_artifacts:
           path: test-reports
