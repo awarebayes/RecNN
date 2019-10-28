@@ -10,7 +10,7 @@ next_state = torch.randn(10, 1290)
 done = torch.randn(10, 1)
 batch = {'state': state, 'action': action, 'reward': reward, 'next_state': next_state, 'done': done}
 
-value_net  = recnn.nn.Critic(1290, 128, 256, 54e-2)
+value_net = recnn.nn.Critic(1290, 128, 256, 54e-2)
 policy_net = recnn.nn.Actor(1290, 128, 256, 6e-1)
 
 
