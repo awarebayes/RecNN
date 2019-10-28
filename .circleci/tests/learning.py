@@ -80,8 +80,7 @@ def test_algo():
     value_net  = recnn.nn.Critic(1290, 128, 256, 54e-2)
     policy_net = recnn.nn.Actor(1290, 128, 256, 6e-1)
 
-    cuda = torch.device('cuda')
     ddpg = recnn.nn.DDPG(policy_net, value_net)
-    ddpg = ddpg.to(cuda)
+    ddpg = ddpg
     loss = ddpg.update(batch, learn=True)
     check_loss_and_networks(loss, ddpg.nets)
