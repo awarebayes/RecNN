@@ -6,7 +6,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: pytorch/pytorch
+      - image: pytorch/pytorch:latest
 
 
     working_directory: ~/repo
@@ -36,6 +36,8 @@ jobs:
       - run:
           name: run tests
           command: |
+            . venv/bin/activate
+            pip3 install torch==1.3.0+cpu
             pytest -v -s ./.circleci/tests/main.py
 
       - store_artifacts:
