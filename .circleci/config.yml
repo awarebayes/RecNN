@@ -37,7 +37,7 @@ jobs:
           name: run tests
           command: |
             . venv/bin/activate
-            pip3 install torch==1.3.0+cpu
+            pip3 install torch==1.3.0
             pytest -v -s ./.circleci/tests/main.py
 
       - store_artifacts:
