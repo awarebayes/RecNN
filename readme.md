@@ -15,7 +15,9 @@
     <img src="https://api.codeclimate.com/v1/badges/d3a06ffe45906969239d/maintainability" />
 </a>
 
-
+<a href="https://github.com/awarebayes/RecNN">
+    <img src="https://img.shields.io/github/stars/awarebayes/RecNN?style=social" />
+</a>
 
 </p>
 <p align="center"> 
