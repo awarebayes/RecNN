@@ -3,3 +3,4 @@ pandas
 numpy
 tqdm
 pytest
+matplotlib
