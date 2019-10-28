@@ -11,6 +11,12 @@
     <img src='https://circleci.com/gh/awarebayes/RecNN.svg?style=svg' alt='Documentation Status' />
 </a>
 
+<a href="https://codeclimate.com/github/awarebayes/RecNN/maintainability">
+    <img src="https://api.codeclimate.com/v1/badges/d3a06ffe45906969239d/maintainability" />
+</a>
+
+
+
 </p>
 <p align="center"> 
 This is my school project. It focuses on Reinforcement Learning for personalized news recommendation. The main distinction is that it tries to solve online off-policy learning with dynamically generated item embeddings. I want to create a library with SOTA algorithms for reinforcement learning recommendation, providing the level of abstraction you like.
