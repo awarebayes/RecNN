@@ -1,6 +1,7 @@
-def inc(x):
-    return x + 1
+from learning import *
 
-def test_answer():
-    assert inc(3) == 4
-
+if __name__ == "__main__":
+    test_recommendation()
+    test_update_function()
+    test_algo()
+    print("All passed")

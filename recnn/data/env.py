@@ -5,6 +5,7 @@ from torch.utils.data import Dataset, DataLoader
 import torch
 import numpy as np
 from tqdm.auto import tqdm
+from sklearn.model_selection import train_test_split
 
 """
 .. module:: env
@@ -71,7 +72,7 @@ class Env:
     Env abstract class
     """
 
-    def __init__(self, embeddings, ratings, train_ratio=0.95, min_seq_size=10, data_cols={}):
+    def __init__(self, embeddings, ratings, test_size=0.05, min_seq_size=10, prepare_dataset=utils.prepare_dataset):
 
         """
         .. note::
@@ -81,28 +82,26 @@ class Env:
         :type embeddings: str
         :param ratings: path to the dataset that is similar to the ml20m
         :type ratings: str
-        :param train_ratio: ratio of users to use in training. Rest will be used for testing/validation
-        :type train_ratio: int
+        :param test_size: ratio of users to use in testing. Rest will be used for training/validation
+        :type test_size: int
         :param min_seq_size: filter users: len(user.items) > min seq size
         :type min_seq_size: int
-        :param data_cols: used for column mapping in datasets different from ml20m.
-        :type data_cols: dict
+        :param prepare_dataset: function you provide. should yield user_dict, users
+        :type prepare_dataset: function
         """
 
+        self.prepare_dataset = prepare_dataset
         self.movie_embeddings_key_dict = pickle.load(open(embeddings, 'rb'))
         movies_embeddings_tensor, key_to_id, id_to_key = utils.make_items_tensor(self.movie_embeddings_key_dict)
         self.embeddings = movies_embeddings_tensor
         self.key_to_id = key_to_id
         self.id_to_key = id_to_key
         self.ratings = pd.read_csv(ratings)
-        user_dict, users = utils.prepare_dataset(self.ratings, self.key_to_id, min_seq_size, **data_cols)
+        user_dict, users = self.prepare_dataset(self.ratings, self.key_to_id, min_seq_size)
         self.user_dict = user_dict
         self.users = users  # filtered keys of user_dict
-        train_ratio = int(len(users) * train_ratio)
-        self.train_ratio = train_ratio
 
-        self.test_users = users[train_ratio:]
-        self.train_users = users[:train_ratio]
+        self.train_users, self.test_users = train_test_split(users, test_size=test_size)
         self.train_users = utils.sort_users_itemwise(self.user_dict, self.train_users)[2:]
         self.test_users = utils.sort_users_itemwise(self.user_dict, self.test_users)
         self.train_user_dataset = UserDataset(self.train_users, self.user_dict)
@@ -210,7 +209,7 @@ class SeqEnv(Env):
     def train_batch(self):
         while 1:
             for batch in tqdm(self.train_dataloader):
-                items, ratings, sizes, users = batch['items'], batch['ratings'], batch['sizes'], batch['users']
+                items, ratings, sizes, users = utils.get_irsu(batch)
                 items, ratings, sizes = [i.to(self.device) for i in [items, ratings, sizes]]
                 hidden = None
                 state = None

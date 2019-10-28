@@ -11,9 +11,13 @@ def rolling_window(a, window):
     return np.lib.stride_tricks.as_strided(a, shape=shape, strides=strides)
 
 
+def get_irsu(batch):
+    items_t, ratings_t, sizes_t, users_t = batch['items'], batch['ratings'], batch['sizes'], batch['users']
+    return items_t, ratings_t, sizes_t, users_t
+
+
 def batch_no_embeddings(batch, frame_size):
-    items_t, ratings_t, sizes_t, users_t = batch['items'], batch['ratings'], \
-                                         batch['sizes'], batch['users']
+    items_t, ratings_t, sizes_t, users_t = get_irsu(batch)
     b_size = ratings_t.size(0)
     items = items_t[:, :-1]
     next_items = items_t[:, 1:]
@@ -31,8 +35,7 @@ def batch_no_embeddings(batch, frame_size):
 
 
 def batch_tensor_embeddings(batch, item_embeddings_tensor, frame_size):
-    items_t, ratings_t, sizes_t, users_t = batch['items'], batch['ratings'],\
-                                         batch['sizes'], batch['users']
+    items_t, ratings_t, sizes_t, users_t = get_irsu(batch)
     items_emb = item_embeddings_tensor[items_t.long()]
     b_size = ratings_t.size(0)
 
@@ -76,7 +79,7 @@ def sort_users_itemwise(user_dict, users):
 
 
 def prepare_batch_dynamic_size(batch, item_embeddings_tensor):
-    item_idx, ratings_t, sizes_t, users_t = batch['items'], batch['ratings'], batch['sizes'], batch['users']
+    item_idx, ratings_t, sizes_t, users_t = get_irsu(batch)
     item_t = item_embeddings_tensor[item_idx]
     batch = {'items': item_t, 'users': users_t, 'ratings': ratings_t, 'sizes': sizes_t}
     return batch
@@ -180,6 +183,8 @@ def prepare_dataset(df, key_to_id, frame_size, user_id='userId', rating='rating'
 
     ratings.progress_apply(app)
     return user_dict, users
+
+
 
 
 class ReplayBuffer:

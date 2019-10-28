@@ -1,2 +1,5 @@
+scikit-learn
+pandas
+numpy
 tqdm
 pytest

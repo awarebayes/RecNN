@@ -2,18 +2,11 @@ import torch
 import torch.functional as F
 from recnn import utils
 from recnn import data
-
-"""
-helper function for weight update
-"""
+from recnn.utils import soft_update
 
 
-def soft_update(net, target_net, soft_tau=1e-2):
-    for target_param, param in zip(target_net.parameters(), net.parameters()):
-            target_param.data.copy_(
-                target_param.data * (1.0 - soft_tau) + param.data * soft_tau
-            )
-
+def temporal_difference(reward, done, gamma, target):
+    return reward + (1.0 - done) * gamma * target
 
 def ddpg_update(batch, params, nets, optimizer, device, debug, writer=False, learn=True, step=-1):
 
@@ -66,7 +59,7 @@ def ddpg_update(batch, params, nets, optimizer, device, debug, writer=False, lea
     with torch.no_grad():
         next_action = nets['target_policy_net'](next_state)
         target_value = nets['target_value_net'](next_state, next_action.detach())
-        expected_value = reward + params['gamma'] * target_value
+        expected_value = temporal_difference(reward, done, params['gamma'], target_value)
         expected_value = torch.clamp(expected_value,
                                      params['min_value'], params['max_value'])
 
@@ -177,7 +170,7 @@ def td3_update(batch, params, nets, optimizer, writer, device, debug, learn=True
         target_q_value1 = nets['target_value_net1'](next_state, next_action)
         target_q_value2 = nets['target_value_net2'](next_state, next_action)
         target_q_value = torch.min(target_q_value1, target_q_value2)
-        expected_q_value = reward + (1.0 - done) * params['gamma'] * target_q_value
+        expected_q_value = temporal_difference(reward, done, params['gamma'], target_q_value)
 
     q_value1 = nets['value_net1'](state, action)
     q_value2 = nets['value_net2'](state, action)
@@ -322,7 +315,7 @@ def bcq_update(batch, params, nets, optimizer, writer, device, debug, learn=True
         target_value += 0.25 * torch.max(target_Q1, target_Q2)  #
         target_value = target_value.view(batch_size, -1).max(1)[0].view(-1, 1)
 
-        expected_value = reward + (1.0 - done) * params['gamma'] * target_value
+        expected_value = temporal_difference(reward, done, params['gamma'], target_value)
 
     value = nets['value_net1'](state, action)
     value_loss = torch.pow(value - expected_value.detach(), 2).mean()

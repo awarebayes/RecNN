@@ -87,8 +87,12 @@ class Plotter:
 
     @staticmethod
     def kde_reconstruction_error(ad, gen_actions, true_actions, device=torch.device('cpu')):
-        true_scores = ad.rec_error(torch.tensor(true_actions).to(device).float()).detach().cpu().numpy()
-        gen_scores = ad.rec_error(torch.tensor(gen_actions).to(device).float()).detach().cpu().numpy()
+
+        def rec_score(actions):
+            return ad.rec_error(torch.tensor(actions).to(device).float()).detach().cpu().numpy()
+
+        true_scores = rec_score(true_actions)
+        gen_scores = rec_score(gen_actions)
 
         true_kernel = stats.gaussian_kde(true_scores)
         gen_kernel = stats.gaussian_kde(gen_scores)
