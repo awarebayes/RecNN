@@ -123,9 +123,12 @@ class FrameEnv(Env):
         :type frame_size: int
 
         p.s. you can also provide **pandas_conf in the arguments.
+
         It is useful if you dataset columns are different from ml20::
+
             pandas_conf = {user_id='userId', rating='rating', item='movieId', timestamp='timestamp'}
             env = FrameEnv(embed_dir, rating_dir, **pandas_conf)
+
         """
 
         super(FrameEnv, self).__init__(embeddings, ratings, min_seq_size=frame_size+1, *args, **kwargs)

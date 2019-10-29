@@ -19,6 +19,10 @@
     <img src="https://img.shields.io/github/stars/awarebayes/RecNN?style=social" />
 </a>
 
+<a href="https://colab.research.google.com/github/awarebayes/RecNN/">
+    <img src="https://colab.research.google.com/assets/colab-badge.svg" />
+</a>
+
 </p>
 <p align="center"> 
 This is my school project. It focuses on Reinforcement Learning for personalized news recommendation. The main distinction is that it tries to solve online off-policy learning with dynamically generated item embeddings. I want to create a library with SOTA algorithms for reinforcement learning recommendation, providing the level of abstraction you like.
@@ -43,8 +47,7 @@ Temporal Convolutional Networks, Echo State Networks and Chaos Free RNNs that ar
 
 - SOTA optimizers (RAdam, LookAhead, Ranger) come pre-packaged.
 
-To find more about recnn, read the docs: 
- <a href="https://readthedocs.org/projects/recnn/">recnn.readthedocs.io</a> 
+To find more about recnn, read the docs: <a href="https://readthedocs.org/projects/recnn/">recnn.readthedocs.io</a> 
 
 ## Medium Articles
 
@@ -93,7 +96,13 @@ This is my school project. It focuses on Reinforcement Learning for personalized
 <a href="https://colab.research.google.com/drive/1xWX4JQvlcx3mizwL4gB0THEyxw6LsXTL"><img src="./res/get_started.png"></a>
 </p>
 
-p.s. Image is clickable. here is [direct link](https://colab.research.google.com/drive/1qGjgLYuTpJTiW_P1pbs0zEgRa9BhZckw).
+
+p.s. Image is clickable. here is direct link:
+<a href="https://colab.research.google.com/drive/1qGjgLYuTpJTiW_P1pbs0zEgRa9BhZckw">
+    <img src="https://colab.research.google.com/assets/colab-badge.svg" />
+</a>
+
+To find more about recnn, read the docs: <a href="">recnn.readthedocs.io</a> 
 
 ### Code snippet for simplest setup:
 
