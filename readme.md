@@ -1,6 +1,7 @@
 <p align="center"> 
 <img src="./res/logo big.png">
 </p>
+
 <p align="center"> 
 
 <a href='https://recnn.readthedocs.io/en/latest/?badge=latest'>
@@ -22,12 +23,15 @@
 <a href="https://colab.research.google.com/github/awarebayes/RecNN/">
     <img src="https://colab.research.google.com/assets/colab-badge.svg" />
 </a>
-
 </p>
+
 <p align="center"> 
 This is my school project. It focuses on Reinforcement Learning for personalized news recommendation. The main distinction is that it tries to solve online off-policy learning with dynamically generated item embeddings. I want to create a library with SOTA algorithms for reinforcement learning recommendation, providing the level of abstraction you like.
 </p>
 
+<p align="center">
+    <a href="https://recnn.readthedocs.io">recnn.readthedocs.io</a>
+</p>
 
 
 ### All in all the features can be summed up to:
@@ -46,8 +50,6 @@ Temporal Convolutional Networks, Echo State Networks and Chaos Free RNNs that ar
 - New datasets will be added in the future.
 
 - SOTA optimizers (RAdam, LookAhead, Ranger) come pre-packaged.
-
-To learn more about recnn, read the docs: <a href="https://recnn.readthedocs.io">recnn.readthedocs.io</a> 
 
 ## Medium Articles
 
