@@ -47,7 +47,7 @@ Temporal Convolutional Networks, Echo State Networks and Chaos Free RNNs that ar
 
 - SOTA optimizers (RAdam, LookAhead, Ranger) come pre-packaged.
 
-To learn more about recnn, read the docs: <a href="recnn.readthedocs.io">recnn.readthedocs.io</a> 
+To learn more about recnn, read the docs: <a href="https://recnn.readthedocs.io">recnn.readthedocs.io</a> 
 
 ## Medium Articles
 
@@ -109,7 +109,7 @@ p.s. Image is clickable. here is direct link:
     <img src="https://colab.research.google.com/assets/colab-badge.svg" />
 </a>
 
-To learn more about recnn, read the docs: <a href="recnn.readthedocs.io">recnn.readthedocs.io</a> 
+To learn more about recnn, read the docs: <a href="https://recnn.readthedocs.io">recnn.readthedocs.io</a> 
 
 ### Code snippet for simplest setup:
 
