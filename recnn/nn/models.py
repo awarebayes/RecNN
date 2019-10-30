@@ -57,6 +57,7 @@ class Actor(nn.Module):
         
     def forward(self, state, tanh=False):
         """
+        :param action: nothing should be provided here.
         :param state: state
         :param tanh: whether to use tahn as action activation
         :return: action

@@ -47,7 +47,7 @@ Temporal Convolutional Networks, Echo State Networks and Chaos Free RNNs that ar
 
 - SOTA optimizers (RAdam, LookAhead, Ranger) come pre-packaged.
 
-To find more about recnn, read the docs: <a href="https://readthedocs.org/projects/recnn/">recnn.readthedocs.io</a> 
+To learn more about recnn, read the docs: <a href="recnn.readthedocs.io">recnn.readthedocs.io</a> 
 
 ## Medium Articles
 
@@ -85,10 +85,17 @@ The repo consists of two parts: the library (./recnn) and the playground (./exam
 - Sfujim's [BCQ](https://github.com/sfujim/BCQ)
 - LiyuanLucasLiu [Radam](https://github.com/LiyuanLucasLiu/RAdam)
 - Higgsfield's [RL Adventure 2](https://github.com/higgsfield/RL-Adventure-2)
+- Mpyrozhok's [adamwr](https://github.com/mpyrozhok/adamwr)
 
-## What is this?
+<center> <h2> What is this? </h2> </center>
 
+<p align="center"> 
+    <img src="./res/mockup.svg" height="400">
+</p>
+
+<p align="center"> 
 This is my school project. It focuses on Reinforcement Learning for personalized news recommendation. The main distinction is that it tries to solve online off-policy learning with dynamically generated item embeddings. Also, there is no exploration, since we are working with a dataset. In the example section, I use Google's BERT on the ML20M dataset to extract contextual information from the movie description to form the latent vector representations. Later, you can use the same transformation on new, previously unseen items (hence, the embeddings are dynamically generated). If you don't want to bother with embeddings pipeline, I have a DQN embeddings generator as a proof of concept.
+</p>
 
 ## Getting Started
 
@@ -102,7 +109,7 @@ p.s. Image is clickable. here is direct link:
     <img src="https://colab.research.google.com/assets/colab-badge.svg" />
 </a>
 
-To find more about recnn, read the docs: <a href="">recnn.readthedocs.io</a> 
+To learn more about recnn, read the docs: <a href="recnn.readthedocs.io">recnn.readthedocs.io</a> 
 
 ### Code snippet for simplest setup:
 

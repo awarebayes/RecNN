@@ -83,7 +83,7 @@ def ddpg_update(batch, params, nets, optimizer, device, debug, writer=False, lea
     # --------------------------------------------------------#
     # Policy learning
 
-    gen_action = nets['policy_net'](state)
+    gen_action = nets['policy_net'](state, action)
     policy_loss = -nets['value_net'](state, gen_action)
 
     if not learn:
