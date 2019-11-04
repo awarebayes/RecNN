@@ -107,7 +107,7 @@ This is my school project. It focuses on Reinforcement Learning for personalized
 
 
 p.s. Image is clickable. here is direct link:
-<a href="https://colab.research.google.com/drive/1qGjgLYuTpJTiW_P1pbs0zEgRa9BhZckw">
+<a href="https://colab.research.google.com/drive/1xWX4JQvlcx3mizwL4gB0THEyxw6LsXTL">
     <img src="https://colab.research.google.com/assets/colab-badge.svg" />
 </a>
 
