@@ -112,7 +112,7 @@ class FrameEnv(Env):
     """
     Static length user environment.
     """
-    def __init__(self, embeddings, ratings, frame_size=10, batch_size=25, *args, **kwargs):
+    def __init__(self, embeddings, ratings, frame_size=10, batch_size=25, num_workers=1, *args, **kwargs):
 
         """
         :param embeddings: path to where item embeddings are stored.
@@ -137,11 +137,16 @@ class FrameEnv(Env):
             batch = utils.prepare_batch_static_size(x, self.embeddings, frame_size=frame_size)
             return batch
 
+        self.prepare_batch_wrapper = prepare_batch_wrapper
+        self.frame_size = frame_size
+        self.batch_size = batch_size
+        self.num_workers = num_workers
+
         self.train_dataloader = DataLoader(self.train_user_dataset, batch_size=batch_size,
-                                           shuffle=True, num_workers=1, collate_fn=prepare_batch_wrapper)
+                                           shuffle=True, num_workers=num_workers, collate_fn=prepare_batch_wrapper)
 
         self.test_dataloader = DataLoader(self.test_user_dataset, batch_size=batch_size,
-                                          shuffle=True, num_workers=1, collate_fn=prepare_batch_wrapper)
+                                          shuffle=True, num_workers=num_workers, collate_fn=prepare_batch_wrapper)
 
     def train_batch(self):
         """ Get batch for training """
@@ -164,7 +169,7 @@ class SeqEnv(Env):
     """
 
     def __init__(self, embeddings, ratings,  state_encoder, batch_size=25, device=torch.device('cuda'),
-                                                                    layout=None, max_buf_size=1000):
+                                                                    layout=None, max_buf_size=1000, num_workers=1):
 
         """
         :param embeddings: path to where item embeddings are stored.
@@ -196,13 +201,17 @@ class SeqEnv(Env):
             batch = utils.prepare_batch_dynamic_size(batch, self.embeddings)
             return batch
 
+        self.prepare_batch_wrapper = prepare_batch_wrapper
+        self.batch_size = batch_size
+        self.num_workers = num_workers
+
         self.device = device
         self.state_encoder = state_encoder
         self.max_buf_size = max_buf_size
         self.train_dataloader = DataLoader(self.train_user_dataset, batch_size=batch_size,
-                                           shuffle=False, num_workers=1, collate_fn=prepare_batch_wrapper)
+                                           shuffle=False, num_workers=num_workers, collate_fn=prepare_batch_wrapper)
         self.test_dataloader = DataLoader(self.test_user_dataset, batch_size=batch_size,
-                                          shuffle=False, num_workers=1, collate_fn=prepare_batch_wrapper)
+                                          shuffle=False, num_workers=num_workers, collate_fn=prepare_batch_wrapper)
 
         self.buffer_layout = layout
 

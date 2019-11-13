@@ -26,6 +26,7 @@ def batch_no_embeddings(batch, frame_size):
     action = items_t[:, -1]
     reward = ratings_t[:, -1]
     done = torch.zeros(b_size)
+
     done[torch.cumsum(sizes_t - frame_size, dim=0) - 1] = 1
     batch = {'items': items, 'next_items': next_items,
              ratings: 'ratings', 'next_ratings': next_ratings,
