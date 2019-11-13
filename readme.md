@@ -92,14 +92,14 @@ The repo consists of two parts: the library (./recnn) and the playground (./exam
 <center> <h2> What is this? </h2> </center>
 
 <p align="center"> 
-    <img src="./res/mockup.svg" height="400">
-</p>
-
-<p align="center"> 
 This is my school project. It focuses on Reinforcement Learning for personalized news recommendation. The main distinction is that it tries to solve online off-policy learning with dynamically generated item embeddings. Also, there is no exploration, since we are working with a dataset. In the example section, I use Google's BERT on the ML20M dataset to extract contextual information from the movie description to form the latent vector representations. Later, you can use the same transformation on new, previously unseen items (hence, the embeddings are dynamically generated). If you don't want to bother with embeddings pipeline, I have a DQN embeddings generator as a proof of concept.
 </p>
 
 ## Getting Started
+
+<p align="center"> 
+<a href="https://colab.research.google.com/drive/1xWX4JQvlcx3mizwL4gB0THEyxw6LsXTL"><img src="./res/code.png"></a>
+</p>
 
 <p align="center"> 
 <a href="https://colab.research.google.com/drive/1xWX4JQvlcx3mizwL4gB0THEyxw6LsXTL"><img src="./res/get_started.png"></a>
@@ -112,25 +112,6 @@ p.s. Image is clickable. here is direct link:
 </a>
 
 To learn more about recnn, read the docs: <a href="https://recnn.readthedocs.io">recnn.readthedocs.io</a> 
-
-### Code snippet for simplest setup:
-
-```
-import torch
-import recnn
-
-env = recnn.data.env.FrameEnv('ml20_pca128.pkl','ml-20m/ratings.csv')
-
-value_net  = recnn.nn.Critic(1290, 128, 256, 54e-2)
-policy_net = recnn.nn.Actor(1290, 128, 256, 6e-1)
-
-cuda = torch.device('cuda')
-ddpg = recnn.nn.DDPG(policy_net, value_net)
-ddpg = ddpg.to(cuda)
-
-for batch in env.train_dataloader:
-    ddpg.update(batch, learn=True)
-```
 
 ### Installing
 
