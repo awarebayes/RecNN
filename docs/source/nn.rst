@@ -14,3 +14,9 @@ Update
 .. automodule:: recnn.nn.update
     :members:
     :exclude-members: forward
+
+Algo
+------
+
+.. automodule:: recnn.nn.algo
+    :members:

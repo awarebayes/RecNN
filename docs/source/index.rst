@@ -47,7 +47,7 @@ How parameters should look like::
 
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Tutorials:
 
       Tutorials <examples/examples>

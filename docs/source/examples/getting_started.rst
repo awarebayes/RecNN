@@ -24,7 +24,7 @@ Let's do some imports::
     jtplot.style(theme='grade3')
 
 Environments
-============
+++++++++++++
 Main abstraction of the library for datasets is called environment, similar to how other reinforcement learning libraries name it. This interface is created to provide SARSA like input for your RL Models. When you are working with recommendation env, you have two choices: using static length inputs (say 10 items) or dynamic length time series with sequential encoders (many to one rnn). Static length is provided via FrameEnv, and dynamic length along with sequential state representation encoder is implemented in SeqEnv. Let’s take a look at FrameEnv first:
 
 In order to initialize an env, you need to provide embeddings and ratings directories::
@@ -50,7 +50,8 @@ In order to initialize an env, you need to provide embeddings and ratings direct
         [  9.0742,   0.3944,  -6.4801,  ...,  -1.0000,   3.0000,  -1.0000]])
 
 Recommending
-============
+++++++++++++
+
 Let's initialize main networks, and recommend something! ::
 
     value_net  = recnn.nn.Critic(1290, 128, 256, 54e-2)
@@ -80,7 +81,8 @@ Let's initialize main networks, and recommend something! ::
             [ 5.4069]], grad_fn=<AddmmBackward>)
 
 Algo classes
-============
+++++++++++++
+
 Algo is a high level abstraction for an RL algorithm. You need two networks
 (policy and value) in order to initialize it. Later on you can tweak parameters
 and stuff in the algo itself.
@@ -111,6 +113,7 @@ ddpg.loss_layout is also handy, it allows you to see how the loss should look li
     ddpg = recnn.nn.DDPG(policy_net, value_net)
     ddpg = ddpg.to(cuda)
     plotter = recnn.utils.Plotter(ddpg.loss_layout, [['value', 'policy']],)
+    ddpg.writer = SummaryWriter(dir='./runs')
 
     from IPython.display import clear_output
     import matplotlib.pyplot as plt
@@ -136,3 +139,8 @@ ddpg.loss_layout is also handy, it allows you to see how the loss should look li
 
     learn()
 
+Update Functions
+++++++++++++++++
+
+Basically, the Algo class is a high level wrapper around the update function. The code for that is pretty messy,
+so if you want to check it out, I explained it in the colab notebook linked at the top.
