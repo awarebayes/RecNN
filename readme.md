@@ -25,6 +25,7 @@
 </a>
 </p>
 
+
 <p align="center"> 
 This is my school project. It focuses on Reinforcement Learning for personalized news recommendation. The main distinction is that it tries to solve online off-policy learning with dynamically generated item embeddings. I want to create a library with SOTA algorithms for reinforcement learning recommendation, providing the level of abstraction you like.
 </p>
@@ -32,7 +33,6 @@ This is my school project. It focuses on Reinforcement Learning for personalized
 <p align="center">
     <a href="https://recnn.readthedocs.io">recnn.readthedocs.io</a>
 </p>
-
 
 ### All in all the features can be summed up to:
 
@@ -95,6 +95,10 @@ The repo consists of two parts: the library (./recnn) and the playground (./exam
 This is my school project. It focuses on Reinforcement Learning for personalized news recommendation. The main distinction is that it tries to solve online off-policy learning with dynamically generated item embeddings. Also, there is no exploration, since we are working with a dataset. In the example section, I use Google's BERT on the ML20M dataset to extract contextual information from the movie description to form the latent vector representations. Later, you can use the same transformation on new, previously unseen items (hence, the embeddings are dynamically generated). If you don't want to bother with embeddings pipeline, I have a DQN embeddings generator as a proof of concept.
 </p>
 
+<p align="center"> 
+<img width="100%" src="./res/portfolio.png">
+</p>
+
 ## Getting Started
 
 <p align="center"> 
@@ -149,3 +153,6 @@ If you find RecNN useful for an academic publication, then please use the follow
 }
 ```
 
+<p align="center"> 
+<img width="100%" src="./res/portfolio.png">
+</p>
