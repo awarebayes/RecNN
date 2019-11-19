@@ -72,7 +72,9 @@ class Env:
     Env abstract class
     """
 
-    def __init__(self, embeddings, ratings, test_size=0.05, min_seq_size=10, prepare_dataset=utils.prepare_dataset):
+    def __init__(self, embeddings, ratings, test_size=0.05, min_seq_size=10,
+                 prepare_dataset=utils.prepare_dataset,
+                 embed_batch=utils.batch_tensor_embeddings):
 
         """
         .. note::
@@ -88,16 +90,19 @@ class Env:
         :type min_seq_size: int
         :param prepare_dataset: function you provide. should yield user_dict, users
         :type prepare_dataset: function
+        :param embed_batch: function to apply embeddings to batch. can be set to yield continuous/discrete state/action
+        :type embed_batch: function
         """
 
         self.prepare_dataset = prepare_dataset
+        self.embed_batch = embed_batch
         self.movie_embeddings_key_dict = pickle.load(open(embeddings, 'rb'))
         movies_embeddings_tensor, key_to_id, id_to_key = utils.make_items_tensor(self.movie_embeddings_key_dict)
         self.embeddings = movies_embeddings_tensor
         self.key_to_id = key_to_id
         self.id_to_key = id_to_key
         self.ratings = pd.read_csv(ratings)
-        user_dict, users = self.prepare_dataset(self.ratings, self.key_to_id, min_seq_size)
+        user_dict, users = self.prepare_dataset(self.ratings, self.key_to_id, min_seq_size, env=self)
         self.user_dict = user_dict
         self.users = users  # filtered keys of user_dict
 
@@ -134,7 +139,9 @@ class FrameEnv(Env):
         super(FrameEnv, self).__init__(embeddings, ratings, min_seq_size=frame_size+1, *args, **kwargs)
 
         def prepare_batch_wrapper(x):
-            batch = utils.prepare_batch_static_size(x, self.embeddings, frame_size=frame_size)
+            batch = utils.prepare_batch_static_size(x, self.embeddings,
+                                                    embed_batch=self.embed_batch,
+                                                    frame_size=frame_size)
             return batch
 
         self.prepare_batch_wrapper = prepare_batch_wrapper
@@ -169,7 +176,8 @@ class SeqEnv(Env):
     """
 
     def __init__(self, embeddings, ratings,  state_encoder, batch_size=25, device=torch.device('cuda'),
-                                                                    layout=None, max_buf_size=1000, num_workers=1):
+                 layout=None, max_buf_size=1000, num_workers=1, embed_batch=utils.batch_tensor_embeddings,
+                 *args, **kwargs):
 
         """
         :param embeddings: path to where item embeddings are stored.
@@ -186,7 +194,8 @@ class SeqEnv(Env):
         :type layout: list<torch.Size>
         """
 
-        super(SeqEnv, self).__init__(embeddings, ratings, min_seq_size=10)
+        super(SeqEnv, self).__init__(embeddings, ratings, min_seq_size=10, *args, **kwargs)
+        self.embed_batch = embed_batch
 
         if layout is None:
             # default ml20m layout for my (action=128) embeddings, (state=256)

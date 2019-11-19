@@ -16,7 +16,10 @@ def get_irsu(batch):
     return items_t, ratings_t, sizes_t, users_t
 
 
-def batch_no_embeddings(batch, frame_size):
+def batch_no_embeddings(batch, frame_size, *args, **kwargs):
+    """
+    Embed Batch: discrete state discrete action
+    """
     items_t, ratings_t, sizes_t, users_t = get_irsu(batch)
     b_size = ratings_t.size(0)
     items = items_t[:, :-1]
@@ -35,7 +38,11 @@ def batch_no_embeddings(batch, frame_size):
     return batch
 
 
-def batch_tensor_embeddings(batch, item_embeddings_tensor, frame_size):
+def batch_tensor_embeddings(batch, item_embeddings_tensor, frame_size, *args, **kwargs):
+    """
+    Embed Batch: continuous state continuous action
+    """
+
     items_t, ratings_t, sizes_t, users_t = get_irsu(batch)
     items_emb = item_embeddings_tensor[items_t.long()]
     b_size = ratings_t.size(0)
@@ -58,6 +65,36 @@ def batch_tensor_embeddings(batch, item_embeddings_tensor, frame_size):
     return batch
 
 
+def batch_contstate_discaction(batch, item_embeddings_tensor, frame_size, num_items, *args, **kwargs):
+
+    """
+    Embed Batch: continuous state discrete action
+    """
+
+    items_t, ratings_t, sizes_t, users_t = get_irsu(batch)
+    items_emb = item_embeddings_tensor[items_t.long()]
+    b_size = ratings_t.size(0)
+
+    items = items_emb[:, :-1, :].view(b_size, -1)
+    next_items = items_emb[:, 1:, :].view(b_size, -1)
+    ratings = ratings_t[:, :-1]
+    next_ratings = ratings_t[:, 1:]
+
+    state = torch.cat([items, ratings], 1)
+    next_state = torch.cat([next_items, next_ratings], 1)
+    action = items_t[:, -1]
+    reward = ratings_t[:, -1]
+
+    done = torch.zeros(b_size)
+    done[torch.cumsum(sizes_t - frame_size, dim=0) - 1] = 1
+
+    one_hot_action = torch.zeros(b_size, num_items)
+    one_hot_action.scatter_(1, action.view(-1, 1), 1)
+
+    batch = {'state': state, 'action': one_hot_action, 'reward': reward, 'next_state': next_state, 'done': done,
+             'meta': {'users': users_t, 'sizes': sizes_t}}
+    return batch
+
 # pads stuff to work with lstms
 def padder(x):
     items_t = []
@@ -79,7 +116,7 @@ def sort_users_itemwise(user_dict, users):
     return pd.Series(dict([(i, user_dict[i]['items'].shape[0]) for i in users])).sort_values(ascending=False).index
 
 
-def prepare_batch_dynamic_size(batch, item_embeddings_tensor):
+def prepare_batch_dynamic_size(batch, item_embeddings_tensor, embed_batch=None):
     item_idx, ratings_t, sizes_t, users_t = get_irsu(batch)
     item_t = item_embeddings_tensor[item_idx]
     batch = {'items': item_t, 'users': users_t, 'ratings': ratings_t, 'sizes': sizes_t}
@@ -90,8 +127,8 @@ def prepare_batch_dynamic_size(batch, item_embeddings_tensor):
 # CollateFn docs:
 # https://pytorch.org/docs/stable/data.html#working-with-collate-fn
 
-
-def prepare_batch_static_size(batch, item_embeddings_tensor=False, frame_size=10):
+def prepare_batch_static_size(batch, item_embeddings_tensor, frame_size=10,
+                              embed_batch=batch_tensor_embeddings):
     item_t, ratings_t, sizes_t, users_t = [], [], [], []
     for i in range(len(batch)):
         item_t.append(batch[i]['items'])
@@ -108,12 +145,9 @@ def prepare_batch_static_size(batch, item_embeddings_tensor=False, frame_size=10
     sizes_t = torch.tensor(sizes_t)
 
     batch = {'items': item_t, 'users': users_t, 'ratings': ratings_t, 'sizes': sizes_t}
-    batch_size = ratings_t.size(0)
 
-    if type(item_embeddings_tensor) == bool:
-        return batch_no_embeddings(batch, frame_size)
-    elif type(item_embeddings_tensor) == torch.Tensor:
-        return batch_tensor_embeddings(batch, item_embeddings_tensor, frame_size)
+    return embed_batch(batch=batch,  item_embeddings_tensor=item_embeddings_tensor,
+                       frame_size=frame_size)
 
 
 # Usually in data sets there item index is inconsistent (if you plot it doesn't look like a line)
@@ -161,7 +195,7 @@ def make_items_tensor(items_embeddings_key_dict):
 
 
 def prepare_dataset(df, key_to_id, frame_size, user_id='userId', rating='rating', item='movieId',
-                    timestamp='timestamp', sort_users=False):
+                    timestamp='timestamp', sort_users=False, *args, **kwargs):
     df[rating] = df[rating].progress_apply(lambda i: 2 * (i - 2.5))
     df[item] = df[item].progress_apply(key_to_id.get)
     users = df[[user_id, item]].groupby([user_id]).size()
@@ -182,8 +216,6 @@ def prepare_dataset(df, key_to_id, frame_size, user_id='userId', rating='rating'
 
     ratings.progress_apply(app)
     return user_dict, users
-
-
 
 
 class ReplayBuffer:
