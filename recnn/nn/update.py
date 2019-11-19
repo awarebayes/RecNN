@@ -8,7 +8,43 @@ from recnn.utils import soft_update
 def temporal_difference(reward, done, gamma, target):
     return reward + (1.0 - done) * gamma * target
 
-def ddpg_update(batch, params, nets, optimizer, device, debug, writer=False, learn=True, step=-1):
+
+def value_update(batch, params, nets, optimizer,
+                 writer=utils.DummyWriter(),
+                 device=torch.device('cpu'),
+                 debug=dict(), learn=False, step=-1):
+
+    state, action, reward, next_state, done = data.get_base_batch(batch, device=device)
+
+    with torch.no_grad():
+        next_action = nets['target_policy_net'](next_state)
+        target_value = nets['target_value_net'](next_state, next_action.detach())
+        expected_value = reward + (1.0 - done) * params['gamma'] * target_value
+        expected_value = torch.clamp(expected_value, -params['min_value'], params['max_value'])
+
+    value = nets['value_net'](state, action)
+    value_loss = torch.pow(value - expected_value.detach(), 2).mean()
+
+    if learn:
+        optimizer['value_optimizer'].zero_grad()
+        value_loss.backward(retain_graph=True)
+        optimizer['value_optimizer'].step()
+
+    elif not learn:
+        debug['next_action'] = next_action
+        writer.add_figure('next_action',
+                          utils.pairwise_distances_fig(next_action[:50]), step)
+        writer.add_histogram('value', value, step)
+        writer.add_histogram('target_value', target_value, step)
+        writer.add_histogram('expected_value', expected_value, step)
+
+    return value_loss
+
+
+def ddpg_update(batch, params, nets, optimizer,
+                writer=utils.DummyWriter(),
+                device=torch.device('cpu'),
+                debug=dict(), learn=False, step=-1):
 
     """
     :param batch: batch [state, action, reward, next_state] returned by environment.
@@ -56,29 +92,7 @@ def ddpg_update(batch, params, nets, optimizer, device, debug, writer=False, lea
     # --------------------------------------------------------#
     # Value Learning
 
-    with torch.no_grad():
-        next_action = nets['target_policy_net'](next_state)
-        target_value = nets['target_value_net'](next_state, next_action.detach())
-        expected_value = temporal_difference(reward, done, params['gamma'], target_value)
-        expected_value = torch.clamp(expected_value,
-                                     params['min_value'], params['max_value'])
-
-    value = nets['value_net'](state, action)
-
-    value_loss = torch.pow(value - expected_value.detach(), 2).mean()
-
-    if learn:
-        optimizer['value_optimizer'].zero_grad()
-        value_loss.backward(retain_graph=True)
-        optimizer['value_optimizer'].step()
-
-    elif not learn:
-        debug['next_action'] = next_action
-        writer.add_figure('next_action',
-                          utils.pairwise_distances_fig(next_action[:50]), step)
-        writer.add_histogram('value', value, step)
-        writer.add_histogram('target_value', target_value, step)
-        writer.add_histogram('expected_value', expected_value, step)
+    value_loss = value_update(batch, params, nets, optimizer, writer, device, debug, learn, step)
 
     # --------------------------------------------------------#
     # Policy learning
@@ -107,7 +121,10 @@ def ddpg_update(batch, params, nets, optimizer, device, debug, writer=False, lea
     return losses
 
 
-def td3_update(batch, params, nets, optimizer, writer, device, debug, learn=True, step=-1):
+def td3_update(batch, params, nets, optimizer,
+               writer=utils.DummyWriter(),
+               device=torch.device('cpu'),
+               debug=dict(), learn=False, step=-1):
     """
     :param batch: batch [state, action, reward, next_state] returned by environment.
     :param params: dict of algorithm parameters.
@@ -230,7 +247,10 @@ def td3_update(batch, params, nets, optimizer, writer, device, debug, learn=True
 
 
 # batch, params, writer, debug, learn=True, step=-1
-def bcq_update(batch, params, nets, optimizer, writer, device, debug, learn=True, step=-1):
+def bcq_update(batch, params, nets, optimizer,
+               writer=utils.DummyWriter(),
+               device=torch.device('cpu'),
+               debug=dict(), learn=False, step=-1):
 
     """
     :param batch: batch [state, action, reward, next_state] returned by environment.
