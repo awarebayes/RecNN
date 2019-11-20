@@ -120,8 +120,11 @@ class DDPG:
         return self
 
     def update(self, batch, learn):
+
         return update.ddpg_update(batch, self.params, self.nets, self.optimizers,
-                                  self.device, self.debug, self.writer, step=self._step, learn=learn)
+                                  device=self.device,
+                                  debug=self.debug, writer=self.writer,
+                                  learn=learn, step=self._step)
 
     def step(self):
         self._step += 1
@@ -269,7 +272,9 @@ class TD3:
 
     def update(self, batch, learn):
         return update.td3_update(batch, self.params, self.nets, self.optimizers,
-                                 self.device, self.debug, self.writer, step=self._step, learn=learn)
+                                 device=self.device,
+                                 debug=self.debug, writer=self.writer,
+                                 learn=learn, step=self._step)
 
     def step(self):
         self._step += 1

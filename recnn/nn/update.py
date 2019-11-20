@@ -10,19 +10,21 @@ def temporal_difference(reward, done, gamma, target):
 
 
 def value_update(batch, params, nets, optimizer,
-                 writer=utils.DummyWriter(),
                  device=torch.device('cpu'),
-                 debug=dict(), learn=False, step=-1):
+                 debug=None, writer=utils.DummyWriter(),
+                 learn=False, step=-1):
 
     state, action, reward, next_state, done = data.get_base_batch(batch, device=device)
 
     with torch.no_grad():
         next_action = nets['target_policy_net'](next_state)
         target_value = nets['target_value_net'](next_state, next_action.detach())
-        expected_value = reward + (1.0 - done) * params['gamma'] * target_value
-        expected_value = torch.clamp(expected_value, -params['min_value'], params['max_value'])
+        expected_value = temporal_difference(reward, done, params['gamma'], target_value)
+        expected_value = torch.clamp(expected_value,
+                                     params['min_value'], params['max_value'])
 
     value = nets['value_net'](state, action)
+
     value_loss = torch.pow(value - expected_value.detach(), 2).mean()
 
     if learn:
@@ -42,9 +44,10 @@ def value_update(batch, params, nets, optimizer,
 
 
 def ddpg_update(batch, params, nets, optimizer,
-                writer=utils.DummyWriter(),
                 device=torch.device('cpu'),
-                debug=dict(), learn=False, step=-1):
+                debug=None, writer=utils.DummyWriter(),
+                learn=False, step=-1):
+
 
     """
     :param batch: batch [state, action, reward, next_state] returned by environment.
@@ -57,34 +60,28 @@ def ddpg_update(batch, params, nets, optimizer,
     :param learn: whether to learn on this step (used for testing)
     :param step: integer step for policy update
     :return: loss dictionary
-
     How parameters should look like::
-
         params = {
             'gamma'      : 0.99,
             'min_value'  : -10,
             'max_value'  : 10,
             'policy_step': 3,
             'soft_tau'   : 0.001,
-
             'policy_lr'  : 1e-5,
             'value_lr'   : 1e-5,
             'actor_weight_init': 3e-1,
             'critic_weight_init': 6e-1,
         }
-
         nets = {
             'value_net': models.Critic,
             'target_value_net': models.Critic,
             'policy_net': models.Actor,
             'target_policy_net': models.Actor,
         }
-
         optimizer - {
             'policy_optimizer': some optimizer
             'value_optimizer':  some optimizer
         }
-
     """
 
     state, action, reward, next_state, done = data.get_base_batch(batch, device=device)
@@ -92,7 +89,9 @@ def ddpg_update(batch, params, nets, optimizer,
     # --------------------------------------------------------#
     # Value Learning
 
-    value_loss = value_update(batch, params, nets, optimizer, writer, device, debug, learn, step)
+    value_loss = value_update(batch, params, nets, optimizer,
+                              writer=writer, device=device,
+                              debug=debug, learn=learn, step=step)
 
     # --------------------------------------------------------#
     # Policy learning
@@ -122,9 +121,9 @@ def ddpg_update(batch, params, nets, optimizer,
 
 
 def td3_update(batch, params, nets, optimizer,
-               writer=utils.DummyWriter(),
                device=torch.device('cpu'),
-               debug=dict(), learn=False, step=-1):
+               debug=None, writer=utils.DummyWriter(),
+               learn=False, step=-1):
     """
     :param batch: batch [state, action, reward, next_state] returned by environment.
     :param params: dict of algorithm parameters.
@@ -172,6 +171,8 @@ def td3_update(batch, params, nets, optimizer,
 
     """
 
+    if debug is None:
+        debug = dict()
     state, action, reward, next_state, done = data.get_base_batch(batch, device=device)
 
     # --------------------------------------------------------#
@@ -248,9 +249,9 @@ def td3_update(batch, params, nets, optimizer,
 
 # batch, params, writer, debug, learn=True, step=-1
 def bcq_update(batch, params, nets, optimizer,
-               writer=utils.DummyWriter(),
                device=torch.device('cpu'),
-               debug=dict(), learn=False, step=-1):
+               debug=None, writer=utils.DummyWriter(),
+               learn=False, step=-1):
 
     """
     :param batch: batch [state, action, reward, next_state] returned by environment.
@@ -300,6 +301,8 @@ def bcq_update(batch, params, nets, optimizer,
 
     """
 
+    if debug is None:
+        debug = dict()
     state, action, reward, next_state, done = data.get_base_batch(batch, device=device)
     batch_size = done.size(0)
 
