@@ -4,6 +4,9 @@ from recnn.data.utils import make_items_tensor
     What?
     +++++
     
+    Chain of responsibility pattern.
+    https://refactoring.guru/design-patterns/chain-of-responsibility/python/example
+    
     RecNN is designed to work with your dataflow. 
     Function that contain 'dataset' are needed to interact with environment.
     The environment is provided via env.argument.
@@ -46,6 +49,8 @@ def prepare_dataset(df, key_to_id, frame_size, env, sort_users=False, **kwargs):
         [1, 34, 123, 2000], recnn makes it look like [0,1,2,3] for you.
     """
 
+    key_to_id = env.key_to_id
+
     df['rating'] = df['rating'].progress_apply(lambda i: 2 * (i - 2.5))
     df['movieId'] = df['movieId'].progress_apply(key_to_id.get)
     users = df[['userId', 'movieId']].groupby(['userId']).size()
@@ -70,8 +75,7 @@ def prepare_dataset(df, key_to_id, frame_size, env, sort_users=False, **kwargs):
     env.users = users
 
     return {'df': df, 'key_to_id': key_to_id,
-            'frame_size': frame_size, 'env': env, 'sort_users': sort_users,
-            **kwargs}
+            'frame_size': frame_size, 'env': env, 'sort_users': sort_users, **kwargs}
 
 
 def truncate_dataset(df, key_to_id, frame_size, env, reduce_items_to, sort_users=False, **kwargs):
@@ -79,12 +83,11 @@ def truncate_dataset(df, key_to_id, frame_size, env, reduce_items_to, sort_users
         Truncate #items to num_items provided in the arguments
     """
 
+    # here n items to keep are adjusted
     num_items = reduce_items_to
 
-    value_counts = df['movieId'].value_counts().sort_values()
-
-    to_remove = value_counts[:-num_items].index
-    to_keep = value_counts[-num_items:].index
+    to_remove = df['movieId'].value_counts().sort_values()[:-num_items].index
+    to_keep = df['movieId'].value_counts().sort_values()[-num_items:].index
     to_remove_indices = df[df['movieId'].isin(to_remove)].index
     num_removed = len(to_remove)
 
@@ -95,17 +98,17 @@ def truncate_dataset(df, key_to_id, frame_size, env, reduce_items_to, sort_users
             del env.movie_embeddings_key_dict[i]
 
     env.embeddings, env.key_to_id, env.id_to_key = make_items_tensor(env.movie_embeddings_key_dict)
+
     print('action space is reduced to {} - {} = {}'.format(num_items + num_removed, num_removed,
                                                            num_items))
 
-    return {'df': df, 'key_to_id': key_to_id,
-            'frame_size': frame_size, 'env': env, 'sort_users': sort_users,
-            'reduce_items_to': reduce_items_to, **kwargs}
+    return {'df': df, 'key_to_id': env.key_to_id, 'env': env,
+            'frame_size': frame_size, 'sort_users': sort_users, **kwargs}
 
 
 def build_data_pipeline(chain, **kwargs):
     """
-        curry function chain
+        Chain of responsibility pattern
 
         :param chain: array of callable
         :param **kwargs: any kwargs you like
@@ -113,6 +116,6 @@ def build_data_pipeline(chain, **kwargs):
 
     kwargdict = kwargs
     for call in chain:
-        kwargdict = call(**kwargs)
+        kwargdict = call(**kwargdict)
     return kwargdict
 

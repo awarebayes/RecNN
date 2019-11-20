@@ -33,6 +33,9 @@ dataset_functions
 What?
 +++++
 
+Chain of responsibility pattern:
+refactoring.guru/design-patterns/chain-of-responsibility/python/example
+
 RecNN is designed to work with your dataflow.
 Function that contain 'dataset' are needed to interact with environment.
 The environment is provided via env.argument.

@@ -172,7 +172,7 @@ class TD3(Algo):
 class Reinforce(Algo):
     def __init__(self, policy_net, value_net):
 
-        super(Algo, self).__init__()
+        super(Reinforce, self).__init__()
 
         self.algorithm = update.reinforce_update
 
@@ -203,7 +203,7 @@ class Reinforce(Algo):
             'value_optimizer': value_optimizer
         }
 
-        params = {
+        self.params = {
             'reinforce': ChooseREINFORCE(ChooseREINFORCE.basic_reinforce),
             'gamma': 0.99,
             'min_value': -10,

@@ -53,7 +53,8 @@ Here is how default ML20M dataset is processed. Use this as a reference::
 
 Although not required, it is advised that you return all of the arguments + kwargs. If the function is finishing
 this may work fine, but if you are using **build_data_pipeline**, you need to do it as I said. Look in
-reference/data/dataset_functions for further details.
+reference/data/dataset_functions for further details. Chain of responsibility pattern:
+refactoring.guru/design-patterns/chain-of-responsibility/python/example
 
 Toy Dataset
 +++++++++++

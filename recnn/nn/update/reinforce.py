@@ -3,8 +3,8 @@ import torch
 from recnn import utils
 from recnn import data
 from recnn.utils import soft_update
-
 from recnn.nn.update import value_update
+import gc
 
 
 class ChooseREINFORCE:
@@ -25,8 +25,7 @@ class ChooseREINFORCE:
     def reinforce_with_correction():
         raise NotImplemented
 
-    def __call__(self, policy, optimizer):
-
+    def __call__(self, policy, optimizer, learn=True):
         R = 0
 
         returns = []
@@ -39,9 +38,10 @@ class ChooseREINFORCE:
 
         policy_loss = self.method(policy, returns)
 
-        optimizer.zero_grad()
-        policy_loss.backward()
-        optimizer.step()
+        if learn:
+            optimizer.zero_grad()
+            policy_loss.backward()
+            optimizer.step()
 
         del policy.rewards[:]
         del policy.saved_log_probs[:]
@@ -51,7 +51,7 @@ class ChooseREINFORCE:
 
 def reinforce_update(batch, params, nets, optimizer,
                      device=torch.device('cpu'),
-                     debug=None, writer= utils.DummyWriter(),
+                     debug=None, writer=utils.DummyWriter(),
                      learn=False, step=-1):
     state, action, reward, next_state, done = data.get_base_batch(batch)
 
@@ -60,17 +60,22 @@ def reinforce_update(batch, params, nets, optimizer,
     nets['policy_net'].rewards.append(reward.mean())
 
     value_loss = value_update(batch, params, nets, optimizer,
-                              writer=writer, device=device,
-                              debug=debug, learn=learn, step=step)
+                                       writer=writer,
+                                       device=device,
+                                       debug=debug, learn=learn, step=step)
 
-    if step % params['policy_step'] == 0 and step > 0:
-        policy_loss = params['reinforce'](nets['policy_net'], optimizer['policy_optimizer'])
-        del nets['policy_net'].rewards[:]
-        del nets['policy_net'].saved_log_probs[:]
+    if len(nets['policy_net'].saved_log_probs) > params['policy_step'] and learn:
+        policy_loss = params['reinforce'](nets['policy_net'], optimizer['policy_optimizer'], learn=learn)
+
         print('step: ', step, '| value:', value_loss.item(), '| policy', policy_loss.item())
 
-        soft_update(nets['value_net'], nets['target_value_net'], soft_tau=params['soft_tau'])
-        soft_update(nets['policy_net'], nets['target_policy_net'], soft_tau=params['soft_tau'])
+        utils.soft_update(nets['value_net'], nets['target_value_net'], soft_tau=params['soft_tau'])
+        utils.soft_update(nets['policy_net'], nets['target_policy_net'], soft_tau=params['soft_tau'])
+
+        del nets['policy_net'].rewards[:]
+        del nets['policy_net'].saved_log_probs[:]
+
+        gc.collect()
 
         losses = {'value': value_loss.item(),
                   'policy': policy_loss.item(),
