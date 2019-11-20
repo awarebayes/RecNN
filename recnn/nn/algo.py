@@ -1,5 +1,6 @@
 from recnn import utils, optim
 from recnn.nn import update
+from recnn.nn.update import ChooseREINFORCE
 
 import torch
 import copy
@@ -166,3 +167,53 @@ class TD3(Algo):
             'test': {'value1': [], 'value2': [], 'policy': [], 'step': []},
             'train': {'value1': [], 'value2': [], 'policy': [], 'step': []}
         }
+
+
+class Reinforce(Algo):
+    def __init__(self, policy_net, value_net):
+
+        super(Algo, self).__init__()
+
+        self.algorithm = update.reinforce_update
+
+        # these are target networks that we need for ddpg algorigm to work
+        target_policy_net = copy.deepcopy(policy_net)
+        target_value_net = copy.deepcopy(value_net)
+
+        target_policy_net.eval()
+        target_value_net.eval()
+
+        # soft update
+        utils.soft_update(value_net, target_value_net, soft_tau=1.0)
+        utils.soft_update(policy_net, target_policy_net, soft_tau=1.0)
+
+        # define optimizers
+        value_optimizer = optim.Ranger(value_net.parameters(), lr=1e-5, weight_decay=1e-2)
+        policy_optimizer = optim.Ranger(policy_net.parameters(), lr=1e-5, weight_decay=1e-2)
+
+        self.nets = {
+            'value_net': value_net,
+            'target_value_net': target_value_net,
+            'policy_net': policy_net,
+            'target_policy_net': target_policy_net,
+        }
+
+        self.optimizers = {
+            'policy_optimizer': policy_optimizer,
+            'value_optimizer': value_optimizer
+        }
+
+        params = {
+            'reinforce': ChooseREINFORCE(ChooseREINFORCE.basic_reinforce),
+            'gamma': 0.99,
+            'min_value': -10,
+            'max_value': 10,
+            'policy_step': 10,
+            'soft_tau': 0.001,
+        }
+
+        self.loss_layout = {
+            'test': {'value': [], 'policy': [], 'step': []},
+            'train': {'value': [], 'policy': [], 'step': []}
+        }
+

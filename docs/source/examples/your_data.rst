@@ -16,7 +16,13 @@ memory usage. There is no need to worry about mixing up indexes while preprocess
 
 Here is how default ML20M dataset is processed. Use this as a reference::
 
-    def prepare_ml20m_dataset(df, key_to_id, frame_size, sort_users=False):
+    def prepare_dataset(df, key_to_id, frame_size, env, sort_users=False, **kwargs):
+
+        """
+            Basic prepare dataset function. Automatically makes index linear, in ml20 movie indices look like:
+            [1, 34, 123, 2000], recnn makes it look like [0,1,2,3] for you.
+        """
+
         df['rating'] = df['rating'].progress_apply(lambda i: 2 * (i - 2.5))
         df['movieId'] = df['movieId'].progress_apply(key_to_id.get)
         users = df[['userId', 'movieId']].groupby(['userId']).size()
@@ -24,8 +30,7 @@ Here is how default ML20M dataset is processed. Use this as a reference::
         if sort_users:
             users = users.sort_values(ascending=False)
         users = users.index
-        ratings = df.sort_values(by='timestamp').set_index('userId')
-        ratings = ratings.drop('timestamp', axis=1).groupby('userId')
+        ratings = df.sort_values(by='timestamp').set_index('userId').drop('timestamp', axis=1).groupby('userId')
 
         # Groupby user
         user_dict = {}
@@ -37,8 +42,18 @@ Here is how default ML20M dataset is processed. Use this as a reference::
             user_dict[int(userid)]['ratings'] = x['rating'].values
 
         ratings.progress_apply(app)
-        return user_dict, users
 
+        # make sure to set up these two!
+        env.user_dict = user_dict
+        env.users = users
+
+        return {'df': df, 'key_to_id': key_to_id,
+                'frame_size': frame_size, 'env': env, 'sort_users': sort_users,
+                **kwargs}
+
+Although not required, it is advised that you return all of the arguments + kwargs. If the function is finishing
+this may work fine, but if you are using **build_data_pipeline**, you need to do it as I said. Look in
+reference/data/dataset_functions for further details.
 
 Toy Dataset
 +++++++++++
@@ -92,7 +107,7 @@ Writing custom preprocessing function
 
 The following is a copy of the preprocessing function listed above to work with the toy dataset::
 
-    def prepare_my_dataset(df, key_to_id, frame_size, sort_users=False):
+    def prepare_my_dataset(df, key_to_id, frame_size, env, sort_users=False, **kwargs):
         # transform [0 1] -> [-1 1]
         # you can also choose not use progress_apply here
 
@@ -118,7 +133,14 @@ The following is a copy of the preprocessing function listed above to work with 
             user_dict[int(userid)]['ratings'] = x['liked'].values
 
         ratings.progress_apply(app)
-        return user_dict, users
+
+        # make sure to set up these two!
+        env.user_dict = user_dict
+        env.users = users
+
+        return {'df': df, 'key_to_id': key_to_id,
+                'frame_size': frame_size, 'env': env, 'sort_users': sort_users,
+                **kwargs}
 
 Putting it all together
 +++++++++++++++++++++++

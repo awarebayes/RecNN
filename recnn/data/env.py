@@ -1,4 +1,4 @@
-from . import utils
+from . import utils, dataset_functions as dset_F
 import pickle
 import pandas as pd
 from torch.utils.data import Dataset, DataLoader
@@ -73,7 +73,7 @@ class Env:
     """
 
     def __init__(self, embeddings, ratings, test_size=0.05, min_seq_size=10,
-                 prepare_dataset=utils.prepare_dataset,
+                 prepare_dataset=dset_F.prepare_dataset,
                  embed_batch=utils.batch_tensor_embeddings):
 
         """
@@ -102,11 +102,15 @@ class Env:
         self.key_to_id = key_to_id
         self.id_to_key = id_to_key
         self.ratings = pd.read_csv(ratings)
-        user_dict, users = self.prepare_dataset(self.ratings, self.key_to_id, min_seq_size, env=self)
-        self.user_dict = user_dict
-        self.users = users  # filtered keys of user_dict
 
-        self.train_users, self.test_users = train_test_split(users, test_size=test_size)
+        self.user_dict = None
+        self.users = None  # filtered keys of user_dict
+
+        self.prepare_dataset(df=self.ratings, key_to_id=self.key_to_id,
+                             min_seq_size=min_seq_size, frame_size=min_seq_size, env=self)
+        # after this call user_dict and users should be set to their values!
+
+        self.train_users, self.test_users = train_test_split(self.users, test_size=test_size)
         self.train_users = utils.sort_users_itemwise(self.user_dict, self.train_users)[2:]
         self.test_users = utils.sort_users_itemwise(self.user_dict, self.test_users)
         self.train_user_dataset = UserDataset(self.train_users, self.user_dict)

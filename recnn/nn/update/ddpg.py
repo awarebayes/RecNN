@@ -22,7 +22,9 @@ def ddpg_update(batch, params, nets, optimizer,
     :param learn: whether to learn on this step (used for testing)
     :param step: integer step for policy update
     :return: loss dictionary
+
     How parameters should look like::
+
         params = {
             'gamma'      : 0.99,
             'min_value'  : -10,
@@ -44,6 +46,7 @@ def ddpg_update(batch, params, nets, optimizer,
             'policy_optimizer': some optimizer
             'value_optimizer':  some optimizer
         }
+
     """
 
     state, action, reward, next_state, done = data.get_base_batch(batch, device=device)

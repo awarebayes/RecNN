@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
+from torch.distributions import Categorical
 
 class AnomalyDetector(nn.Module):
 
@@ -73,11 +73,11 @@ class Actor(nn.Module):
 
 
 class DiscreteActor(nn.Module):
-    def __init__(self, hidden_size, num_inputs, num_actions):
+    def __init__(self, input_dim, action_dim, hidden_size, init_w=2e-1):
         super(DiscreteActor, self).__init__()
 
-        self.linear1 = nn.Linear(num_inputs, hidden_size)
-        self.linear2 = nn.Linear(hidden_size, num_actions)
+        self.linear1 = nn.Linear(input_dim, hidden_size)
+        self.linear2 = nn.Linear(hidden_size, action_dim)
 
         self.saved_log_probs = []
         self.rewards = []
@@ -94,6 +94,7 @@ class DiscreteActor(nn.Module):
         action = m.sample()
         self.saved_log_probs.append(m.log_prob(action))
         return action, probs
+
 
 class Critic(nn.Module):
 

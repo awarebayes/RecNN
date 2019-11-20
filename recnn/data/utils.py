@@ -175,49 +175,6 @@ def make_items_tensor(items_embeddings_key_dict):
     return items_embeddings_tensor, key_to_id, id_to_key
 
 
-"""
-    Main function used for dataset transformation
-    Basically works like pandas.groupby user 
-    Arguments:
-        df:arg - ml20 like dataset
-        key_to_id:arg - 
-        frame_size:arg - only used for static size batches, number of items to take
-        user_id:arg string name of 'user id' pandas column
-        rating:arg string name of 'rating' pandas column
-        item:arg string name of 'item id' pandas column
-    Returns:
-        user_dict:arg - dict {user_id: {
-                                    'items': [item_id (np.ndarray)],
-                                    'ratings': [ratings (np.ndarray)]
-                                } }
-        users: list of valid users (n_items > frame_size)
-"""
-
-
-def prepare_dataset(df, key_to_id, frame_size, user_id='userId', rating='rating', item='movieId',
-                    timestamp='timestamp', sort_users=False, *args, **kwargs):
-    df[rating] = df[rating].progress_apply(lambda i: 2 * (i - 2.5))
-    df[item] = df[item].progress_apply(key_to_id.get)
-    users = df[[user_id, item]].groupby([user_id]).size()
-    users = users[users > frame_size]
-    if sort_users:
-        users = users.sort_values(ascending=False)
-    users = users.index
-    ratings = df.sort_values(by='timestamp').set_index(user_id).drop(timestamp, axis=1).groupby(user_id)
-
-    # Groupby user
-    user_dict = {}
-
-    def app(x):
-        userid = x.index[0]
-        user_dict[int(userid)] = {}
-        user_dict[int(userid)]['items'] = x[item].values
-        user_dict[int(userid)]['ratings'] = x[rating].values
-
-    ratings.progress_apply(app)
-    return user_dict, users
-
-
 class ReplayBuffer:
     def __init__(self, buffer_size, layout):
         self.buffer = None

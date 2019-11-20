@@ -12,6 +12,9 @@ def value_update(batch, params, nets, optimizer,
                  device=torch.device('cpu'),
                  debug=None, writer=utils.DummyWriter(),
                  learn=False, step=-1):
+    """
+        Everything is the same as in ddpg_update
+    """
 
     state, action, reward, next_state, done = data.get_base_batch(batch, device=device)
 

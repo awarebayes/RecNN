@@ -42,10 +42,6 @@ How parameters should look like::
         ddpg.update(batch, learn=True)
 
 
-
-
-
-
 .. toctree::
    :maxdepth: 3
    :caption: Tutorials:
