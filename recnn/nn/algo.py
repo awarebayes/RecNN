@@ -1,8 +1,13 @@
-from .. import utils, optim
-from . import update
+from recnn import utils, optim
+from recnn.nn import update
 
 import torch
 import copy
+
+
+"""
+ Algorithms as is aren't much. Just classes with pre set up parameters, optimizers and stuff.
+"""
 
 
 class Algo:

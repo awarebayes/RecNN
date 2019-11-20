@@ -72,6 +72,29 @@ class Actor(nn.Module):
         return action
 
 
+class DiscreteActor(nn.Module):
+    def __init__(self, hidden_size, num_inputs, num_actions):
+        super(DiscreteActor, self).__init__()
+
+        self.linear1 = nn.Linear(num_inputs, hidden_size)
+        self.linear2 = nn.Linear(hidden_size, num_actions)
+
+        self.saved_log_probs = []
+        self.rewards = []
+
+    def forward(self, inputs):
+        x = inputs
+        x = F.relu(self.linear1(x))
+        action_scores = self.linear2(x)
+        return F.softmax(action_scores)
+
+    def select_action(self, state):
+        probs = self.forward(state)
+        m = Categorical(probs)
+        action = m.sample()
+        self.saved_log_probs.append(m.log_prob(action))
+        return action, probs
+
 class Critic(nn.Module):
 
     """
