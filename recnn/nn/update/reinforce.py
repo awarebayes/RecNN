@@ -52,7 +52,11 @@ class ChooseREINFORCE:
 def reinforce_update(batch, params, nets, optimizer,
                      device=torch.device('cpu'),
                      debug=None, writer=utils.DummyWriter(),
-                     learn=False, step=-1):
+                     learn=True, step=-1):
+
+    # Due no its mechanics, reinforce doesn't support testing!
+    learn = True
+
     state, action, reward, next_state, done = data.get_base_batch(batch)
 
     predicted_action, predicted_probs = nets['policy_net'].select_action(state)
@@ -60,11 +64,10 @@ def reinforce_update(batch, params, nets, optimizer,
     nets['policy_net'].rewards.append(reward.mean())
 
     value_loss = value_update(batch, params, nets, optimizer,
-                                       writer=writer,
-                                       device=device,
-                                       debug=debug, learn=learn, step=step)
+                              writer=writer, device=device,
+                              debug=debug, learn=True, step=step)
 
-    if len(nets['policy_net'].saved_log_probs) > params['policy_step'] and learn:
+    if step % params['policy_step'] == 0 and step > 0:
         policy_loss = params['reinforce'](nets['policy_net'], optimizer['policy_optimizer'], learn=learn)
 
         print('step: ', step, '| value:', value_loss.item(), '| policy', policy_loss.item())

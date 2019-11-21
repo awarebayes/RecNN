@@ -82,11 +82,6 @@ class DiscreteActor(nn.Module):
         self.saved_log_probs = []
         self.rewards = []
 
-        # with large action spaces it can be overflowed
-        # in order to prevent this, I set a max limit
-        
-        self.save_limit = 15
-
     def forward(self, inputs):
         x = inputs
         x = F.relu(self.linear1(x))
@@ -94,11 +89,6 @@ class DiscreteActor(nn.Module):
         return F.softmax(action_scores)
 
     def select_action(self, state):
-
-        if len(self.saved_log_probs) > self.save_limit:
-            del self.saved_log_probs[:]
-            del self.rewards[:]
-
         probs = self.forward(state)
         m = Categorical(probs)
         action = m.sample()

@@ -125,7 +125,7 @@ def bcq_update(batch, params, nets, optimizer,
     perturbator_loss = perturbator_loss.mean()
 
     if learn:
-        if step % params['perturbator_step']:
+        if step % params['perturbator_step'] == 0:
             optimizer['perturbator_optimizer'].zero_grad()
             perturbator_loss.backward()
             torch.nn.utils.clip_grad_norm_(nets['perturbator_net'].parameters(), -1, 1)
