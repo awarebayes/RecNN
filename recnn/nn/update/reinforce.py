@@ -22,8 +22,12 @@ class ChooseREINFORCE:
         return policy_loss
 
     @staticmethod
-    def reinforce_with_correction():
-        raise NotImplemented
+    def reinforce_with_correction(policy, returns, *args, **kwargs):
+        policy_loss = []
+        for corr, log_prob, R in zip(policy.correction, policy.saved_log_probs, returns):
+            policy_loss.append(corr * -log_prob * R)  # this line here
+        policy_loss = torch.cat(policy_loss).sum()
+        return policy_loss
 
     def __call__(self, policy, optimizer, learn=True):
         R = 0
@@ -43,8 +47,8 @@ class ChooseREINFORCE:
             policy_loss.backward()
             optimizer.step()
 
-        del policy.rewards[:]
-        del policy.saved_log_probs[:]
+        policy.gc()
+        gc.collect()
 
         return policy_loss
 
@@ -59,7 +63,7 @@ def reinforce_update(batch, params, nets, optimizer,
 
     state, action, reward, next_state, done = data.get_base_batch(batch)
 
-    predicted_action, predicted_probs = nets['policy_net'].select_action(state)
+    predicted_action, predicted_probs = nets['policy_net'].select_action(state=state, action=action)
     reward = nets['value_net'](state, predicted_probs).detach()
     nets['policy_net'].rewards.append(reward.mean())
 
@@ -74,11 +78,6 @@ def reinforce_update(batch, params, nets, optimizer,
 
         utils.soft_update(nets['value_net'], nets['target_value_net'], soft_tau=params['soft_tau'])
         utils.soft_update(nets['policy_net'], nets['target_policy_net'], soft_tau=params['soft_tau'])
-
-        del nets['policy_net'].rewards[:]
-        del nets['policy_net'].saved_log_probs[:]
-
-        gc.collect()
 
         losses = {'value': value_loss.item(),
                   'policy': policy_loss.item(),
