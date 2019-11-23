@@ -70,12 +70,12 @@ The repo consists of two parts: the library (./recnn) and the playground (./exam
     
 | Algorithm                             | Paper                            | Code                       |
 |---------------------------------------|----------------------------------|----------------------------|
-| Deep Q Learning (PoC)                 | https://arxiv.org/abs/1312.5602  | examples/0. Embeddings/ 1.DQN                  |
+| Deep Q Learning (PoC)                 | https://arxiv.org/abs/1312.5602  | examples/0. Embeddings/ 1.DQN |
 | Deep Deterministic Policy Gradients   | https://arxiv.org/abs/1509.02971 | examples/1.Vanilla RL/DDPG |
 | Twin Delayed DDPG (TD3)               | https://arxiv.org/abs/1802.09477 | examples/1.Vanilla RL/TD3  |
-| Soft Actor-Critic                     | https://arxiv.org/abs/1801.01290 |examples/1.Vanilla RL/SAC         |
-| Batch Constrained Q-Learning          | https://arxiv.org/abs/1812.02900 | examples/2.BCQ/BCQ Pytorch |
-| REINFORCE Top-K Off-Policy Correction | https://arxiv.org/abs/1509.02971 | WIP                        |
+| Soft Actor-Critic                     | https://arxiv.org/abs/1801.01290 | examples/1.Vanilla RL/SAC  |
+| Batch Constrained Q-Learning          | https://arxiv.org/abs/1812.02900 | examples/99.To be released/BCQ |
+| REINFORCE Top-K Off-Policy Correction | https://arxiv.org/abs/1509.02971 | examples/2. REINFORCE TopK |
 
 </p>
 
