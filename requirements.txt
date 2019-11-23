@@ -1,5 +1,5 @@
 scikit-learn
+tqdm
 pandas
 numpy
-tqdm
 pytest

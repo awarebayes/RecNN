@@ -50,7 +50,7 @@ def prepare_dataset(df, key_to_id, frame_size, env, sort_users=False, **kwargs):
     """
 
     df['rating'] = df['rating'].progress_apply(lambda i: 2 * (i - 2.5))
-    df['movieId'] = df['movieId'].progress_apply(key_to_id.get)
+    df['movieId'] = df['movieId'].progress_apply(lambda i: key_to_id.get(i))
 
     users = df[['userId', 'movieId']].groupby(['userId']).size()
     users = users[users > frame_size]
