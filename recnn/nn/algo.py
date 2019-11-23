@@ -205,6 +205,7 @@ class Reinforce(Algo):
 
         self.params = {
             'reinforce': ChooseREINFORCE(ChooseREINFORCE.basic_reinforce),
+            'K': 10,
             'gamma': 0.99,
             'min_value': -10,
             'max_value': 10,

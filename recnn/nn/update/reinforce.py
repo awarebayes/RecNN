@@ -17,7 +17,7 @@ class ChooseREINFORCE:
     def basic_reinforce(policy, returns, *args, **kwargs):
         policy_loss = []
         for log_prob, R in zip(policy.saved_log_probs, returns):
-            policy_loss.append(-log_prob * R)
+            policy_loss.append(-log_prob * R)  # <- this line here
         policy_loss = torch.cat(policy_loss).sum()
         return policy_loss
 
@@ -25,7 +25,15 @@ class ChooseREINFORCE:
     def reinforce_with_correction(policy, returns, *args, **kwargs):
         policy_loss = []
         for corr, log_prob, R in zip(policy.correction, policy.saved_log_probs, returns):
-            policy_loss.append(corr * -log_prob * R)  # this line here
+            policy_loss.append(corr * -log_prob * R)  # <- this line here
+        policy_loss = torch.cat(policy_loss).sum()
+        return policy_loss
+
+    @staticmethod
+    def reinforce_with_TopK_correction(policy, returns, *args, **kwargs):
+        policy_loss = []
+        for l_k, corr, log_prob, R in zip(policy.lambda_k, policy.correction, policy.saved_log_probs, returns):
+            policy_loss.append(l_k * corr * -log_prob * R)  # <- this line here
         policy_loss = torch.cat(policy_loss).sum()
         return policy_loss
 
@@ -63,7 +71,8 @@ def reinforce_update(batch, params, nets, optimizer,
 
     state, action, reward, next_state, done = data.get_base_batch(batch)
 
-    predicted_action, predicted_probs = nets['policy_net'].select_action(state=state, action=action)
+    predicted_probs = nets['policy_net'].select_action(state=state, action=action, K=params['K'],
+                                                       learn=learn, writer=writer, step=step)
     reward = nets['value_net'](state, predicted_probs).detach()
     nets['policy_net'].rewards.append(reward.mean())
 
@@ -72,9 +81,7 @@ def reinforce_update(batch, params, nets, optimizer,
                               debug=debug, learn=True, step=step)
 
     if step % params['policy_step'] == 0 and step > 0:
-        policy_loss = params['reinforce'](nets['policy_net'], optimizer['policy_optimizer'], learn=learn)
-
-        print('step: ', step, '| value:', value_loss.item(), '| policy', policy_loss.item())
+        policy_loss = params['reinforce'](nets['policy_net'], optimizer['policy_optimizer'],)
 
         utils.soft_update(nets['value_net'], nets['target_value_net'], soft_tau=params['soft_tau'])
         utils.soft_update(nets['policy_net'], nets['target_policy_net'], soft_tau=params['soft_tau'])

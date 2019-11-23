@@ -82,6 +82,7 @@ class DiscreteActor(nn.Module):
         self.saved_log_probs = []
         self.rewards = []
         self.correction = []
+        self.lambda_k = []
         self.select_action = self._select_action
 
     def forward(self, inputs):
@@ -90,20 +91,20 @@ class DiscreteActor(nn.Module):
         action_scores = self.linear2(x)
         return F.softmax(action_scores)
 
+    def gc(self):
+        del self.rewards[:]
+        del self.saved_log_probs[:]
+        del self.correction[:]
+        del self.lambda_k[:]
+
     def _select_action(self, state, **kwargs):
         probs = self.forward(state)
         m = Categorical(probs)
         action = m.sample()
         self.saved_log_probs.append(m.log_prob(action))
-        return action, probs
+        return probs
 
-    def gc(self):
-        del self.rewards[:]
-        del self.saved_log_probs[:]
-        del self.correction[:]
-
-    def _select_action_with_correction(self, state, beta, action, **kwargs):
-
+    def pi_beta_sample(self, state, beta, action, **kwargs):
         # 1. obtain probabilities
         # note: detach is to block gradient
         beta_probs = beta(state.detach(), action=action)
@@ -118,15 +119,45 @@ class DiscreteActor(nn.Module):
         pi_action = pi_categorical.sample()
 
         # 4. calculate stuff we need
-
         pi_log_prob = pi_categorical.log_prob(pi_action)
         beta_log_prob = beta_categorical.log_prob(beta_action)
+
+        return pi_log_prob, beta_log_prob, pi_probs
+
+    def _select_action_with_correction(self, state, beta, action, writer, step, **kwargs):
+        pi_log_prob, beta_log_prob, pi_probs = self.pi_beta_sample(state, beta, action)
+
+        # calculate correction
         corr = torch.exp(pi_log_prob) / torch.exp(beta_log_prob)
+
+        writer.add_histogram('correction', corr, step)
+        writer.add_histogram('pi_log_prob', pi_log_prob, step)
+        writer.add_histogram('beta_log_prob', beta_log_prob, step)
 
         self.correction.append(corr)
         self.saved_log_probs.append(pi_log_prob)
 
-        return pi_action, pi_probs
+        return pi_probs
+
+    def _select_action_with_TopK_correction(self, state, beta, action, K, writer, step, **kwargs):
+        pi_log_prob, beta_log_prob, pi_probs = self.pi_beta_sample(state, beta, action)
+
+        # calculate correction
+        corr = torch.exp(pi_log_prob) / torch.exp(beta_log_prob)
+
+        # calculate top K correction
+        l_k = K * (1 - torch.exp(pi_log_prob)) ** (K-1)
+
+        writer.add_histogram('correction', corr, step)
+        writer.add_histogram('l_k', l_k, step)
+        writer.add_histogram('pi_log_prob', pi_log_prob, step)
+        writer.add_histogram('beta_log_prob', beta_log_prob, step)
+
+        self.correction.append(corr)
+        self.lambda_k.append(l_k)
+        self.saved_log_probs.append(pi_log_prob)
+
+        return pi_probs
 
 
 class Critic(nn.Module):
