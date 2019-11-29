@@ -45,7 +45,7 @@ This is my school project. It focuses on Reinforcement Learning for personalized
 - State Representation module with various methods. For sequential state representation, you can use basic LSTM/RNN/GRU, 
 Temporal Convolutional Networks, Echo State Networks and Chaos Free RNNs that are way faster than GRU.
 
-- Pytorch 1.2 support with Tensorboard visualization.
+- Pytorch 1.3 support with Tensorboard visualization.
 
 - New datasets will be added in the future.
 
@@ -55,11 +55,19 @@ Temporal Convolutional Networks, Echo State Networks and Chaos Free RNNs that ar
 
 The repo consists of two parts: the library (./recnn) and the playground (./examples)  where I explain how to work with certain things. 
 
-- The first article, the code is under notes/1. Vanilla RL/, it's very beginner-friendly and covers basic Reinforcement Learning Approach:
+- Pretty much what you need to get started with this library if you know recommenders but don't know much about
+  reinforcement learning:
 
 <p align="center"> 
    <a href="https://towardsdatascience.com/reinforcement-learning-ddpg-and-td3-for-news-recommendation-d3cddec26011">
-        <img src="./res/Article.png">
+        <img src="./res/article_1.png"  width="70%">
+    </a>
+</p>
+
+- Top-K Off-Policy Correction for a REINFORCE Recommender System:
+<p align="center"> 
+   <a href="https://towardsdatascience.com/top-k-off-policy-correction-for-a-reinforce-recommender-system-e34381dceef8">
+        <img src="./res/article_2.png" width="70%">
     </a>
 </p>
 
