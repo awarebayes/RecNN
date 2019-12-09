@@ -83,7 +83,7 @@ The repo consists of two parts: the library (./recnn) and the playground (./exam
 | Twin Delayed DDPG (TD3)               | https://arxiv.org/abs/1802.09477 | examples/1.Vanilla RL/TD3  |
 | Soft Actor-Critic                     | https://arxiv.org/abs/1801.01290 | examples/1.Vanilla RL/SAC  |
 | Batch Constrained Q-Learning          | https://arxiv.org/abs/1812.02900 | examples/99.To be released/BCQ |
-| REINFORCE Top-K Off-Policy Correction | https://arxiv.org/abs/1509.02971 | examples/2. REINFORCE TopK |
+| REINFORCE Top-K Off-Policy Correction | https://arxiv.org/abs/1812.02353 | examples/2. REINFORCE TopK |
 
 </p>
 

@@ -9,6 +9,7 @@ recnn/.idea/
 *csv
 *zip
 .idea/
+.desktopfolder
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

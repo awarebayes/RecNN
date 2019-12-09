@@ -7,7 +7,7 @@ from recnn.data.utils import make_items_tensor
     Chain of responsibility pattern.
     https://refactoring.guru/design-patterns/chain-of-responsibility/python/example
     
-    RecNN is designed to work with your dataflow. 
+    RecNN is designed to work with your data flow. 
     Function that contain 'dataset' are needed to interact with environment.
     The environment is provided via env.argument.
     These functions can interact with env and set up some stuff how you like.
@@ -38,7 +38,7 @@ from recnn.data.utils import make_items_tensor
                                             
     Notice: prepare_dataset doesn't take **reduce_items_to** argument, but it is required in truncate_dataset.
     As I previously mentioned RecNN is designed to be argument agnostic, meaning you provide some kwarg in the  
-    build_data_pipeline function and it is passed down the function chain. If needed, it will be used. Otherwise ignored  
+    build_data_pipeline function, and it is passed down the function chain. If needed, it will be used. Otherwise, ignored  
 """
 
 
@@ -82,7 +82,7 @@ def truncate_dataset(df, key_to_id, frame_size, env, reduce_items_to, sort_users
         Truncate #items to num_items provided in the arguments
     """
 
-    # here n items to keep are adjusted
+    # here are adjusted n items to keep
     num_items = reduce_items_to
 
     to_remove = df['movieId'].value_counts().sort_values()[:-num_items].index

@@ -83,6 +83,12 @@ class DiscreteActor(nn.Module):
         self.rewards = []
         self.correction = []
         self.lambda_k = []
+
+        # What's action source? See this issue: https://github.com/awarebayes/RecNN/issues/7
+        # by default {pi: pi, beta: beta}
+        # you can change it to be like {pi: beta, beta: beta} as miracle24 suggested
+
+        self.action_source = {'pi': 'pi', 'beta': 'beta'}
         self.select_action = self._select_action
 
     def forward(self, inputs):
@@ -98,11 +104,15 @@ class DiscreteActor(nn.Module):
         del self.lambda_k[:]
 
     def _select_action(self, state, **kwargs):
-        probs = self.forward(state)
-        m = Categorical(probs)
-        action = m.sample()
-        self.saved_log_probs.append(m.log_prob(action))
-        return probs
+
+        # for reinforce without correction only pi_probs is available.
+        # the action source is ignored, since there is no beta
+
+        pi_probs = self.forward(state)
+        pi_categorical = Categorical(pi_probs)
+        pi_action = pi_categorical.sample()
+        self.saved_log_probs.append(pi_categorical.log_prob(pi_action))
+        return pi_probs
 
     def pi_beta_sample(self, state, beta, action, **kwargs):
         # 1. obtain probabilities
@@ -110,13 +120,19 @@ class DiscreteActor(nn.Module):
         beta_probs = beta(state.detach(), action=action)
         pi_probs = self.forward(state)
 
-        # 2. probabilities -> categorical distribution
+        # 2. probabilities -> categorical distribution.
         beta_categorical = Categorical(beta_probs)
         pi_categorical = Categorical(pi_probs)
 
-        # 3. sample actions
-        beta_action = beta_categorical.sample()
-        pi_action = pi_categorical.sample()
+        # 3. sample the actions
+        # See this issue: https://github.com/awarebayes/RecNN/issues/7
+        # usually it works like:
+        # pi_action = pi_categorical.sample(); beta_action = beta_categorical.sample();
+        # but changing the action_source to {pi: beta, beta: beta} can be configured to be:
+        # pi_action = beta_categorical.sample(); beta_action = beta_categorical.sample();
+        available_actions = {'pi': pi_categorical.sample(), 'beta': beta_categorical.sample()}
+        pi_action = available_actions[self.action_source['pi']]
+        beta_action = available_actions[self.action_source['beta']]
 
         # 4. calculate stuff we need
         pi_log_prob = pi_categorical.log_prob(pi_action)

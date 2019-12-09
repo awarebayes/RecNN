@@ -66,7 +66,7 @@ def reinforce_update(batch, params, nets, optimizer,
                      debug=None, writer=utils.DummyWriter(),
                      learn=True, step=-1):
 
-    # Due no its mechanics, reinforce doesn't support testing!
+    # Due to its mechanics, reinforce doesn't support testing!
     learn = True
 
     state, action, reward, next_state, done = data.get_base_batch(batch)
