@@ -70,12 +70,12 @@ def load_omdb_meta():
 def load_models(device):
     ddpg = recnn.nn.models.Actor(1290, 128, 256).to(device)
     td3 = recnn.nn.models.Actor(1290, 128, 256).to(device)
-    ddpg.load_state_dict(torch.load( MODELSPATH + 'ddpg_policy.pt'))
-    td3.load_state_dict(torch.load(MODELSPATH + 'td3_policy.pt'))
+    ddpg.load_state_dict(torch.load( MODELSPATH + 'ddpg_policy.pt', map_location=device))
+    td3.load_state_dict(torch.load(MODELSPATH + 'td3_policy.pt', map_location=device))
     return {'ddpg': ddpg, 'td3': td3}
 
 
-def rank(gen_action, metric):
+def rank(gen_action, metric, k):
     scores = []
     movie_embeddings_key_dict = get_mekd()
     meta = load_omdb_meta()
@@ -85,9 +85,9 @@ def rank(gen_action, metric):
             continue
         scores.append([i, metric(movie_embeddings_key_dict[i], gen_action)])
     scores = list(sorted(scores, key = lambda x: x[1]))
-    scores = scores[:10]
+    scores = scores[:k]
     ids = [i[0] for i in scores]
-    for i in range(10):
+    for i in range(k):
         #scores[i].extend([meta[str(scores[i][0])]['omdb'][key]  for key in ['Title',
         #                        'Genre', 'Language', 'Released', 'imdbRating']])
         scores[i].extend([meta[str(scores[i][0])]['omdb'][key]  for key in ['Title',
@@ -266,6 +266,8 @@ def main():
         metric = st.selectbox('Choose a metric', ('euclidean', 'cosine', 'correlation',
                                                   'canberra', 'minkowski', 'chebyshev',
                                                   'braycurtis', 'cityblock',))
+        topk = st.slider("TOP K items to recommend:", min_value=1, max_value=30, value=7)
+
         dist = {'euclidean': distance.euclidean, 'cosine': distance.cosine,
                 'correlation': distance.correlation, 'canberra': distance.canberra,
                 'minkowski': distance.minkowski, 'chebyshev': distance.chebyshev,
@@ -274,7 +276,7 @@ def main():
         action = models[algorithm].forward(state)
 
         st.markdown('**Recommendations for state with index {}**'.format(action_id))
-        st.write(rank(action[action_id].detach().cpu().numpy(), dist[metric]))
+        st.write(rank(action[action_id].detach().cpu().numpy(), dist[metric], topk))
 
         st.subheader('Pairwise distances for all actions in the batch:')
         st.pyplot(recnn.utils.pairwise_distances_fig(action))
