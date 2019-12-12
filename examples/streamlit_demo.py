@@ -5,6 +5,7 @@ import numpy as np
 import pickle
 import json
 import copy
+import random
 from tqdm.auto import tqdm
 
 import torch
@@ -20,64 +21,54 @@ import streamlit.ReportThread as ReportThread
 from streamlit.server.Server import Server
 
 # constants
-
-RATINGSPATH = '../data/ml-20m/ratings.csv'
-EMBEDPATH =  '../data/embeddings/ml20_pca128.pkl'
-METAPATH = '../data/parsed/omdb.json'
+ML20MPATH = '../data/ml-20m/'
 MODELSPATH = '../models/'
+DATAPATH = '../data/streamlit/'
+SHOW_TOPN_MOVIES = 200
 
 # disable it if you get an error
 from jupyterthemes import jtplot
 jtplot.style(theme='grade3')
 
-@st.cache
-def set_up_env():
-    env = recnn.data.FrameEnv(EMBEDPATH, RATINGSPATH, 10, 1)
-
-    batch_wrapper = env.prepare_batch_wrapper
-    del env.prepare_batch_wrapper, env.train_dataloader.collate_fn, env.test_dataloader.collate_fn
-
-    env_serialized = pickle.dumps(env)
-    return env_serialized, batch_wrapper
-
-
-def get_env():
-    env, batch_wrapper = set_up_env()
-    env = pickle.loads(env)
-    env.prepare_batch_wrapper = batch_wrapper
-    env.train_dataloader.collate_fn = batch_wrapper
-    env.test_dataloader.collate_fn = batch_wrapper
-
-    return env
 
 @st.cache
-def get_mekd():
-    return get_env().movie_embeddings_key_dict
+def load_mekd():
+    return pickle.load(open(DATAPATH + 'mekd.pkl', 'rb'))
 
 
-@st.cache
 def get_batch(device):
-    env = get_env()
-    test_batch = next(iter(env.test_dataloader))
-    return recnn.data.get_base_batch(test_batch, device=device)
+    # gets a random batch using cached load
+    @st.cache
+    def load_batch():
+        return pickle.load(open(DATAPATH + 'batch.pkl', 'rb'))
+    # todo remove randomness
+    return [i.to(device) for i in random.choice(load_batch())]
 
+
+def get_embeddings():
+    movie_embeddings_key_dict = load_mekd()
+    movies_embeddings_tensor, key_to_id, id_to_key = recnn.data.utils.make_items_tensor(movie_embeddings_key_dict)
+    return  movies_embeddings_tensor, key_to_id, id_to_key
 
 @st.cache
 def load_omdb_meta():
-    return json.load(open(METAPATH))
+    return json.load(open(DATAPATH + 'omdb.json'))
 
 
 def load_models(device):
     ddpg = recnn.nn.models.Actor(1290, 128, 256).to(device)
     td3 = recnn.nn.models.Actor(1290, 128, 256).to(device)
-    ddpg.load_state_dict(torch.load( MODELSPATH + 'ddpg_policy.pt', map_location=device))
+    ddpg.load_state_dict(torch.load(MODELSPATH + 'ddpg_policy.pt', map_location=device))
     td3.load_state_dict(torch.load(MODELSPATH + 'td3_policy.pt', map_location=device))
     return {'ddpg': ddpg, 'td3': td3}
 
+@st.cache
+def load_links():
+    return pd.read_csv(ML20MPATH + 'links.csv', index_col='tmdbId')
 
 def rank(gen_action, metric, k):
     scores = []
-    movie_embeddings_key_dict = get_mekd()
+    movie_embeddings_key_dict = load_mekd()
     meta = load_omdb_meta()
 
     for i in movie_embeddings_key_dict.keys():
@@ -88,13 +79,8 @@ def rank(gen_action, metric, k):
     scores = scores[:k]
     ids = [i[0] for i in scores]
     for i in range(k):
-        #scores[i].extend([meta[str(scores[i][0])]['omdb'][key]  for key in ['Title',
-        #                        'Genre', 'Language', 'Released', 'imdbRating']])
         scores[i].extend([meta[str(scores[i][0])]['omdb'][key]  for key in ['Title',
                                 'Genre', 'imdbRating']])
-        # scores[i][3] = ' '.join([genres_dict[i] for i in scores[i][3]])
-
-    # indexes = ['id', 'score', 'Title', 'Genre', 'Language', 'Released', 'imdbRating']
     indexes = ['id', 'score', 'Title', 'Genre', 'imdbRating']
     table_dict = dict([(key, [i[idx] for i in scores]) for idx, key in enumerate(indexes)])
     table = pd.DataFrame(table_dict)
@@ -168,10 +154,23 @@ def render_header():
 
     """, unsafe_allow_html=True)
 
-
 @st.cache
-def get_embs():
-    return get_env().embeddings
+def get_mov_base():
+    links = load_links()
+    movies_embeddings_tensor, key_to_id, id_to_key = get_embeddings()
+    meta = load_omdb_meta()
+
+    mov_base = {}
+
+    for i, k in list(meta.items())[:SHOW_TOPN_MOVIES]:
+        tmdid = int(meta[i]['tmdbId'])
+        if tmdid > 0:
+            movieid = pd.to_numeric(links.loc[tmdid]['movieId'])
+            if isinstance(movieid, pd.Series):
+                continue
+            mov_base[int(movieid)] = meta[i]['omdb']['Title']
+
+    return mov_base
 
 
 def get_index():
@@ -182,7 +181,8 @@ def get_index():
     indexIP = faiss.IndexFlatIP(128)
     indexCOS = faiss.IndexFlatIP(128)
 
-    mov_mat = get_embs().numpy().astype('float32')
+    mov_mat, _, _ = get_embeddings()
+    mov_mat = mov_mat.numpy().astype('float32')
     indexL2.add(mov_mat)
     indexIP.add(mov_mat)
     indexCOS.add(normalize(mov_mat, axis=1, norm='l2'))
@@ -198,9 +198,10 @@ def main():
         device = torch.device('cpu')
 
     st.sidebar.subheader('Choose a page to proceed:')
-    page = st.sidebar.selectbox("", ["Get Started", "Recommend", "Test distance"])
+    page = st.sidebar.selectbox("", ["🚀 Get Started", "📽 ️Recommend me a movie", "🔨 Test Recommendation",
+                                     "⛏️ Test Diversity"])
 
-    if page == "Get Started":
+    if page == "🚀 Get Started":
         render_header()
 
         st.markdown("""
@@ -222,17 +223,13 @@ def main():
         st.markdown(
             """
             ### Downloads
-            - [MovieLens 20M (ratings.csv)](https://grouplens.org/datasets/movielens/20m/)
-            - [My Movie Embeddings (ml20_pca128.pkl)](https://drive.google.com/open?id=1EQ_zXBR3DKpmJR3jBgLvt-xoOvArGMsL)
-            - [Meta (omdb.json)](https://drive.google.com/open?id=1t0LNCbqLjiLkAMFwtP8OIYU-zPUCNAjK)
-
-            set RATINGSPATH, EMBEDPATH, METAPATH, MODELSPATH variables to these
+            aren't public yet, but we are getting here! 
             """
         )
 
-    if page == "Recommend":
+    if page == "🔨 Test Recommendation":
 
-        st.header("Let's recommend something!")
+        st.header("Test the Recommendations")
 
         st.info("Upon the first opening the data will start loading."
                 "\n Unfortunately there is no progress verbose in streamlit. Look in your console.")
@@ -281,8 +278,8 @@ def main():
         st.subheader('Pairwise distances for all actions in the batch:')
         st.pyplot(recnn.utils.pairwise_distances_fig(action))
 
-    if page == "Test distance":
-        st.header("Test distances")
+    if page == "⛏️ Test Diversity":
+        st.header("Test the Distances (diversity and pinpoint accuracy)")
 
         models = load_models(device)
         st.success('Models are loaded!')
@@ -327,6 +324,12 @@ def main():
 
         # Mean Err
         st.subheader('Mean error')
+        st.markdown("""
+        How close are we to the actual movie embedding? 
+        
+        The closer the better, although higher error may
+        produce more diverse recommendations.
+        """)
         labels = ['DDPG', 'TD3']
         x_pos = np.arange(len(labels))
         CTEs = [ddpg_mean, td3_mean]
@@ -344,13 +347,66 @@ def main():
 
         # Similarities
         st.header('Similarities')
-        emb = get_embs()
+        emb, _, _ = get_embeddings()
+
+        st.markdown('Heatmap of correlation similarities (Grammarian Product of actions)'
+                    '\n\n'
+                    'Higher = mode diverse, lower = less diverse. You decide what is better...')
 
         st.subheader('ddpg')
         st.pyplot(recnn.utils.pairwise_distances_fig(torch.tensor(emb[ddpg_I])))
         st.subheader('td3')
         st.pyplot(recnn.utils.pairwise_distances_fig(torch.tensor(emb[td3_I])))
 
+    if page == "📽 ️Recommend me a movie":
+        st.header("📽 ️Recommend me a movie")
+        st.markdown("""
+        **Now, this is probably why you came here. Let's get you some movies suggested**
+        
+        You need to choose 10 movies in the bar below by typing their titles.
+        Due to the client side limitations, I am only able to display top 200 movies
+        """)
+
+        mov_base = get_mov_base()
+        mov_base_by_title = {v: k for k, v in mov_base.items()}
+        movies_chosen = st.multiselect('Choose 10 movies', list(mov_base.values()))
+        st.markdown('**{} chosen {} to go**'.format(len(movies_chosen), 10 - len(movies_chosen)))
+
+        if len(movies_chosen) > 10:
+            st.error('Please select exactly 10 movies, you have selected {}'.format(len(movies_chosen)))
+        if len(movies_chosen) == 10:
+            st.success("You have selected 10 movies. Now let's rate them")
+        else:
+            st.info('Please select 10 movies in the input above')
+
+        if len(movies_chosen) == 10:
+            st.markdown('### Rate each movie from 1 to 10')
+            ratings = dict([(i, st.number_input(i, min_value=1, max_value=10, value=5)) for i in movies_chosen])
+            # st.write('for debug your ratings are:', ratings)
+
+
+            ids = [mov_base_by_title[i] for i in movies_chosen]
+            # st.write('Movie indexes', list(ids))
+            embs = load_mekd()
+            state = torch.cat([torch.cat([embs[i] for i in ids]), torch.tensor(list(ratings.values())).float() - 5])
+            st.write('your state', state)
+            state = state.to(device).squeeze(0)
+
+            models = load_models(device)
+            algorithm = st.selectbox('Choose an algorithm', ('ddpg', 'td3'))
+            metric = st.selectbox('Choose a metric', ('euclidean', 'cosine', 'correlation',
+                                                          'canberra', 'minkowski', 'chebyshev',
+                                                          'braycurtis', 'cityblock',))
+            topk = st.slider("TOP K items to recommend:", min_value=1, max_value=30, value=7)
+
+            dist = {'euclidean': distance.euclidean, 'cosine': distance.cosine,
+                    'correlation': distance.correlation, 'canberra': distance.canberra,
+                    'minkowski': distance.minkowski, 'chebyshev': distance.chebyshev,
+                    'braycurtis': distance.braycurtis, 'cityblock': distance.cityblock}
+
+            action = models[algorithm].forward(state)
+
+            st.write(rank(action[0].detach().cpu().numpy(), dist[metric], topk))
 
 
 
