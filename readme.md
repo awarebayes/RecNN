@@ -34,7 +34,7 @@ This is my school project. It focuses on Reinforcement Learning for personalized
     <a href="https://recnn.readthedocs.io">recnn.readthedocs.io</a>
 </p>
 
-### All in all the features can be summed up to:
+### 📊 The features can be summed up to:
 
 - Abstract as you decide: you can import the entire algorithm (say DDPG) and tell it to ddpg.learn(batch), you can import networks and the learning function separately, create a custom loader for your task, or can define everything by yourself.
 
@@ -51,7 +51,7 @@ Temporal Convolutional Networks, Echo State Networks and Chaos Free RNNs that ar
 
 - SOTA optimizers (RAdam, LookAhead, Ranger) come pre-packaged.
 
-## Medium Articles
+## 📚 Medium Articles
 
 The repo consists of two parts: the library (./recnn), and the playground (./examples) where I explain how to work with certain things. 
 
@@ -72,7 +72,7 @@ The repo consists of two parts: the library (./recnn), and the playground (./exa
 </p>
 
 
-## Algorithms that are/will be added:
+## 🤖 Algorithms that are/will be added:
 
 <p align="center"> 
     
@@ -90,14 +90,14 @@ The repo consists of two parts: the library (./recnn), and the playground (./exa
 ***
 ### [My Trello with useful papers](https://trello.com/b/wnor4IZf/recnn)
 *** 
-### Repos I used code from:
+### 👨‍💻 Repos I used code from:
 
 - Sfujim's [BCQ](https://github.com/sfujim/BCQ)
 - LiyuanLucasLiu [Radam](https://github.com/LiyuanLucasLiu/RAdam)
 - Higgsfield's [RL Adventure 2](https://github.com/higgsfield/RL-Adventure-2)
 - Mpyrozhok's [adamwr](https://github.com/mpyrozhok/adamwr)
 
-<center> <h2> What is this? </h2> </center>
+### 🤔 What is this? 
 
 <p align="center"> 
 This is my school project. It focuses on Reinforcement Learning for personalized news recommendation. The main distinction is that it tries to solve online off-policy learning with dynamically generated item embeddings. Also, there is no exploration, since we are working with a dataset. In the example section, I use Google's BERT on the ML20M dataset to extract contextual information from the movie description to form the latent vector representations. Later, you can use the same transformation on new, previously unseen items (hence, the embeddings are dynamically generated). If you don't want to bother with embeddings pipeline, I have a DQN embeddings generator as a proof of concept.
@@ -107,7 +107,7 @@ This is my school project. It focuses on Reinforcement Learning for personalized
 <img width="100%" src="./res/portfolio.png">
 </p>
 
-## Getting Started
+## ✋ Getting Started
 <p align="center"> 
 <a href="https://colab.research.google.com/drive/1xWX4JQvlcx3mizwL4gB0THEyxw6LsXTL"><img src="https://i.postimg.cc/mDzKRc1K/code.png"></a>
 </p>
@@ -124,26 +124,23 @@ p.s. Image is clickable. here is direct link:
 
 To learn more about recnn, read the docs: <a href="https://recnn.readthedocs.io">recnn.readthedocs.io</a> 
 
-### Installing
+### ⚙️ Installing
 
 ```
 pip install git+git://github.com/awarebayes/RecNN.git
-
-or
-
-git clone https://github.com/awarebayes/RecNN
-pip install ./RecNN
 ```
 
-## Downloads
+pip is on its way...
+
+## 📁 Downloads
 - [MovieLens 20M](https://grouplens.org/datasets/movielens/20m/)
 - [Movie Embeddings](https://drive.google.com/open?id=1EQ_zXBR3DKpmJR3jBgLvt-xoOvArGMsL)
 - [Misc Data](https://drive.google.com/open?id=1TclEmCnZN_Xkl3TfUXL5ivPYmLnIjQSu)
 - [Parsed (omdb,tmdb)](https://drive.google.com/open?id=1t0LNCbqLjiLkAMFwtP8OIYU-zPUCNAjK)
 
-## [Download the Models](https://drive.google.com/file/d/1goGa15XZmDAp2msZvRi2v_1h9xfmnhz7/view?usp=sharing)
+## 📁 [Download the Models](https://drive.google.com/file/d/1goGa15XZmDAp2msZvRi2v_1h9xfmnhz7/view?usp=sharing)
 
-## Citing
+## 📄 Citing
 If you find RecNN useful for an academic publication, then please use the following BibTeX to cite it:
 
 ```

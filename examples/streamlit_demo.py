@@ -231,7 +231,7 @@ def main():
 
         st.markdown(
             """
-            **Downloads** + change the **constants**, so they point to this unpacked folder:
+            📁 **Downloads** + change the **constants**, so they point to this unpacked folder:
             
             - [Models](https://drive.google.com/file/d/1goGa15XZmDAp2msZvRi2v_1h9xfmnhz7/view?usp=sharing)
              **= MODELSPATH**
