@@ -53,7 +53,7 @@ Temporal Convolutional Networks, Echo State Networks and Chaos Free RNNs that ar
 
 ## Medium Articles
 
-The repo consists of two parts: the library (./recnn) and the playground (./examples)  where I explain how to work with certain things. 
+The repo consists of two parts: the library (./recnn), and the playground (./examples) where I explain how to work with certain things. 
 
 - Pretty much what you need to get started with this library if you know recommenders but don't know much about
   reinforcement learning:
@@ -108,13 +108,12 @@ This is my school project. It focuses on Reinforcement Learning for personalized
 </p>
 
 ## Getting Started
-
 <p align="center"> 
-<a href="https://colab.research.google.com/drive/1xWX4JQvlcx3mizwL4gB0THEyxw6LsXTL"><img src="./res/code.png"></a>
+<a href="https://colab.research.google.com/drive/1xWX4JQvlcx3mizwL4gB0THEyxw6LsXTL"><img src="https://i.postimg.cc/mDzKRc1K/code.png"></a>
 </p>
 
 <p align="center"> 
-<a href="https://colab.research.google.com/drive/1xWX4JQvlcx3mizwL4gB0THEyxw6LsXTL"><img src="./res/get_started.png"></a>
+<a href="https://colab.research.google.com/drive/1xWX4JQvlcx3mizwL4gB0THEyxw6LsXTL"><img src="https://i.postimg.cc/D0Qjy1vp/get-started.png"></a>
 </p>
 
 
@@ -142,10 +141,7 @@ pip install ./RecNN
 - [Misc Data](https://drive.google.com/open?id=1TclEmCnZN_Xkl3TfUXL5ivPYmLnIjQSu)
 - [Parsed (omdb,tmdb)](https://drive.google.com/open?id=1t0LNCbqLjiLkAMFwtP8OIYU-zPUCNAjK)
 
-## Models
-
-- [Articles 1,2: DDPG, TD3, BCQ](https://drive.google.com/open?id=1a15mvtXZwOOSj9aQJNCxNlPMYREYYDxg)
-
+## [Download the Models](https://drive.google.com/file/d/1goGa15XZmDAp2msZvRi2v_1h9xfmnhz7/view?usp=sharing)
 
 ## Citing
 If you find RecNN useful for an academic publication, then please use the following BibTeX to cite it:
@@ -154,7 +150,7 @@ If you find RecNN useful for an academic publication, then please use the follow
 @misc{RecNN,
   author = {M Scherbina},
   title = {RecNN: RL Recommendation with PyTorch},
-  year = {2018},
+  year = {2019},
   publisher = {GitHub},
   journal = {GitHub repository},
   howpublished = {\url{https://github.com/awarebayes/RecNN}},

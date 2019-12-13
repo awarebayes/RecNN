@@ -171,6 +171,7 @@ class FrameEnv(Env):
 class SeqEnv(Env):
 
     """
+    WARNING: THIS FEATURE IS IN ALPHA
     Dynamic length user environment.
     Due to some complications, this module is implemented quiet differently from FrameEnv.
     First of all, it relies on the replay buffer. Train/Test batch is a generator.
@@ -199,6 +200,7 @@ class SeqEnv(Env):
         """
 
         super(SeqEnv, self).__init__(embeddings, ratings, min_seq_size=10, *args, **kwargs)
+        print("Sequential support is super experimental and is not guaranteed to work")
         self.embed_batch = embed_batch
 
         if layout is None:

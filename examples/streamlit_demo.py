@@ -1,10 +1,11 @@
 import streamlit as st
 import matplotlib.pyplot as plt
-import pandas as pd
+
 import numpy as np
 import pickle
 import json
 import copy
+import pandas as pd
 import random
 from tqdm.auto import tqdm
 
@@ -15,16 +16,15 @@ from scipy.spatial import distance
 import sys
 sys.path.append("../")
 import recnn
-tqdm.pandas()
 
-import streamlit.ReportThread as ReportThread
-from streamlit.server.Server import Server
+
+tqdm.pandas()
 
 # constants
 ML20MPATH = '../data/ml-20m/'
 MODELSPATH = '../models/'
 DATAPATH = '../data/streamlit/'
-SHOW_TOPN_MOVIES = 200
+SHOW_TOPN_MOVIES = 200 # recommend me a movie. show only top ... movies, higher values lead to slow ux
 
 # disable it if you get an error
 from jupyterthemes import jtplot
@@ -58,8 +58,8 @@ def load_omdb_meta():
 def load_models(device):
     ddpg = recnn.nn.models.Actor(1290, 128, 256).to(device)
     td3 = recnn.nn.models.Actor(1290, 128, 256).to(device)
-    ddpg.load_state_dict(torch.load(MODELSPATH + 'ddpg_policy.pt', map_location=device))
-    td3.load_state_dict(torch.load(MODELSPATH + 'td3_policy.pt', map_location=device))
+    ddpg.load_state_dict(torch.load(MODELSPATH + 'ddpg_policy.model', map_location=device))
+    td3.load_state_dict(torch.load(MODELSPATH + 'td3_policy.model', map_location=device))
     return {'ddpg': ddpg, 'td3': td3}
 
 @st.cache
@@ -192,29 +192,38 @@ def get_index():
 def main():
     st.sidebar.header('📰 recnn by @awarebayes 👨‍🔧')
 
-    if st.sidebar.checkbox('Use cuda', True):
+    if st.sidebar.checkbox('Use cuda', torch.cuda.is_available()):
         device = torch.device('cuda')
     else:
         device = torch.device('cpu')
 
     st.sidebar.subheader('Choose a page to proceed:')
     page = st.sidebar.selectbox("", ["🚀 Get Started", "📽 ️Recommend me a movie", "🔨 Test Recommendation",
-                                     "⛏️ Test Diversity"])
+                                     "⛏️ Test Diversity", "🤖 Reinforce Top K"])
+
+    st.sidebar.markdown("""
+    ### I need your help!
+    Currently, I am at my final year of high school. I am doing all this to get into a university.
+    I live in Russia and I believe that I have no future here.
+    
+    If you happened to know a prof/teacher/postdoc/anyone at your 
+    university, please show them my CV: [link]().
+    
+    **I promise that I will make this library even better if I get a college degree!**
+    """)
 
     if page == "🚀 Get Started":
         render_header()
 
         st.markdown("""
             
-            ## Available algorithms:
+            ## You can play with these (more will be implemented):
             
             | Algorithm                             | Paper                            | Code                       |
             |---------------------------------------|----------------------------------|----------------------------|
-            | Deep Q Learning (PoC)                 | https://arxiv.org/abs/1312.5602  | examples/0. Embeddings/ 1.DQN |
             | Deep Deterministic Policy Gradients   | https://arxiv.org/abs/1509.02971 | examples/1.Vanilla RL/DDPG |
             | Twin Delayed DDPG (TD3)               | https://arxiv.org/abs/1802.09477 | examples/1.Vanilla RL/TD3  |
             | Soft Actor-Critic                     | https://arxiv.org/abs/1801.01290 | examples/1.Vanilla RL/SAC  |
-            | Batch Constrained Q-Learning          | https://arxiv.org/abs/1812.02900 | examples/99.To be released/BCQ |
             | REINFORCE Top-K Off-Policy Correction | https://arxiv.org/abs/1812.02353 | examples/2. REINFORCE TopK |
         """)
 
@@ -222,8 +231,17 @@ def main():
 
         st.markdown(
             """
-            ### Downloads
-            aren't public yet, but we are getting here! 
+            **Downloads** + change the **constants**, so they point to this unpacked folder:
+            
+            - [Models](https://drive.google.com/file/d/1goGa15XZmDAp2msZvRi2v_1h9xfmnhz7/view?usp=sharing)
+             **= MODELSPATH**
+            - [Data for Streamlit Demo](https://drive.google.com/file/d/1nuhHDdC4mCmiB7g0fmwUSOh1jEUQyWuz/view?usp=sharing)
+             **= DATAPATH**
+            - [ML20M Dataset](https://grouplens.org/datasets/movielens/20m/)
+             **= ML20MPATH**
+             
+            p.s. ml20m is only needed for links.csv, I couldn't include it in my streamlit data because of copyright.
+            This is all the data you need.
             """
         )
 
@@ -364,7 +382,8 @@ def main():
         **Now, this is probably why you came here. Let's get you some movies suggested**
         
         You need to choose 10 movies in the bar below by typing their titles.
-        Due to the client side limitations, I am only able to display top 200 movies
+        Due to the client side limitations, I am only able to display top 200 movies.
+        P.S. you can type to search
         """)
 
         mov_base = get_mov_base()
@@ -406,8 +425,13 @@ def main():
 
             action = models[algorithm].forward(state)
 
+            st.subheader('The neural network thinks you should watch:')
+
             st.write(rank(action[0].detach().cpu().numpy(), dist[metric], topk))
 
+    if page == "🤖 Reinforce Top K":
+        st.title("🤖 Reinforce Top K")
+        st.subheader('This page is under construction')
 
 
 if __name__ == "__main__":
