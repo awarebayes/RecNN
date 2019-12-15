@@ -72,7 +72,7 @@ The repo consists of two parts: the library (./recnn), and the playground (./exa
 </p>
 
 
-## 🤖 Algorithms that are/will be added:
+## Algorithms that are/will be added:
 
 <p align="center"> 
     
@@ -87,10 +87,7 @@ The repo consists of two parts: the library (./recnn), and the playground (./exa
 
 </p>
 
-***
-### [My Trello with useful papers](https://trello.com/b/wnor4IZf/recnn)
-*** 
-### 👨‍💻 Repos I used code from:
+### ‍Repos I used code from:
 
 - Sfujim's [BCQ](https://github.com/sfujim/BCQ)
 - LiyuanLucasLiu [Radam](https://github.com/LiyuanLucasLiu/RAdam)

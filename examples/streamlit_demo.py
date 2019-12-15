@@ -135,7 +135,7 @@ def render_header():
             <a href="https://recnn.readthedocs.io">recnn.readthedocs.io</a>
         </p>
         
-        ### Read the articles on medium!
+        ### 📚 Read the articles on medium!
         
         - Pretty much what you need to get started with this library if you know recommenders
           but don't know much about reinforcement learning:
@@ -153,6 +153,18 @@ def render_header():
         </p>
 
     """, unsafe_allow_html=True)
+
+    st.markdown("""
+
+        ### 🤖 You can play with these (more will be implemented):
+
+        | Algorithm                             | Paper                            | Code                       |
+        |---------------------------------------|----------------------------------|----------------------------|
+        | Deep Deterministic Policy Gradients   | https://arxiv.org/abs/1509.02971 | examples/1.Vanilla RL/DDPG |
+        | Twin Delayed DDPG (TD3)               | https://arxiv.org/abs/1802.09477 | examples/1.Vanilla RL/TD3  |
+        | Soft Actor-Critic                     | https://arxiv.org/abs/1801.01290 | examples/1.Vanilla RL/SAC  |
+        | REINFORCE Top-K Off-Policy Correction | https://arxiv.org/abs/1812.02353 | examples/2. REINFORCE TopK |
+    """)
 
 @st.cache
 def get_mov_base():
@@ -203,29 +215,17 @@ def main():
 
     st.sidebar.markdown("""
     ### I need your help!
-    Currently, I am at my final year of high school. I am doing all this to get into a university.
-    I live in Russia and I believe that I have no future here.
+    Currently, I am at my final year of high school, doing all this to get into a university.
+    I live in Russia and believe that I have no future here.
     
     If you happened to know a prof/teacher/postdoc/anyone at your 
-    university, please show them my CV: [link]().
+    university, please show them my CV: [link](https://drive.google.com/file/d/1jgM-SzEUbUjqgHzaajoUv4ENhC7-oaDT/view?usp=sharing).
     
     **I promise that I will make this library even better if I get a college degree!**
     """)
 
     if page == "🚀 Get Started":
         render_header()
-
-        st.markdown("""
-            
-            ## You can play with these (more will be implemented):
-            
-            | Algorithm                             | Paper                            | Code                       |
-            |---------------------------------------|----------------------------------|----------------------------|
-            | Deep Deterministic Policy Gradients   | https://arxiv.org/abs/1509.02971 | examples/1.Vanilla RL/DDPG |
-            | Twin Delayed DDPG (TD3)               | https://arxiv.org/abs/1802.09477 | examples/1.Vanilla RL/TD3  |
-            | Soft Actor-Critic                     | https://arxiv.org/abs/1801.01290 | examples/1.Vanilla RL/SAC  |
-            | REINFORCE Top-K Off-Policy Correction | https://arxiv.org/abs/1812.02353 | examples/2. REINFORCE TopK |
-        """)
 
         st.subheader("If you have cloned this repo, here is some stuff for you:")
 
