@@ -73,6 +73,11 @@ def reinforce_update(batch, params, nets, optimizer,
 
     predicted_probs = nets['policy_net'].select_action(state=state, action=action, K=params['K'],
                                                        learn=learn, writer=writer, step=step)
+    writer.add_histogram('predicted_probs_std', predicted_probs.std(), step)
+    writer.add_histogram('predicted_probs_mean', predicted_probs.mean(), step)
+    mx = predicted_probs.max(dim=1).values
+    writer.add_histogram('predicted_probs_max_mean', mx.mean(), step)
+    writer.add_histogram('predicted_probs_max_std', mx.std(), step)
     reward = nets['value_net'](state, predicted_probs).detach()
     nets['policy_net'].rewards.append(reward.mean())
 

@@ -31,6 +31,86 @@ from jupyterthemes import jtplot
 jtplot.style(theme='grade3')
 
 
+def render_header():
+    st.write("""
+        <p align="center"> 
+            <img src="https://raw.githubusercontent.com/awarebayes/RecNN/master/res/logo%20big.png">
+        </p>
+
+
+        <p align="center"> 
+        <iframe src="https://ghbtns.com/github-btn.html?user=awarebayes&repo=recnn&type=star&count=true&size=large" frameborder="0" scrolling="0" width="160px" height="30px"></iframe>
+        <iframe src="https://ghbtns.com/github-btn.html?user=awarebayes&repo=recnn&type=fork&count=true&size=large" frameborder="0" scrolling="0" width="158px" height="30px"></iframe>
+        <iframe src="https://ghbtns.com/github-btn.html?user=awarebayes&type=follow&count=true&size=large" frameborder="0" scrolling="0" width="220px" height="30px"></iframe>
+        </p>
+
+        <p align="center"> 
+
+        <a href='https://circleci.com/gh/awarebayes/RecNN'>
+        <img src='https://circleci.com/gh/awarebayes/RecNN.svg?style=svg' alt='Documentation Status' />
+        </a>
+
+        <a href="https://codeclimate.com/github/awarebayes/RecNN/maintainability">
+        <img src="https://api.codeclimate.com/v1/badges/d3a06ffe45906969239d/maintainability" />            
+        </a>
+
+        <a href="https://colab.research.google.com/github/awarebayes/RecNN/">
+        <img src="https://colab.research.google.com/assets/colab-badge.svg" />
+        </a>
+
+        <a href='https://recnn.readthedocs.io/en/latest/?badge=latest'>
+        <img src='https://readthedocs.org/projects/recnn/badge/?version=latest' alt='Documentation Status' />
+        </a>
+
+        </p>
+
+        <p align="center"> 
+            <b> Choose the page on the left sidebar to proceed </b>
+        </p>
+
+        <p align="center"> 
+            This is my school project. It focuses on Reinforcement Learning for personalized news recommendation.
+            The main distinction is that it tries to solve online off-policy learning with dynamically generated 
+            item embeddings. I want to create a library with SOTA algorithms for reinforcement learning
+            recommendation, providing the level of abstraction you like.
+        </p>
+
+        <p align="center">
+            <a href="https://recnn.readthedocs.io">recnn.readthedocs.io</a>
+        </p>
+
+        ### 📚 Read the articles on medium!
+
+        - Pretty much what you need to get started with this library if you know recommenders
+          but don't know much about reinforcement learning:
+        <p align="center"> 
+           <a href="https://towardsdatascience.com/reinforcement-learning-ddpg-and-td3-for-news-recommendation-d3cddec26011">
+                <img src="https://raw.githubusercontent.com/awarebayes/RecNN/master/res/article_1.png"  width="100%">
+            </a>
+        </p>
+
+        - Top-K Off-Policy Correction for a REINFORCE Recommender System:
+        <p align="center"> 
+           <a href="https://towardsdatascience.com/top-k-off-policy-correction-for-a-reinforce-recommender-system-e34381dceef8">
+                <img src="https://raw.githubusercontent.com/awarebayes/RecNN/master/res/article_2.png" width="100%">
+            </a>
+        </p>
+
+    """, unsafe_allow_html=True)
+
+    st.markdown("""
+
+        ### 🤖 You can play with these (more will be implemented):
+
+        | Algorithm                             | Paper                            | Code                       |
+        |---------------------------------------|----------------------------------|----------------------------|
+        | Deep Deterministic Policy Gradients   | https://arxiv.org/abs/1509.02971 | examples/1.Vanilla RL/DDPG |
+        | Twin Delayed DDPG (TD3)               | https://arxiv.org/abs/1802.09477 | examples/1.Vanilla RL/TD3  |
+        | Soft Actor-Critic                     | https://arxiv.org/abs/1801.01290 | examples/1.Vanilla RL/SAC  |
+        | REINFORCE Top-K Off-Policy Correction | https://arxiv.org/abs/1812.02353 | examples/2. REINFORCE TopK |
+    """)
+
+
 @st.cache
 def load_mekd():
     return pickle.load(open(DATAPATH + 'mekd.pkl', 'rb'))
@@ -58,6 +138,7 @@ def load_omdb_meta():
 def load_models(device):
     ddpg = recnn.nn.models.Actor(1290, 128, 256).to(device)
     td3 = recnn.nn.models.Actor(1290, 128, 256).to(device)
+
     ddpg.load_state_dict(torch.load(MODELSPATH + 'ddpg_policy.model', map_location=device))
     td3.load_state_dict(torch.load(MODELSPATH + 'td3_policy.model', map_location=device))
     return {'ddpg': ddpg, 'td3': td3}
@@ -66,117 +147,19 @@ def load_models(device):
 def load_links():
     return pd.read_csv(ML20MPATH + 'links.csv', index_col='tmdbId')
 
-def rank(gen_action, metric, k):
-    scores = []
-    movie_embeddings_key_dict = load_mekd()
-    meta = load_omdb_meta()
-
-    for i in movie_embeddings_key_dict.keys():
-        if i == 0 or i == '0':
-            continue
-        scores.append([i, metric(movie_embeddings_key_dict[i], gen_action)])
-    scores = list(sorted(scores, key = lambda x: x[1]))
-    scores = scores[:k]
-    ids = [i[0] for i in scores]
-    for i in range(k):
-        scores[i].extend([meta[str(scores[i][0])]['omdb'][key]  for key in ['Title',
-                                'Genre', 'imdbRating']])
-    indexes = ['id', 'score', 'Title', 'Genre', 'imdbRating']
-    table_dict = dict([(key, [i[idx] for i in scores]) for idx, key in enumerate(indexes)])
-    table = pd.DataFrame(table_dict)
-    return table
-
-
-def render_header():
-    st.write("""
-        <p align="center"> 
-            <img src="https://raw.githubusercontent.com/awarebayes/RecNN/master/res/logo%20big.png">
-        </p>
-        
-        
-        <p align="center"> 
-        <iframe src="https://ghbtns.com/github-btn.html?user=awarebayes&repo=recnn&type=star&count=true&size=large" frameborder="0" scrolling="0" width="160px" height="30px"></iframe>
-        <iframe src="https://ghbtns.com/github-btn.html?user=awarebayes&repo=recnn&type=fork&count=true&size=large" frameborder="0" scrolling="0" width="158px" height="30px"></iframe>
-        <iframe src="https://ghbtns.com/github-btn.html?user=awarebayes&type=follow&count=true&size=large" frameborder="0" scrolling="0" width="220px" height="30px"></iframe>
-        </p>
-
-        <p align="center"> 
-
-        <a href='https://circleci.com/gh/awarebayes/RecNN'>
-        <img src='https://circleci.com/gh/awarebayes/RecNN.svg?style=svg' alt='Documentation Status' />
-        </a>
-
-        <a href="https://codeclimate.com/github/awarebayes/RecNN/maintainability">
-        <img src="https://api.codeclimate.com/v1/badges/d3a06ffe45906969239d/maintainability" />            
-        </a>
-
-        <a href="https://colab.research.google.com/github/awarebayes/RecNN/">
-        <img src="https://colab.research.google.com/assets/colab-badge.svg" />
-        </a>
-
-        <a href='https://recnn.readthedocs.io/en/latest/?badge=latest'>
-        <img src='https://readthedocs.org/projects/recnn/badge/?version=latest' alt='Documentation Status' />
-        </a>
-
-        </p>
-        
-        <p align="center"> 
-            <b> Choose the page on the left sidebar to proceed </b>
-        </p>
-
-        <p align="center"> 
-            This is my school project. It focuses on Reinforcement Learning for personalized news recommendation.
-            The main distinction is that it tries to solve online off-policy learning with dynamically generated 
-            item embeddings. I want to create a library with SOTA algorithms for reinforcement learning
-            recommendation, providing the level of abstraction you like.
-        </p>
-
-        <p align="center">
-            <a href="https://recnn.readthedocs.io">recnn.readthedocs.io</a>
-        </p>
-        
-        ### 📚 Read the articles on medium!
-        
-        - Pretty much what you need to get started with this library if you know recommenders
-          but don't know much about reinforcement learning:
-        <p align="center"> 
-           <a href="https://towardsdatascience.com/reinforcement-learning-ddpg-and-td3-for-news-recommendation-d3cddec26011">
-                <img src="https://raw.githubusercontent.com/awarebayes/RecNN/master/res/article_1.png"  width="100%">
-            </a>
-        </p>
-        
-        - Top-K Off-Policy Correction for a REINFORCE Recommender System:
-        <p align="center"> 
-           <a href="https://towardsdatascience.com/top-k-off-policy-correction-for-a-reinforce-recommender-system-e34381dceef8">
-                <img src="https://raw.githubusercontent.com/awarebayes/RecNN/master/res/article_2.png" width="100%">
-            </a>
-        </p>
-
-    """, unsafe_allow_html=True)
-
-    st.markdown("""
-
-        ### 🤖 You can play with these (more will be implemented):
-
-        | Algorithm                             | Paper                            | Code                       |
-        |---------------------------------------|----------------------------------|----------------------------|
-        | Deep Deterministic Policy Gradients   | https://arxiv.org/abs/1509.02971 | examples/1.Vanilla RL/DDPG |
-        | Twin Delayed DDPG (TD3)               | https://arxiv.org/abs/1802.09477 | examples/1.Vanilla RL/TD3  |
-        | Soft Actor-Critic                     | https://arxiv.org/abs/1801.01290 | examples/1.Vanilla RL/SAC  |
-        | REINFORCE Top-K Off-Policy Correction | https://arxiv.org/abs/1812.02353 | examples/2. REINFORCE TopK |
-    """)
-
 @st.cache
 def get_mov_base():
     links = load_links()
     movies_embeddings_tensor, key_to_id, id_to_key = get_embeddings()
     meta = load_omdb_meta()
 
+    popular = pd.read_csv(DATAPATH + 'movie_counts.csv')[:SHOW_TOPN_MOVIES]
+    st.write(popular['id'])
     mov_base = {}
 
-    for i, k in list(meta.items())[:SHOW_TOPN_MOVIES]:
+    for i, k in list(meta.items()):
         tmdid = int(meta[i]['tmdbId'])
-        if tmdid > 0:
+        if tmdid > 0 and popular['id'].isin([i]).any():
             movieid = pd.to_numeric(links.loc[tmdid]['movieId'])
             if isinstance(movieid, pd.Series):
                 continue
@@ -200,6 +183,31 @@ def get_index():
     indexCOS.add(normalize(mov_mat, axis=1, norm='l2'))
     return {'L2': indexL2, 'IP': indexIP, 'COS': indexCOS}
 
+def rank(gen_action, metric, k):
+    scores = []
+    movie_embeddings_key_dict = load_mekd()
+    meta = load_omdb_meta()
+
+    for i in movie_embeddings_key_dict.keys():
+        if i == 0 or i == '0':
+            continue
+        scores.append([i, metric(movie_embeddings_key_dict[i], gen_action)])
+    scores = list(sorted(scores, key = lambda x: x[1]))
+    scores = scores[:k]
+    ids = [i[0] for i in scores]
+    for i in range(k):
+        scores[i].extend([meta[str(scores[i][0])]['omdb'][key]  for key in ['Title',
+                                                                            'Genre', 'imdbRating']])
+    indexes = ['id', 'score', 'Title', 'Genre', 'imdbRating']
+    table_dict = dict([(key, [i[idx] for i in scores]) for idx, key in enumerate(indexes)])
+    table = pd.DataFrame(table_dict)
+    return table
+
+@st.cache
+def load_reinforce():
+    indexes = pickle.load(open(DATAPATH + 'reinforce_indexes.pkl', 'rb'))
+    state = pickle.load(open(DATAPATH + 'reinforce_state.pkl', 'rb'))
+    return state, indexes
 
 def main():
     st.sidebar.header('📰 recnn by @awarebayes 👨‍🔧')
@@ -413,25 +421,33 @@ def main():
 
             models = load_models(device)
             algorithm = st.selectbox('Choose an algorithm', ('ddpg', 'td3'))
+
             metric = st.selectbox('Choose a metric', ('euclidean', 'cosine', 'correlation',
-                                                          'canberra', 'minkowski', 'chebyshev',
-                                                          'braycurtis', 'cityblock',))
-            topk = st.slider("TOP K items to recommend:", min_value=1, max_value=30, value=7)
+                                                      'canberra', 'minkowski', 'chebyshev',
+                                                      'braycurtis', 'cityblock',))
 
             dist = {'euclidean': distance.euclidean, 'cosine': distance.cosine,
                     'correlation': distance.correlation, 'canberra': distance.canberra,
                     'minkowski': distance.minkowski, 'chebyshev': distance.chebyshev,
                     'braycurtis': distance.braycurtis, 'cityblock': distance.cityblock}
 
+            topk = st.slider("TOP K items to recommend:", min_value=1, max_value=30, value=7)
             action = models[algorithm].forward(state)
 
             st.subheader('The neural network thinks you should watch:')
-
             st.write(rank(action[0].detach().cpu().numpy(), dist[metric], topk))
 
     if page == "🤖 Reinforce Top K":
         st.title("🤖 Reinforce Top K")
+        st.markdown("**Reinforce is a discrete state algorithm, meaning a lot of metrics (i.e. error, diversity test) "
+                    "won't be possible. **")
         st.subheader('This page is under construction')
+
+
+
+
+
+
 
 
 if __name__ == "__main__":
