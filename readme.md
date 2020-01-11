@@ -48,7 +48,7 @@ recommendations, pairwise distances, and pinpoint accuracy.
 
 It is also possible to run a local copy of this script, it the online version is not available:
 ```
-git clone https://github.com/awarebayes/RecNN
+git clone git@github.com:awarebayes/RecNN.git 
 cd RecNN
 streamlit run examples/streamlit_demo.py
 ``` 
