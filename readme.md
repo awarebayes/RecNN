@@ -32,26 +32,7 @@ This is my school project. It focuses on Reinforcement Learning for personalized
 
 <p align="center">
     <a href="https://recnn.readthedocs.io">recnn.readthedocs.io</a>
-    |
-    <a href="http://68.183.123.150/">recnn.dev</a>
 </p>
-
-### 🚀 [New!] Try recommending online: [recnn.dev](http://68.183.123.150/)
-
-The streamlit demo finally has arrived! Source code is available [here](https://github.com/awarebayes/recnn-demo)
-
-
-Also, it has 'recommend me a movie' feature! Note how the score changes when you **rate** the movies. When you start
-and the movies aren't rated (5/10 by default) the score is about ~40 (euc), but as you rate them it drops to <10,
-indicating more personalized and precise predictions. You can also test diversity, check out the correlation of
-recommendations, pairwise distances, and pinpoint accuracy.
-
-It is also possible to run a local copy of this script, it the online version is not available:
-```
-git clone git@github.com:awarebayes/RecNN.git 
-cd RecNN
-streamlit run examples/streamlit_demo.py
-``` 
 
 ### 📊 The features can be summed up to:
 
@@ -146,7 +127,23 @@ To learn more about recnn, read the docs: <a href="https://recnn.readthedocs.io"
 pip install git+git://github.com/awarebayes/RecNN.git
 ```
 
-pip is on its way...
+PyPi is on its way...
+
+### 🚀 Try demo
+
+I built a [Streamlit](https://www.streamlit.io/) demo to showcase its features.
+It has 'recommend me a movie' feature! Note how the score changes when you **rate** the movies. When you start
+and the movies aren't rated (5/10 by default) the score is about ~40 (euc), but as you rate them it drops to <10,
+indicating more personalized and precise predictions. You can also test diversity, check out the correlation of
+recommendations, pairwise distances, and pinpoint accuracy.
+
+Run it:
+```
+git clone git@github.com:awarebayes/RecNN.git 
+cd RecNN && streamlit run examples/streamlit_demo.py
+```
+
+[Docker image is available here](https://github.com/awarebayes/recnn-demo)
 
 ## 📁 Downloads
 - [MovieLens 20M](https://grouplens.org/datasets/movielens/20m/)
