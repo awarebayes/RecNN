@@ -166,7 +166,3 @@ If you find RecNN useful for an academic publication, then please use the follow
   howpublished = {\url{https://github.com/awarebayes/RecNN}},
 }
 ```
-
-<p align="center"> 
-<img width="100%" src="./res/portfolio.png">
-</p>
