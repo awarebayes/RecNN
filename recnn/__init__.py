@@ -1,1 +1,1 @@
-from recnn import optim, data, utils, nn, rep
+from recnn import data, utils, nn, rep

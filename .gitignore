@@ -1,7 +1,7 @@
 data/*
 !recnn/data/
 runs/
-
+.vscode/
 models/
 recnn/.idea/
 .ipynb_checkpoints/

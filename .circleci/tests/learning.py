@@ -2,6 +2,7 @@ import torch
 
 # == recnn ==
 import recnn
+import torch_optimizer as optim
 
 state = torch.randn(10, 1290)
 action = torch.randn(10, 128)
@@ -42,9 +43,9 @@ def test_update_function():
     recnn.utils.soft_update(policy_net, target_policy_net, soft_tau=1.0)
 
     # define optimizers
-    value_optimizer = recnn.optim.RAdam(value_net.parameters(),
+    value_optimizer = optim.RAdam(value_net.parameters(),
                                   lr=1e-5, weight_decay=1e-2)
-    policy_optimizer = recnn.optim.RAdam(policy_net.parameters(), lr=1e-5 , weight_decay=1e-2)
+    policy_optimizer = optim.RAdam(policy_net.parameters(), lr=1e-5 , weight_decay=1e-2)
 
     nets = {
         'value_net': value_net,

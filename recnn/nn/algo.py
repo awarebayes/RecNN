@@ -1,8 +1,9 @@
-from recnn import utils, optim
+from recnn import utils 
 from recnn.nn import update
 from recnn.nn.update import ChooseREINFORCE
 
 import torch
+import torch_optimizer as optim
 import copy
 
 
