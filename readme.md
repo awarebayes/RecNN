@@ -100,9 +100,6 @@ The repo consists of two parts: the library (./recnn), and the playground (./exa
 This is my school project. It focuses on Reinforcement Learning for personalized news recommendation. The main distinction is that it tries to solve online off-policy learning with dynamically generated item embeddings. Also, there is no exploration, since we are working with a dataset. In the example section, I use Google's BERT on the ML20M dataset to extract contextual information from the movie description to form the latent vector representations. Later, you can use the same transformation on new, previously unseen items (hence, the embeddings are dynamically generated). If you don't want to bother with embeddings pipeline, I have a DQN embeddings generator as a proof of concept.
 </p>
 
-<p align="center"> 
-<img width="100%" src="./res/portfolio.png">
-</p>
 
 ## ✋ Getting Started
 <p align="center"> 

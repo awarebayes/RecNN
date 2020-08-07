@@ -10,3 +10,5 @@ Those are mostly copies of the notebooks.
 
       Getting Started <getting_started>
       Working with Your Data <your_data>
+      Using Pandas backends <pandas_backend>
+      
