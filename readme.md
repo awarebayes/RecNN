@@ -45,11 +45,9 @@ This is my school project. It focuses on Reinforcement Learning for personalized
 - State Representation module with various methods. For sequential state representation, you can use basic LSTM/RNN/GRU, 
 Temporal Convolutional Networks, Echo State Networks and Chaos Free RNNs that are way faster than GRU.
 
-- Pytorch 1.3 support with Tensorboard visualization.
+- Pytorch 1.5 support with Tensorboard visualization.
 
 - New datasets will be added in the future.
-
-- SOTA optimizers (RAdam, LookAhead, Ranger) come pre-packaged.
 
 ## 📚 Medium Articles
 
@@ -89,10 +87,8 @@ The repo consists of two parts: the library (./recnn), and the playground (./exa
 
 ### ‍Repos I used code from:
 
-- Sfujim's [BCQ](https://github.com/sfujim/BCQ)
-- LiyuanLucasLiu [Radam](https://github.com/LiyuanLucasLiu/RAdam)
-- Higgsfield's [RL Adventure 2](https://github.com/higgsfield/RL-Adventure-2)
-- Mpyrozhok's [adamwr](https://github.com/mpyrozhok/adamwr)
+- Sfujim's [BCQ](https://github.com/sfujim/BCQ) (not released yet)
+- Higgsfield's [RL Adventure 2](https://github.com/higgsfield/RL-Adventure-2) (great insiration)
 
 ### 🤔 What is this? 
 
