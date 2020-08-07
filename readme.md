@@ -42,8 +42,9 @@ This is my school project. It focuses on Reinforcement Learning for personalized
 
 - The learning is built around sequential or frame environment that supports ML20M and like. Seq and Frame determine the length type of sequential data, seq is fully sequential dynamic size, while the frame is just a static frame.
 
-- State Representation module with various methods. For sequential state representation, you can use basic LSTM/RNN/GRU, 
-Temporal Convolutional Networks, Echo State Networks and Chaos Free RNNs that are way faster than GRU.
+- State Representation module with various methods. For sequential state representation, you can use LSTM/RNN/GRU (WIP)
+
+- Parallel data loading with Modin (Dask and Ray) with one line of code = 3x time improvement
 
 - Pytorch 1.5 support with Tensorboard visualization.
 
@@ -135,7 +136,7 @@ recommendations, pairwise distances, and pinpoint accuracy.
 
 Run it:
 ```
-git clone git@github.com:awarebayes/RecNN.git 
+git clone --depth 1 git@github.com:awarebayes/RecNN.git 
 cd RecNN && streamlit run examples/streamlit_demo.py
 ```
 
