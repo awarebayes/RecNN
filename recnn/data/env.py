@@ -1,6 +1,6 @@
 from . import utils, dataset_functions as dset_F
 import pickle
-from .pandas_backend import pd
+import pandas as pd
 from torch.utils.data import Dataset, DataLoader
 import torch
 import numpy as np
@@ -101,8 +101,7 @@ class Env:
         self.embeddings = movies_embeddings_tensor
         self.key_to_id = key_to_id
         self.id_to_key = id_to_key
-        self.ratings = pd.get().read_csv(ratings)
-
+        self.ratings = pd.read_csv(ratings)
 
         self.user_dict = None
         self.users = None  # filtered keys of user_dict

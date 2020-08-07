@@ -1,5 +1,4 @@
 from recnn.data.utils import make_items_tensor
-from .pandas_backend import pd
 
 """     
     What?
@@ -42,12 +41,6 @@ from .pandas_backend import pd
     build_data_pipeline function, and it is passed down the function chain. If needed, it will be used. Otherwise, ignored  
 """
 
-def try_progress_apply(data_frame, function):
-    try: 
-        return data_frame.progress_apply(function)
-    except AttributeError:
-        return data_frame.apply(function)
-
 
 def prepare_dataset(df, key_to_id, frame_size, env, sort_users=False, **kwargs):
 
@@ -56,28 +49,26 @@ def prepare_dataset(df, key_to_id, frame_size, env, sort_users=False, **kwargs):
         [1, 34, 123, 2000], recnn makes it look like [0,1,2,3] for you.
     """
 
-    df['rating'] =  try_progress_apply(df['rating'], lambda i: 2 * (i - 2.5))
-    df['movieId'] = try_progress_apply(df['movieId'], lambda i: key_to_id.get(i))
+    df['rating'] = df['rating'].progress_apply(lambda i: 2 * (i - 2.5))
+    df['movieId'] = df['movieId'].progress_apply(lambda i: key_to_id.get(i))
 
     users = df[['userId', 'movieId']].groupby(['userId']).size()
     users = users[users > frame_size]
     if sort_users:
         users = users.sort_values(ascending=False)
     users = users.index
-    if pd.get_type() == "modin": # modin groupby.apply isn't much faster
-        df = df._to_pandas() # and collect better be single threaded
     ratings = df.sort_values(by='timestamp').set_index('userId').drop('timestamp', axis=1).groupby('userId')
-    
+
     # Groupby user
     user_dict = {}
 
     def app(x):
-        userid = int(x.index[0])
-        user_dict[userid] = {}
-        user_dict[userid]['items'] = x['movieId'].values
-        user_dict[userid]['ratings'] = x['rating'].values
+        userid = x.index[0]
+        user_dict[int(userid)] = {}
+        user_dict[int(userid)]['items'] = x['movieId'].values
+        user_dict[int(userid)]['ratings'] = x['rating'].values
 
-    try_progress_apply(ratings, app)
+    ratings.progress_apply(app)
 
     env.user_dict = user_dict
     env.users = users

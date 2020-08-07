@@ -42,13 +42,14 @@ This is my school project. It focuses on Reinforcement Learning for personalized
 
 - The learning is built around sequential or frame environment that supports ML20M and like. Seq and Frame determine the length type of sequential data, seq is fully sequential dynamic size, while the frame is just a static frame.
 
-- State Representation module with various methods. For sequential state representation, you can use LSTM/RNN/GRU (WIP)
+- State Representation module with various methods. For sequential state representation, you can use basic LSTM/RNN/GRU, 
+Temporal Convolutional Networks, Echo State Networks and Chaos Free RNNs that are way faster than GRU.
 
-- Parallel data loading with Modin (Dask and Ray) with one line of code = 3x time improvement
-
-- Pytorch 1.5 support with Tensorboard visualization.
+- Pytorch 1.3 support with Tensorboard visualization.
 
 - New datasets will be added in the future.
+
+- SOTA optimizers (RAdam, LookAhead, Ranger) come pre-packaged.
 
 ## 📚 Medium Articles
 
@@ -88,8 +89,10 @@ The repo consists of two parts: the library (./recnn), and the playground (./exa
 
 ### ‍Repos I used code from:
 
-- Sfujim's [BCQ](https://github.com/sfujim/BCQ) (not released yet)
-- Higgsfield's [RL Adventure 2](https://github.com/higgsfield/RL-Adventure-2) (great insiration)
+- Sfujim's [BCQ](https://github.com/sfujim/BCQ)
+- LiyuanLucasLiu [Radam](https://github.com/LiyuanLucasLiu/RAdam)
+- Higgsfield's [RL Adventure 2](https://github.com/higgsfield/RL-Adventure-2)
+- Mpyrozhok's [adamwr](https://github.com/mpyrozhok/adamwr)
 
 ### 🤔 What is this? 
 
@@ -136,7 +139,7 @@ recommendations, pairwise distances, and pinpoint accuracy.
 
 Run it:
 ```
-git clone --depth 1 git@github.com:awarebayes/RecNN.git 
+git clone git@github.com:awarebayes/RecNN.git 
 cd RecNN && streamlit run examples/streamlit_demo.py
 ```
 
