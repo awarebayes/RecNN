@@ -1,7 +1,7 @@
 
 import numpy as np
 import torch
-import pandas as pd
+from .pandas_backend import pd
 
 # helper function similar to pandas.Series.rolling
 def rolling_window(a, window):
@@ -112,8 +112,7 @@ def padder(x):
 
 
 def sort_users_itemwise(user_dict, users):
-    return pd.Series(dict([(i, user_dict[i]['items'].shape[0]) for i in users])).sort_values(ascending=False).index
-
+    return pd.get().Series(dict([(i, user_dict[i]['items'].shape[0]) for i in users])).sort_values(ascending=False).index
 
 def prepare_batch_dynamic_size(batch, item_embeddings_tensor, embed_batch=None):
     item_idx, ratings_t, sizes_t, users_t = get_irsu(batch)

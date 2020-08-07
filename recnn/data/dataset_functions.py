@@ -1,5 +1,5 @@
 from recnn.data.utils import make_items_tensor
-
+from .pandas_backend import pd
 """     
     What?
     +++++
@@ -41,6 +41,11 @@ from recnn.data.utils import make_items_tensor
     build_data_pipeline function, and it is passed down the function chain. If needed, it will be used. Otherwise, ignored  
 """
 
+def try_progress_apply(dataframe, function):
+    try:
+        return dataframe.progress_apply(function)
+    except AttributeError:
+        return dataframe.apply(function)
 
 def prepare_dataset(df, key_to_id, frame_size, env, sort_users=False, **kwargs):
 
@@ -49,14 +54,17 @@ def prepare_dataset(df, key_to_id, frame_size, env, sort_users=False, **kwargs):
         [1, 34, 123, 2000], recnn makes it look like [0,1,2,3] for you.
     """
 
-    df['rating'] = df['rating'].progress_apply(lambda i: 2 * (i - 2.5))
-    df['movieId'] = df['movieId'].progress_apply(lambda i: key_to_id.get(i))
+    df['rating'] = try_progress_apply(df['rating'], lambda i: 2 * (i - 2.5))
+    df['movieId'] = try_progress_apply(df['movieId'], lambda i: key_to_id.get(i))
 
     users = df[['userId', 'movieId']].groupby(['userId']).size()
     users = users[users > frame_size]
     if sort_users:
         users = users.sort_values(ascending=False)
     users = users.index
+
+    if pd.get_type() == "modin":
+        df = df._to_pandas()
     ratings = df.sort_values(by='timestamp').set_index('userId').drop('timestamp', axis=1).groupby('userId')
 
     # Groupby user
@@ -68,7 +76,7 @@ def prepare_dataset(df, key_to_id, frame_size, env, sort_users=False, **kwargs):
         user_dict[int(userid)]['items'] = x['movieId'].values
         user_dict[int(userid)]['ratings'] = x['rating'].values
 
-    ratings.progress_apply(app)
+    try_progress_apply(ratings, app)
 
     env.user_dict = user_dict
     env.users = users
