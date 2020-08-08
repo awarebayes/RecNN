@@ -33,43 +33,33 @@ dataset_functions
 What?
 +++++
 
-Chain of responsibility pattern:
-refactoring.guru/design-patterns/chain-of-responsibility/python/example
+RecNN is designed to work with your data flow. 
 
-RecNN is designed to work with your dataflow.
-Function that contain 'dataset' are needed to interact with environment.
-The environment is provided via env.argument.
-These functions can interact with env and set up some stuff how you like.
-They are also designed to be argument agnostic
+Set kwargs in the beginning of prepare_dataset function.
+Kwargs you set are immutable.
 
-Basically you can stack them how you want.
+args_mut are mutable arguments, you can access the following:
+    base: data.EnvBase, df: DataFrame, users: List[int],
+    user_dict: Dict[int, Dict[str, np.ndarray]
 
-To further illustrate this, let's take a look onto code sample from FrameEnv::
+Access args_mut and modify them in functions defined by you.
+Best to use function chaining with build_data_pipeline.
 
-        class Env:
-            def __init__(self, ...,
-                 # look at this function provided here:
-                 prepare_dataset=dataset_functions.prepare_dataset,
-                 .....):
-
-                self.user_dict = None
-                self.users = None  # filtered keys of user_dict
-
-                self.prepare_dataset(df=self.ratings, key_to_id=self.key_to_id,
-                                     min_seq_size=min_seq_size, frame_size=min_seq_size, env=self)
-
-                # after this call user_dict and users should be set to their values!
-
-In reinforce example I further modify it to look like::
-
-        def prepare_dataset(**kwargs):
-            recnn.data.build_data_pipeline([recnn.data.truncate_dataset,
-                                            recnn.data.prepare_dataset],
-                                            reduce_items_to=5000, **kwargs)
-
-Notice: prepare_dataset doesn't take **reduce_items_to** argument, but it is required in truncate_dataset.
-As I previously mentioned RecNN is designed to be argument agnostic, meaning you provide some kwarg in the
-build_data_pipeline function and it is passed down the function chain. If needed, it will be used. Otherwise ignored
+recnn.data.prepare_dataset is a function that is used by default in Env.__init__
+But sometimes you want some extra. I have also predefined truncate_dataset.
+This function truncates the number of items to specified one.
+In reinforce example I modify it to look like::
+        
+    def prepare_dataset(args_mut, kwargs):
+        kwargs.set('reduce_items_to', num_items) # set kwargs for your functions here!
+        pipeline = [recnn.data.truncate_dataset, recnn.data.prepare_dataset]
+        recnn.data.build_data_pipeline(pipeline, kwargs, args_mut)
+        
+    # embeddgings: https://drive.google.com/open?id=1EQ_zXBR3DKpmJR3jBgLvt-xoOvArGMsL
+    env = recnn.data.env.FrameEnv('..',
+                                '...', frame_size, batch_size,
+                                embed_batch=embed_batch, prepare_dataset=prepare_dataset,
+                                num_workers=0)
 
 .. automodule:: recnn.data.dataset_functions
     :members:

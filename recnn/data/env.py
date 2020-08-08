@@ -65,6 +65,15 @@ class UserDataset(Dataset):
         size = items.shape[0]
         return {'items': items, 'rates': rates, 'sizes': size, 'users': idx}
 
+class EnvBase:
+    def __init__(self):
+        self.train_users = None
+        self.test_users = None
+        self.train_user_dataset = None
+        self.test_user_dataset = None
+        self.embeddings = None
+        self.key_to_id = None
+        self.id_to_key = None
 
 class Env:
 
@@ -94,27 +103,39 @@ class Env:
         :type embed_batch: function
         """
 
-        self.prepare_dataset = prepare_dataset
+        self.base = EnvBase()
         self.embed_batch = embed_batch
-        self.movie_embeddings_key_dict = pickle.load(open(embeddings, 'rb'))
-        movies_embeddings_tensor, key_to_id, id_to_key = utils.make_items_tensor(self.movie_embeddings_key_dict)
-        self.embeddings = movies_embeddings_tensor
-        self.key_to_id = key_to_id
-        self.id_to_key = id_to_key
-        self.ratings = pd.get().read_csv(ratings)
+        
+        self.base.movie_embeddings_key_dict = pickle.load(open(embeddings, 'rb'))
+        self.base.embeddings, self.base.key_to_id, self.base.id_to_key = utils.make_items_tensor(self.base.movie_embeddings_key_dict)
+        self.base.ratings = pd.get().read_csv(ratings)
+        
+        process_kwargs = dset_F.DataFuncKwargs(
+            frame_size=min_seq_size, # remove when lstm gets implemented
+        )
 
-        self.user_dict = None
-        self.users = None  # filtered keys of user_dict
+        process_args_mut = dset_F.DataFuncArgsMut(
+            df=self.base.ratings,
+            base=self.base,
+            users=None, # will be set later
+            user_dict=None, # will be set later
+        )
+        
+        prepare_dataset(process_args_mut, process_kwargs)
+        self.base = process_args_mut.base
+        self.df = process_args_mut.df
+        users = process_args_mut.users
+        user_dict = process_args_mut.user_dict
 
-        self.prepare_dataset(df=self.ratings, key_to_id=self.key_to_id,
-                             min_seq_size=min_seq_size, frame_size=min_seq_size, env=self)
-        # after this call user_dict and users should be set to their values!
-
-        self.train_users, self.test_users = train_test_split(self.users, test_size=test_size)
-        self.train_users = utils.sort_users_itemwise(self.user_dict, self.train_users)[2:]
-        self.test_users = utils.sort_users_itemwise(self.user_dict, self.test_users)
-        self.train_user_dataset = UserDataset(self.train_users, self.user_dict)
-        self.test_user_dataset = UserDataset(self.test_users, self.user_dict)
+        train_users, test_users = train_test_split(users, test_size=test_size)
+        train_users = utils.sort_users_itemwise(user_dict, train_users)[2:]
+        test_users = utils.sort_users_itemwise(user_dict, test_users)
+        self.train_user_dataset = UserDataset(train_users, user_dict)
+        self.test_user_dataset = UserDataset(test_users, user_dict)
+    
+    def save_base(self, path):
+        pickle.dump(self.base, open(path, "wb"))
+        
 
 
 class FrameEnv(Env):
@@ -142,22 +163,21 @@ class FrameEnv(Env):
 
         super(FrameEnv, self).__init__(embeddings, ratings, min_seq_size=frame_size+1, *args, **kwargs)
 
-        def prepare_batch_wrapper(x):
-            batch = utils.prepare_batch_static_size(x, self.embeddings,
-                                                    embed_batch=self.embed_batch,
-                                                    frame_size=frame_size)
-            return batch
-
-        self.prepare_batch_wrapper = prepare_batch_wrapper
         self.frame_size = frame_size
         self.batch_size = batch_size
         self.num_workers = num_workers
 
         self.train_dataloader = DataLoader(self.train_user_dataset, batch_size=batch_size,
-                                           shuffle=True, num_workers=num_workers, collate_fn=prepare_batch_wrapper)
+                                           shuffle=True, num_workers=num_workers, collate_fn=self.prepare_batch_wrapper)
 
         self.test_dataloader = DataLoader(self.test_user_dataset, batch_size=batch_size,
-                                          shuffle=True, num_workers=num_workers, collate_fn=prepare_batch_wrapper)
+                                          shuffle=True, num_workers=num_workers, collate_fn=self.prepare_batch_wrapper)
+    
+    def prepare_batch_wrapper(self, x):
+        batch = utils.prepare_batch_static_size(x, self.base.embeddings,
+                                                embed_batch=self.embed_batch,
+                                                frame_size=self.frame_size)
+        return batch
 
     def train_batch(self):
         """ Get batch for training """
@@ -168,6 +188,10 @@ class FrameEnv(Env):
         return next(iter(self.test_dataloader))
 
 
+
+# I will rewrite it some day
+# Pm me if I get lazy
+'''
 class SeqEnv(Env):
 
     """
@@ -285,3 +309,4 @@ class SeqEnv(Env):
                         del g
 
                     state = next_state
+'''

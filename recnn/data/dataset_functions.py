@@ -1,44 +1,40 @@
-from recnn.data.utils import make_items_tensor
+from .utils import make_items_tensor
 from .pandas_backend import pd
+import numpy as np
+from typing import List, Dict, Callable
+
 """     
     What?
     +++++
     
-    Chain of responsibility pattern.
-    https://refactoring.guru/design-patterns/chain-of-responsibility/python/example
-    
     RecNN is designed to work with your data flow. 
-    Function that contain 'dataset' are needed to interact with environment.
-    The environment is provided via env.argument.
-    These functions can interact with env and set up some stuff how you like.
-    They are also designed to be argument agnostic
     
-    Basically you can stack them how you want.
+    Set kwargs in the beginning of prepare_dataset function.
+    Kwargs you set are immutable.
     
-    To further illustrate this, let's take a look onto code sample from FrameEnv::
+    args_mut are mutable arguments, you can access the following:
+        base: data.EnvBase, df: DataFrame, users: List[int],
+        user_dict: Dict[int, Dict[str, np.ndarray]
     
-        class Env:
-            def __init__(self, ...,
-                 prepare_dataset=dataset_functions.prepare_dataset, # <- look at this function provided here
-                 .....):
+    Access args_mut and modify them in functions defined by you.
+    Best to use function chaining with build_data_pipeline.
     
-                self.user_dict = None
-                self.users = None  # filtered keys of user_dict
+    recnn.data.prepare_dataset is a function that is used by default in Env.__init__
+    But sometimes you want some extra. I have also predefined truncate_dataset.
+    This function truncates the number of items to specified one.
+    In reinforce example I modify it to look like::
             
-                self.prepare_dataset(df=self.ratings, key_to_id=self.key_to_id,
-                                     min_seq_size=min_seq_size, frame_size=min_seq_size, env=self)
-                                         
-                # after this call user_dict and users should be set to their values!
-                
-    In reinforce example I further modify it to look like::
-    
-        def prepare_dataset(**kwargs):
-            recnn.data.build_data_pipeline([recnn.data.truncate_dataset,
-                                            recnn.data.prepare_dataset], reduce_items_to=5000, **kwargs)
-                                            
-    Notice: prepare_dataset doesn't take **reduce_items_to** argument, but it is required in truncate_dataset.
-    As I previously mentioned RecNN is designed to be argument agnostic, meaning you provide some kwarg in the  
-    build_data_pipeline function, and it is passed down the function chain. If needed, it will be used. Otherwise, ignored  
+        def prepare_dataset(args_mut, kwargs):
+            kwargs.set('reduce_items_to', num_items) # set kwargs for your functions here!
+            pipeline = [recnn.data.truncate_dataset, recnn.data.prepare_dataset]
+            recnn.data.build_data_pipeline(pipeline, kwargs, args_mut)
+            
+        # embeddgings: https://drive.google.com/open?id=1EQ_zXBR3DKpmJR3jBgLvt-xoOvArGMsL
+        env = recnn.data.env.FrameEnv('..',
+                                    '...', frame_size, batch_size,
+                                    embed_batch=embed_batch, prepare_dataset=prepare_dataset,
+                                    num_workers=0)
+
 """
 
 def try_progress_apply(dataframe, function):
@@ -47,24 +43,57 @@ def try_progress_apply(dataframe, function):
     except AttributeError:
         return dataframe.apply(function)
 
-def prepare_dataset(df, key_to_id, frame_size, env, sort_users=False, **kwargs):
+
+# Plain args. Shouldn't be mutated
+class DataFuncKwargs:
+    def __init__(self, **kwargs):
+        self.kwargs = kwargs
+        
+    def get(self, name: str):
+        if name not in self.kwargs:
+            example = """
+                # example on how to use kwargs:
+                def prepare_dataset(args, args_mut):
+                    args.set_kwarg('{}', your_value) # set kwargs for your functions here!
+                    pipeline = [recnn.data.truncate_dataset, recnn.data.prepare_dataset]
+                    recnn.data.build_data_pipeline(pipeline, args, args_mut)
+            """
+            raise AttributeError("No kwarg with name {} found!\n{}".format(name, example.format(err_desc)))
+        return self.kwargs[name]
+    
+    def set(self, name: str, value):
+        self.kwargs[name] = value
+
+# Used for returning, arguments are mutable
+class DataFuncArgsMut:
+    def __init__(self, df, base, users: List[int], user_dict: Dict[int, Dict[str, np.ndarray]]):
+        self.base = base
+        self.users = users
+        self.user_dict = user_dict
+        self.df = df
+
+        
+def prepare_dataset(args_mut: DataFuncArgsMut, kwargs: DataFuncKwargs):
 
     """
         Basic prepare dataset function. Automatically makes index linear, in ml20 movie indices look like:
         [1, 34, 123, 2000], recnn makes it look like [0,1,2,3] for you.
     """
 
+    # get args
+    frame_size = kwargs.get('frame_size')
+    key_to_id = args_mut.base.key_to_id
+    df = args_mut.df
+    
+    # rating range mapped from [0, 5] to [-5, 5]
     df['rating'] = try_progress_apply(df['rating'], lambda i: 2 * (i - 2.5))
+    # id's tend to be inconsistent and sparse so they are remapped here
     df['movieId'] = try_progress_apply(df['movieId'], lambda i: key_to_id.get(i))
 
     users = df[['userId', 'movieId']].groupby(['userId']).size()
-    users = users[users > frame_size]
-    if sort_users:
-        users = users.sort_values(ascending=False)
-    users = users.index
+    users = users[users > frame_size].sort_values(ascending=False).index
 
-    if pd.get_type() == "modin":
-        df = df._to_pandas()
+    if pd.get_type() == "modin": df = df._to_pandas() # pandas groupby is sync and doesnt affect performance 
     ratings = df.sort_values(by='timestamp').set_index('userId').drop('timestamp', axis=1).groupby('userId')
 
     # Groupby user
@@ -78,21 +107,21 @@ def prepare_dataset(df, key_to_id, frame_size, env, sort_users=False, **kwargs):
 
     try_progress_apply(ratings, app)
 
-    env.user_dict = user_dict
-    env.users = users
+    args_mut.user_dict = user_dict
+    args_mut.users = users
 
-    return {'df': df, 'key_to_id': key_to_id,
-            'frame_size': frame_size, 'env': env, 'sort_users': sort_users, **kwargs}
+    return args_mut, kwargs
 
 
-def truncate_dataset(df, key_to_id, frame_size, env, reduce_items_to, sort_users=False, **kwargs):
+def truncate_dataset(args_mut: DataFuncArgsMut, kwargs: DataFuncKwargs):
     """
-        Truncate #items to num_items provided in the arguments
+        Truncate #items to reduce_items_to provided in kwargs
     """
 
     # here are adjusted n items to keep
-    num_items = reduce_items_to
-
+    num_items = kwargs.get('reduce_items_to')
+    df = args_mut.df
+    
     to_remove = df['movieId'].value_counts().sort_values()[:-num_items].index
     to_keep = df['movieId'].value_counts().sort_values()[-num_items:].index
     to_remove_indices = df[df['movieId'].isin(to_remove)].index
@@ -100,29 +129,28 @@ def truncate_dataset(df, key_to_id, frame_size, env, reduce_items_to, sort_users
 
     df.drop(to_remove_indices, inplace=True)
 
-    for i in list(env.movie_embeddings_key_dict.keys()):
+    for i in list(args_mut.base.movie_embeddings_key_dict.keys()):
         if i not in to_keep:
-            del env.movie_embeddings_key_dict[i]
+            del args_mut.base.movie_embeddings_key_dict[i]
 
-    env.embeddings, env.key_to_id, env.id_to_key = make_items_tensor(env.movie_embeddings_key_dict)
+    args_mut.base.embeddings, args_mut.base.key_to_id, \
+    args_mut.base.id_to_key = make_items_tensor(args_mut.base.movie_embeddings_key_dict)
+    args_mut.df = df
 
     print('action space is reduced to {} - {} = {}'.format(num_items + num_removed, num_removed,
                                                            num_items))
 
-    return {'df': df, 'key_to_id': env.key_to_id, 'env': env,
-            'frame_size': frame_size, 'sort_users': sort_users, **kwargs}
+    return args_mut, kwargs
 
 
-def build_data_pipeline(chain, **kwargs):
+def build_data_pipeline(chain: List[Callable], kwargs: DataFuncKwargs, args_mut: DataFuncArgsMut):
     """
-        Chain of responsibility pattern
-
+        Higher order function
         :param chain: array of callable
         :param **kwargs: any kwargs you like
     """
-
-    kwargdict = kwargs
     for call in chain:
-        kwargdict = call(**kwargdict)
-    return kwargdict
+        # note: returned kwargs are not utilized to guarantee immutability
+        args_mut, _ = call(args_mut, kwargs) 
+    return kwargs, args_mut
 

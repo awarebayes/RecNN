@@ -40,12 +40,13 @@ This is my school project. It focuses on Reinforcement Learning for personalized
 
 - Examples do not contain any of the junk code or workarounds: pure model definition and the algorithm itself in one file. I wrote a couple of articles explaining how it functions.
 
-- The learning is built around sequential or frame environment that supports ML20M and like. Seq and Frame determine the length type of sequential data, seq is fully sequential dynamic size, while the frame is just a static frame.
+- The learning is built around sequential or frame environment that supports ML20M and like. Seq and Frame determine the length type of sequential data, seq is fully sequential dynamic size (WIP), while the frame is just a static frame.
 
-- State Representation module with various methods. For sequential state representation, you can use basic LSTM/RNN/GRU, 
-Temporal Convolutional Networks, Echo State Networks and Chaos Free RNNs that are way faster than GRU.
+- State Representation module with various methods. For sequential state representation, you can use LSTM/RNN/GRU (WIP) 
 
-- Pytorch 1.3 support with Tensorboard visualization.
+- Parallel data loading with Modin (Dask / Ray) and caching
+
+- Pytorch 1.5 support with Tensorboard visualization.
 
 - New datasets will be added in the future.
 
