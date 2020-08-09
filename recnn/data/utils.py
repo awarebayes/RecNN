@@ -3,6 +3,7 @@ import numpy as np
 import torch
 from .pandas_backend import pd
 
+
 # helper function similar to pandas.Series.rolling
 def rolling_window(a, window):
     shape = a.shape[:-1] + (a.shape[-1] - window + 1, window)

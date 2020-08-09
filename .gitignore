@@ -115,3 +115,6 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# other
+.pyre_configuration

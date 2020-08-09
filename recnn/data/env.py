@@ -2,10 +2,8 @@ from . import utils, dataset_functions as dset_F
 from .pandas_backend import pd
 import pickle
 from torch.utils.data import Dataset, DataLoader
-import torch
-import numpy as np
-from tqdm.auto import tqdm
 from sklearn.model_selection import train_test_split
+import os
 
 """
 .. module:: env
@@ -65,15 +63,32 @@ class UserDataset(Dataset):
         size = items.shape[0]
         return {'items': items, 'rates': rates, 'sizes': size, 'users': idx}
 
+
 class EnvBase:
+
+    """
+    Misc class used for serializing
+    """
+
     def __init__(self):
-        self.train_users = None
-        self.test_users = None
         self.train_user_dataset = None
         self.test_user_dataset = None
         self.embeddings = None
         self.key_to_id = None
         self.id_to_key = None
+
+
+class DataPath:
+
+    """
+    [New!] Path to yourd data. Note: cache is optional. It saves EnvBase as a pickle
+    """
+
+    def __init__(self, base:str, ratings: str, embeddings:str, cache: str="", use_cache: bool=True):
+        self.ratings = base + ratings
+        self.embeddings = base + embeddings
+        self.cache = base + cache
+        self.use_cache = use_cache
 
 class Env:
 
@@ -81,47 +96,65 @@ class Env:
     Env abstract class
     """
 
-    def __init__(self, embeddings, ratings, test_size=0.05, min_seq_size=10,
+    def __init__(self, path: DataPath,
                  prepare_dataset=dset_F.prepare_dataset,
-                 embed_batch=utils.batch_tensor_embeddings):
+                 embed_batch=utils.batch_tensor_embeddings,
+                 **kwargs):
 
         """
         .. note::
             embeddings need to be provided in {movie_id: torch.tensor} format!
 
-        :param embeddings: path to where item embeddings are stored.
-        :type embeddings: str
-        :param ratings: path to the dataset that is similar to the ml20m
-        :type ratings: str
+        :param path: DataPath to where item embeddings are stored.
+        :type path: DataPath
         :param test_size: ratio of users to use in testing. Rest will be used for training/validation
         :type test_size: int
-        :param min_seq_size: filter users: len(user.items) > min seq size
+        :param min_seq_size: (use as kwarg) filter users: len(user.items) > min seq size
         :type min_seq_size: int
-        :param prepare_dataset: function you provide. should yield user_dict, users
+        :param prepare_dataset: (use as kwarg) function you provide. 
         :type prepare_dataset: function
-        :param embed_batch: function to apply embeddings to batch. can be set to yield continuous/discrete state/action
+        :param embed_batch: function to apply embeddings to batch. Can be set to yield continuous/discrete state/action
         :type embed_batch: function
         """
 
         self.base = EnvBase()
         self.embed_batch = embed_batch
-        
-        self.base.movie_embeddings_key_dict = pickle.load(open(embeddings, 'rb'))
-        self.base.embeddings, self.base.key_to_id, self.base.id_to_key = utils.make_items_tensor(self.base.movie_embeddings_key_dict)
-        self.base.ratings = pd.get().read_csv(ratings)
-        
+        self.prepare_dataset = prepare_dataset
+        save_state = False
+        if path.use_cache and os.path.isfile(path.cache):
+            self.load_env(path.cache)
+        else:
+            self.process_env(path)
+            if path.use_cache:
+                self.save_env(path.cache)
+
+    def process_env(self, path: DataPath, **kwargs):
+        if 'frame_size' in kwargs.keys():
+            frame_size = kwargs['frame_size']
+        else:
+            frame_size = 10
+
+        if 'test_size' in kwargs.keys():
+            test_size = kwargs['test_size']
+        else:
+            test_size = 0.05
+
+        movie_embeddings_key_dict = pickle.load(open(path.embeddings, 'rb'))
+        self.base.embeddings, self.base.key_to_id, self.base.id_to_key = utils.make_items_tensor(movie_embeddings_key_dict)
+        ratings = pd.get().read_csv(path.ratings)
+
         process_kwargs = dset_F.DataFuncKwargs(
-            frame_size=min_seq_size, # remove when lstm gets implemented
+            frame_size=frame_size,  # remove when lstm gets implemented
         )
 
         process_args_mut = dset_F.DataFuncArgsMut(
-            df=self.base.ratings,
+            df=ratings,
             base=self.base,
-            users=None, # will be set later
-            user_dict=None, # will be set later
+            users=None,  # will be set later
+            user_dict=None,  # will be set later
         )
-        
-        prepare_dataset(process_args_mut, process_kwargs)
+
+        self.prepare_dataset(process_args_mut, process_kwargs)
         self.base = process_args_mut.base
         self.df = process_args_mut.df
         users = process_args_mut.users
@@ -130,19 +163,22 @@ class Env:
         train_users, test_users = train_test_split(users, test_size=test_size)
         train_users = utils.sort_users_itemwise(user_dict, train_users)[2:]
         test_users = utils.sort_users_itemwise(user_dict, test_users)
-        self.train_user_dataset = UserDataset(train_users, user_dict)
-        self.test_user_dataset = UserDataset(test_users, user_dict)
-    
-    def save_base(self, path):
-        pickle.dump(self.base, open(path, "wb"))
-        
+        self.base.train_user_dataset = UserDataset(train_users, user_dict)
+        self.base.test_user_dataset = UserDataset(test_users, user_dict)
+
+    def load_env(self, where: str):
+        self.base = pickle.load(open(where, "rb"))
+
+    def save_env(self, where: str):
+        pickle.dump(self.base, open(where, "wb"))
+
 
 
 class FrameEnv(Env):
     """
     Static length user environment.
     """
-    def __init__(self, embeddings, ratings, frame_size=10, batch_size=25, num_workers=1, *args, **kwargs):
+    def __init__(self, path, frame_size=10, batch_size=25, num_workers=1, *args, **kwargs):
 
         """
         :param embeddings: path to where item embeddings are stored.
@@ -160,19 +196,20 @@ class FrameEnv(Env):
             env = FrameEnv(embed_dir, rating_dir, **pandas_conf)
 
         """
-
-        super(FrameEnv, self).__init__(embeddings, ratings, min_seq_size=frame_size+1, *args, **kwargs)
-
+        
+        kwargs['frame_size'] = frame_size
+        super(FrameEnv, self).__init__(path, min_seq_size=frame_size+1, *args, **kwargs)
+        
         self.frame_size = frame_size
         self.batch_size = batch_size
         self.num_workers = num_workers
 
-        self.train_dataloader = DataLoader(self.train_user_dataset, batch_size=batch_size,
+        self.train_dataloader = DataLoader(self.base.train_user_dataset, batch_size=batch_size,
                                            shuffle=True, num_workers=num_workers, collate_fn=self.prepare_batch_wrapper)
 
-        self.test_dataloader = DataLoader(self.test_user_dataset, batch_size=batch_size,
+        self.test_dataloader = DataLoader(self.base.test_user_dataset, batch_size=batch_size,
                                           shuffle=True, num_workers=num_workers, collate_fn=self.prepare_batch_wrapper)
-    
+
     def prepare_batch_wrapper(self, x):
         batch = utils.prepare_batch_static_size(x, self.base.embeddings,
                                                 embed_batch=self.embed_batch,
@@ -186,7 +223,6 @@ class FrameEnv(Env):
     def test_batch(self):
         """ Get batch for testing """
         return next(iter(self.test_dataloader))
-
 
 
 # I will rewrite it some day

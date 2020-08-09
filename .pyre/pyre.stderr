@@ -1,0 +1,133 @@
+2020-08-09 14:09:48,144 INFO Binary found at `/home/mikew/anaconda3/envs/recnn/bin/pyre.bin`
+2020-08-09 14:09:48,145 DEBUG Trying with: `/home/mikew/anaconda3/envs/recnn/lib/python3.8/site-packages/pyre_check/client/pyre_check/typeshed/`
+2020-08-09 14:09:48,145 DEBUG Trying with: `/home/mikew/anaconda3/envs/recnn/lib/python3.8/site-packages/pyre_check/pyre_check/typeshed/`
+2020-08-09 14:09:48,145 DEBUG Trying with: `/home/mikew/anaconda3/envs/recnn/lib/python3.8/site-packages/pyre_check/typeshed/`
+2020-08-09 14:09:48,145 DEBUG Trying with: `/home/mikew/anaconda3/envs/recnn/lib/python3.8/pyre_check/typeshed/`
+2020-08-09 14:09:48,145 DEBUG Trying with: `/home/mikew/anaconda3/envs/recnn/lib/pyre_check/typeshed/`
+2020-08-09 14:09:48,145 DEBUG Trying with: `/home/mikew/anaconda3/envs/recnn/lib/python3.8/site-packages/pyre_check/client/pyre_check/taint/`
+2020-08-09 14:09:48,145 DEBUG Trying with: `/home/mikew/anaconda3/envs/recnn/lib/python3.8/site-packages/pyre_check/pyre_check/taint/`
+2020-08-09 14:09:48,145 DEBUG Trying with: `/home/mikew/anaconda3/envs/recnn/lib/python3.8/site-packages/pyre_check/taint/`
+2020-08-09 14:09:48,145 DEBUG Trying with: `/home/mikew/anaconda3/envs/recnn/lib/python3.8/pyre_check/taint/`
+2020-08-09 14:09:48,145 DEBUG Trying with: `/home/mikew/anaconda3/envs/recnn/lib/pyre_check/taint/`
+2020-08-09 14:09:48,145 PROMPT Which directory should pyre be initialized in? (Default: `.`): 
+2020-08-09 14:09:52,066 INFO Successfully initialized pyre! You can view the configuration at `/home/mikew/Documents/programming/python/RecNN/.pyre_configuration`.
+2020-08-09 14:11:08,489 DEBUG Running `/home/mikew/anaconda3/envs/recnn/bin/pyre.bin check -logging-sections parser -project-root /home/mikew/Documents/programming/python/RecNN -log-directory /home/mikew/Documents/programming/python/RecNN/.pyre -filter-directories /home/mikew/Documents/programming/python/RecNN/. -workers 12 -ignore-all-errors /home/mikew/Documents/programming/python/RecNN/.pyre -search-path /home/mikew/anaconda3/envs/recnn/lib/pyre_check/typeshed/stdlib/3.9,/home/mikew/anaconda3/envs/recnn/lib/pyre_check/typeshed/stdlib/3.7,/home/mikew/anaconda3/envs/recnn/lib/pyre_check/typeshed/stdlib/3.6,/home/mikew/anaconda3/envs/recnn/lib/pyre_check/typeshed/stdlib/3,/home/mikew/anaconda3/envs/recnn/lib/pyre_check/typeshed/stdlib/2and3,/home/mikew/anaconda3/envs/recnn/lib/pyre_check/typeshed/third_party/3,/home/mikew/anaconda3/envs/recnn/lib/pyre_check/typeshed/third_party/2and3 /home/mikew/Documents/programming/python/RecNN/.`
+2020-08-09 14:11:08,492 DEBUG Registering process with pid 97893 in pid file `/home/mikew/Documents/programming/python/RecNN/.pyre/pid_files/check-97893.pid`
+2020-08-09 14:11:08,549 PERFORMANCE Module tracker built: 0.033682s
+2020-08-09 14:11:08,549 INFO Building type environment...
+2020-08-09 14:11:08,768 INFO Parsing 1015 stubs and sources...
+2020-08-09 14:11:09,654 PERFORMANCE Sources parsed: 0.886113s
+2020-08-09 14:11:10,163 PERFORMANCE Full environment built: 1.614207s
+2020-08-09 14:11:10,164 INFO Checking 165 functions...
+2020-08-09 14:11:10,278 INFO Processed 165 of 165 functions
+2020-08-09 14:11:10,278 PERFORMANCE Check_TypeCheck: 0.113675s
+2020-08-09 14:11:10,278 MEMORY Shared memory size post-typecheck (size: 10)
+2020-08-09 14:11:10,278 INFO Postprocessing 1015 sources...
+2020-08-09 14:11:10,302 INFO Postprocessed 43 of 1015 sources
+2020-08-09 14:11:10,307 INFO Postprocessed 86 of 1015 sources
+2020-08-09 14:11:10,317 INFO Postprocessed 129 of 1015 sources
+2020-08-09 14:11:10,318 INFO Postprocessed 172 of 1015 sources
+2020-08-09 14:11:10,318 INFO Postprocessed 215 of 1015 sources
+2020-08-09 14:11:10,319 INFO Postprocessed 258 of 1015 sources
+2020-08-09 14:11:10,320 INFO Postprocessed 301 of 1015 sources
+2020-08-09 14:11:10,320 INFO Postprocessed 344 of 1015 sources
+2020-08-09 14:11:10,321 INFO Postprocessed 387 of 1015 sources
+2020-08-09 14:11:10,322 INFO Postprocessed 430 of 1015 sources
+2020-08-09 14:11:10,324 INFO Postprocessed 473 of 1015 sources
+2020-08-09 14:11:10,324 INFO Postprocessed 516 of 1015 sources
+2020-08-09 14:11:10,332 INFO Postprocessed 559 of 1015 sources
+2020-08-09 14:11:10,336 INFO Postprocessed 602 of 1015 sources
+2020-08-09 14:11:10,345 INFO Postprocessed 645 of 1015 sources
+2020-08-09 14:11:10,346 INFO Postprocessed 688 of 1015 sources
+2020-08-09 14:11:10,347 INFO Postprocessed 731 of 1015 sources
+2020-08-09 14:11:10,347 INFO Postprocessed 774 of 1015 sources
+2020-08-09 14:11:10,347 INFO Postprocessed 817 of 1015 sources
+2020-08-09 14:11:10,348 INFO Postprocessed 860 of 1015 sources
+2020-08-09 14:11:10,348 INFO Postprocessed 903 of 1015 sources
+2020-08-09 14:11:10,352 INFO Postprocessed 929 of 1015 sources
+2020-08-09 14:11:10,352 INFO Postprocessed 972 of 1015 sources
+2020-08-09 14:11:10,355 INFO Postprocessed 1015 of 1015 sources
+2020-08-09 14:11:10,359 PERFORMANCE Check: 1.846867s
+2020-08-09 14:11:10,405 DEBUG Removing pid file: `/home/mikew/Documents/programming/python/RecNN/.pyre/pid_files/check-97893.pid`
+2020-08-09 14:11:10,410 ERROR Found 46 type errors!
+
+2020-08-09 14:15:56,219 DEBUG Running `/home/mikew/anaconda3/envs/recnn/bin/pyre.bin check -logging-sections parser -project-root /home/mikew/Documents/programming/python/RecNN -log-directory /home/mikew/Documents/programming/python/RecNN/.pyre -filter-directories /home/mikew/Documents/programming/python/RecNN/. -workers 12 -ignore-all-errors /home/mikew/Documents/programming/python/RecNN/.pyre -search-path /home/mikew/anaconda3/envs/recnn/lib/pyre_check/typeshed/stdlib/3.9,/home/mikew/anaconda3/envs/recnn/lib/pyre_check/typeshed/stdlib/3.7,/home/mikew/anaconda3/envs/recnn/lib/pyre_check/typeshed/stdlib/3.6,/home/mikew/anaconda3/envs/recnn/lib/pyre_check/typeshed/stdlib/3,/home/mikew/anaconda3/envs/recnn/lib/pyre_check/typeshed/stdlib/2and3,/home/mikew/anaconda3/envs/recnn/lib/pyre_check/typeshed/third_party/3,/home/mikew/anaconda3/envs/recnn/lib/pyre_check/typeshed/third_party/2and3 /home/mikew/Documents/programming/python/RecNN/.`
+2020-08-09 14:15:56,222 DEBUG Registering process with pid 101427 in pid file `/home/mikew/Documents/programming/python/RecNN/.pyre/pid_files/check-101427.pid`
+2020-08-09 14:15:56,275 PERFORMANCE Module tracker built: 0.032691s
+2020-08-09 14:15:56,275 INFO Building type environment...
+2020-08-09 14:15:56,489 INFO Parsing 1015 stubs and sources...
+2020-08-09 14:15:57,345 PERFORMANCE Sources parsed: 0.855059s
+2020-08-09 14:15:57,848 PERFORMANCE Full environment built: 1.573319s
+2020-08-09 14:15:57,849 INFO Checking 165 functions...
+2020-08-09 14:15:57,949 INFO Processed 165 of 165 functions
+2020-08-09 14:15:57,949 PERFORMANCE Check_TypeCheck: 0.100245s
+2020-08-09 14:15:57,949 MEMORY Shared memory size post-typecheck (size: 10)
+2020-08-09 14:15:57,949 INFO Postprocessing 1015 sources...
+2020-08-09 14:15:57,979 INFO Postprocessed 43 of 1015 sources
+2020-08-09 14:15:57,980 INFO Postprocessed 86 of 1015 sources
+2020-08-09 14:15:57,980 INFO Postprocessed 129 of 1015 sources
+2020-08-09 14:15:57,981 INFO Postprocessed 172 of 1015 sources
+2020-08-09 14:15:57,982 INFO Postprocessed 215 of 1015 sources
+2020-08-09 14:15:57,998 INFO Postprocessed 258 of 1015 sources
+2020-08-09 14:15:57,998 INFO Postprocessed 301 of 1015 sources
+2020-08-09 14:15:58,001 INFO Postprocessed 344 of 1015 sources
+2020-08-09 14:15:58,003 INFO Postprocessed 387 of 1015 sources
+2020-08-09 14:15:58,003 INFO Postprocessed 430 of 1015 sources
+2020-08-09 14:15:58,004 INFO Postprocessed 473 of 1015 sources
+2020-08-09 14:15:58,005 INFO Postprocessed 516 of 1015 sources
+2020-08-09 14:15:58,014 INFO Postprocessed 559 of 1015 sources
+2020-08-09 14:15:58,023 INFO Postprocessed 602 of 1015 sources
+2020-08-09 14:15:58,025 INFO Postprocessed 645 of 1015 sources
+2020-08-09 14:15:58,027 INFO Postprocessed 688 of 1015 sources
+2020-08-09 14:15:58,027 INFO Postprocessed 731 of 1015 sources
+2020-08-09 14:15:58,029 INFO Postprocessed 757 of 1015 sources
+2020-08-09 14:15:58,031 INFO Postprocessed 800 of 1015 sources
+2020-08-09 14:15:58,039 INFO Postprocessed 843 of 1015 sources
+2020-08-09 14:15:58,039 INFO Postprocessed 886 of 1015 sources
+2020-08-09 14:15:58,042 INFO Postprocessed 929 of 1015 sources
+2020-08-09 14:15:58,043 INFO Postprocessed 972 of 1015 sources
+2020-08-09 14:15:58,043 INFO Postprocessed 1015 of 1015 sources
+2020-08-09 14:15:58,047 PERFORMANCE Check: 1.806000s
+2020-08-09 14:15:58,090 DEBUG Removing pid file: `/home/mikew/Documents/programming/python/RecNN/.pyre/pid_files/check-101427.pid`
+2020-08-09 14:15:58,097 ERROR Found 46 type errors!
+
+2020-08-09 14:19:55,130 DEBUG Running `/home/mikew/anaconda3/envs/recnn/bin/pyre.bin check -logging-sections parser -project-root /home/mikew/Documents/programming/python/RecNN -log-directory /home/mikew/Documents/programming/python/RecNN/.pyre -filter-directories /home/mikew/Documents/programming/python/RecNN/ -workers 12 -ignore-all-errors /home/mikew/Documents/programming/python/RecNN/.pyre -search-path /home/mikew/anaconda3/envs/recnn/lib/pyre_check/typeshed/stdlib/3.9,/home/mikew/anaconda3/envs/recnn/lib/pyre_check/typeshed/stdlib/3.7,/home/mikew/anaconda3/envs/recnn/lib/pyre_check/typeshed/stdlib/3.6,/home/mikew/anaconda3/envs/recnn/lib/pyre_check/typeshed/stdlib/3,/home/mikew/anaconda3/envs/recnn/lib/pyre_check/typeshed/stdlib/2and3,/home/mikew/anaconda3/envs/recnn/lib/pyre_check/typeshed/third_party/3,/home/mikew/anaconda3/envs/recnn/lib/pyre_check/typeshed/third_party/2and3 /home/mikew/Documents/programming/python/RecNN/`
+2020-08-09 14:19:55,133 DEBUG Registering process with pid 104816 in pid file `/home/mikew/Documents/programming/python/RecNN/.pyre/pid_files/check-104816.pid`
+2020-08-09 14:19:55,181 PERFORMANCE Module tracker built: 0.033456s
+2020-08-09 14:19:55,181 INFO Building type environment...
+2020-08-09 14:19:55,394 INFO Parsing 1015 stubs and sources...
+2020-08-09 14:19:56,261 PERFORMANCE Sources parsed: 0.867394s
+2020-08-09 14:19:56,765 PERFORMANCE Full environment built: 1.583210s
+2020-08-09 14:19:56,765 INFO Checking 165 functions...
+2020-08-09 14:19:56,875 INFO Processed 165 of 165 functions
+2020-08-09 14:19:56,875 PERFORMANCE Check_TypeCheck: 0.110074s
+2020-08-09 14:19:56,875 MEMORY Shared memory size post-typecheck (size: 10)
+2020-08-09 14:19:56,875 INFO Postprocessing 1015 sources...
+2020-08-09 14:19:56,901 INFO Postprocessed 43 of 1015 sources
+2020-08-09 14:19:56,903 INFO Postprocessed 86 of 1015 sources
+2020-08-09 14:19:56,904 INFO Postprocessed 129 of 1015 sources
+2020-08-09 14:19:56,904 INFO Postprocessed 172 of 1015 sources
+2020-08-09 14:19:56,905 INFO Postprocessed 215 of 1015 sources
+2020-08-09 14:19:56,906 INFO Postprocessed 258 of 1015 sources
+2020-08-09 14:19:56,917 INFO Postprocessed 301 of 1015 sources
+2020-08-09 14:19:56,919 INFO Postprocessed 344 of 1015 sources
+2020-08-09 14:19:56,920 INFO Postprocessed 387 of 1015 sources
+2020-08-09 14:19:56,922 INFO Postprocessed 430 of 1015 sources
+2020-08-09 14:19:56,926 INFO Postprocessed 473 of 1015 sources
+2020-08-09 14:19:56,928 INFO Postprocessed 516 of 1015 sources
+2020-08-09 14:19:56,929 INFO Postprocessed 559 of 1015 sources
+2020-08-09 14:19:56,930 INFO Postprocessed 602 of 1015 sources
+2020-08-09 14:19:56,933 INFO Postprocessed 645 of 1015 sources
+2020-08-09 14:19:56,933 INFO Postprocessed 688 of 1015 sources
+2020-08-09 14:19:56,933 INFO Postprocessed 731 of 1015 sources
+2020-08-09 14:19:56,939 INFO Postprocessed 774 of 1015 sources
+2020-08-09 14:19:56,942 INFO Postprocessed 817 of 1015 sources
+2020-08-09 14:19:56,950 INFO Postprocessed 860 of 1015 sources
+2020-08-09 14:19:56,951 INFO Postprocessed 903 of 1015 sources
+2020-08-09 14:19:56,952 INFO Postprocessed 929 of 1015 sources
+2020-08-09 14:19:56,952 INFO Postprocessed 972 of 1015 sources
+2020-08-09 14:19:56,963 INFO Postprocessed 1015 of 1015 sources
+2020-08-09 14:19:56,967 PERFORMANCE Check: 1.820369s
+2020-08-09 14:19:57,013 DEBUG Removing pid file: `/home/mikew/Documents/programming/python/RecNN/.pyre/pid_files/check-104816.pid`
+2020-08-09 14:19:57,021 ERROR Found 46 type errors!
+

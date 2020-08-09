@@ -32,7 +32,14 @@ In order to initialize an env, you need to provide embeddings and ratings direct
     frame_size = 10
     batch_size = 25
     # embeddgings: https://drive.google.com/open?id=1EQ_zXBR3DKpmJR3jBgLvt-xoOvArGMsL
-    env = recnn.data.env.FrameEnv('ml20_pca128.pkl','ml-20m/ratings.csv', frame_size, batch_size)
+    dirs = recnn.data.env.DataPath(
+        base="../../../data/",
+        embeddings="embeddings/ml20_pca128.pkl",
+        ratings="ml-20m/ratings.csv",
+        cache="cache/frame_env.pkl", # cache will generate after you run
+        use_cache=True
+    )
+    env = recnn.data.env.FrameEnv(dirs, frame_size, batch_size)
 
     train = env.train_batch()
     test = env.train_batch()

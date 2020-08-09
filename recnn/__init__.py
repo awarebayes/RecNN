@@ -1,2 +1,2 @@
-from recnn import data, utils, nn, rep
-from recnn.data import pd
+from . import data, utils, nn 
+from .data import pd

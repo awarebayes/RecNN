@@ -16,45 +16,40 @@ memory usage. There is no need to worry about mixing up indexes while preprocess
 
 Here is how default ML20M dataset is processed. Use this as a reference::
 
-    def prepare_dataset(df, key_to_id, frame_size, env, sort_users=False, **kwargs):
+    def prepare_dataset(args_mut: DataFuncArgsMut, kwargs: DataFuncKwargs):
+        # get args
+        frame_size = kwargs.get('frame_size')
+        key_to_id = args_mut.base.key_to_id
+        df = args_mut.df
 
-        """
-            Basic prepare dataset function. Automatically makes index linear, in ml20 movie indices look like:
-            [1, 34, 123, 2000], recnn makes it look like [0,1,2,3] for you.
-        """
-
-        df['rating'] = df['rating'].progress_apply(lambda i: 2 * (i - 2.5))
-        df['movieId'] = df['movieId'].progress_apply(key_to_id.get)
+        # rating range mapped from [0, 5] to [-5, 5]
+        df['rating'] = try_progress_apply(df['rating'], lambda i: 2 * (i - 2.5))
+        # id's tend to be inconsistent and sparse so they are remapped here
+        df['movieId'] = try_progress_apply(df['movieId'], lambda i: key_to_id.get(i))
         users = df[['userId', 'movieId']].groupby(['userId']).size()
-        users = users[users > frame_size]
-        if sort_users:
-            users = users.sort_values(ascending=False)
-        users = users.index
+        users = users[users > frame_size].sort_values(ascending=False).index
+
+        if pd.get_type() == "modin":
+            df = df._to_pandas() # pandas groupby is sync and doesnt affect performance
         ratings = df.sort_values(by='timestamp').set_index('userId').drop('timestamp', axis=1).groupby('userId')
 
         # Groupby user
         user_dict = {}
 
         def app(x):
-            userid = x.index[0]
-            user_dict[int(userid)] = {}
-            user_dict[int(userid)]['items'] = x['movieId'].values
-            user_dict[int(userid)]['ratings'] = x['rating'].values
+            userid = int(x.index[0])
+            user_dict[userid] = {}
+            user_dict[userid]['items'] = x['movieId'].values
+            user_dict[userid]['ratings'] = x['rating'].values
 
-        ratings.progress_apply(app)
+        try_progress_apply(ratings, app)
 
-        # make sure to set up these two!
-        env.user_dict = user_dict
-        env.users = users
+        args_mut.user_dict = user_dict
+        args_mut.users = users
 
-        return {'df': df, 'key_to_id': key_to_id,
-                'frame_size': frame_size, 'env': env, 'sort_users': sort_users,
-                **kwargs}
+        return args_mut, kwargs
 
-Although not required, it is advised that you return all of the arguments + kwargs. If the function is finishing
-this may work fine, but if you are using **build_data_pipeline**, you need to do it as I said. Look in
-reference/data/dataset_functions for further details. Chain of responsibility pattern:
-refactoring.guru/design-patterns/chain-of-responsibility/python/example
+Look in reference/data/dataset_functions for further details. 
 
 Toy Dataset
 +++++++++++
@@ -108,21 +103,22 @@ Writing custom preprocessing function
 
 The following is a copy of the preprocessing function listed above to work with the toy dataset::
 
-    def prepare_my_dataset(df, key_to_id, frame_size, env, sort_users=False, **kwargs):
-        # transform [0 1] -> [-1 1]
-        # you can also choose not use progress_apply here
+    def prepare_dataset(args_mut, kwargs):
 
-        df['liked'] = df['liked'].progress_apply(lambda a: (a - 1) * (1 - a) + a)
-        df['when'] = df['when'].progress_apply(string_time_to_unix)
-        df['book_id'] = df['book_id'].progress_apply(key_to_id.get)
-        users = df[['reader_id', 'book_id']].groupby(['reader_id']).size()
-        users = users[users > frame_size]
-        if sort_users:
-            users = users.sort_values(ascending=False)
+        # get args
+        frame_size = kwargs.get('frame_size')
+        key_to_id = args_mut.base.key_to_id
+        df = args_mut.df
 
-        users = users.index
-        ratings = df.sort_values(by='when').set_index('reader_id')
-        ratings = ratings.drop('when', axis=1).groupby('reader_id')
+        df['liked'] = df['liked'].apply(lambda a: (a - 1) * (1 - a) + a)
+        df['when'] = df['when'].apply(string_time_to_unix)
+        df['book_id'] = df['book_id'].apply(key_to_id.get)
+
+        users = df[['userId', 'movieId']].groupby(['userId']).size()
+        users = users[users > frame_size].sort_values(ascending=False).index
+
+        if pd.get_type() == "modin": df = df._to_pandas() # pandas groupby is sync and doesnt affect performance 
+        ratings = df.sort_values(by='when').set_index('reader_id').drop('when', axis=1).groupby('reader_id')
 
         # Groupby user
         user_dict = {}
@@ -133,15 +129,13 @@ The following is a copy of the preprocessing function listed above to work with 
             user_dict[int(userid)]['items'] = x['book_id'].values
             user_dict[int(userid)]['ratings'] = x['liked'].values
 
-        ratings.progress_apply(app)
+        ratings.apply(app)
 
-        # make sure to set up these two!
-        env.user_dict = user_dict
-        env.users = users
+        args_mut.user_dict = user_dict
+        args_mut.users = users
 
-        return {'df': df, 'key_to_id': key_to_id,
-                'frame_size': frame_size, 'env': env, 'sort_users': sort_users,
-                **kwargs}
+        return args_mut, kwargs
+
 
 Putting it all together
 +++++++++++++++++++++++
@@ -151,8 +145,15 @@ Final touches::
     frame_size = 10
     batch_size = 25
 
-    env = recnn.data.env.FrameEnv('mydataset/myembeddings.pickle', 'mydataset/mydf.csv',
-                                  frame_size, batch_size, prepare_dataset=prepare_my_dataset) # <- ! pass YOUR function here
+    dirs = recnn.data.env.DataPath(
+        base="/path/to/mydata/",
+        embeddings="myembeddings.pickle",
+        ratings="myratings.csv",
+        cache="cache/frame_env.pkl", # cache will generate after you run
+        use_cache=True # generally you want to save env after it runs
+    )
+    # pass prepare_my_dataset here
+    env = recnn.data.env.FrameEnv(dirs, frame_size, batch_size, prepare_dataset=prepare_my_dataset)
 
     # test function
     def run_tests():
