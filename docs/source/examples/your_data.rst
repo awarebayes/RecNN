@@ -103,7 +103,7 @@ Writing custom preprocessing function
 
 The following is a copy of the preprocessing function listed above to work with the toy dataset::
 
-    def prepare_dataset(args_mut, kwargs):
+   def prepare_my_dataset(args_mut, kwargs):
 
         # get args
         frame_size = kwargs.get('frame_size')
@@ -114,10 +114,11 @@ The following is a copy of the preprocessing function listed above to work with 
         df['when'] = df['when'].apply(string_time_to_unix)
         df['book_id'] = df['book_id'].apply(key_to_id.get)
 
-        users = df[['userId', 'movieId']].groupby(['userId']).size()
+        users = df[['reader_id', 'book_id']].groupby(['reader_id']).size()
         users = users[users > frame_size].sort_values(ascending=False).index
 
-        if pd.get_type() == "modin": df = df._to_pandas() # pandas groupby is sync and doesnt affect performance 
+        # If using modin: pandas groupby is sync and doesnt affect performance
+        # if pd.get_type() == "modin": df = df._to_pandas()  
         ratings = df.sort_values(by='when').set_index('reader_id').drop('when', axis=1).groupby('reader_id')
 
         # Groupby user
@@ -146,9 +147,9 @@ Final touches::
     batch_size = 25
 
     dirs = recnn.data.env.DataPath(
-        base="/path/to/mydata/",
+        base="/mydataset",
         embeddings="myembeddings.pickle",
-        ratings="myratings.csv",
+        ratings="mydf.csv",
         cache="cache/frame_env.pkl", # cache will generate after you run
         use_cache=True # generally you want to save env after it runs
     )

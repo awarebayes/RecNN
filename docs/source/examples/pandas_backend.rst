@@ -6,6 +6,7 @@ RecNN supports different types of pandas backends for faster data loading/proces
 
 
 Pandas is your default backend::
+
     # but you can also set it directly:
     recnn.pd.set("pandas")
     frame_size = 10
@@ -35,6 +36,7 @@ IP.S. nstall Modin `here
 You can also use modin  with Dask / Ray.
 
 Here is a little Ray example::
+
     import os
     import ray
 
@@ -51,6 +53,7 @@ Here is a little Ray example::
     Wall time: 21.4 s
 
 Using Dask::
+
     ### dask
     import os
     os.environ["MODIN_ENGINE"] = "dask"  # Modin will use Dask
@@ -64,5 +67,4 @@ Using Dask::
     <recnn.data.env.FrameEnv at 0x7f623fb30250>
 
 
-Free 2x improvement in loading speed
-====================================
+**Free 2x improvement in loading speed**

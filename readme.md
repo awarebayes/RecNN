@@ -90,10 +90,8 @@ The repo consists of two parts: the library (./recnn), and the playground (./exa
 
 ### ‍Repos I used code from:
 
-- Sfujim's [BCQ](https://github.com/sfujim/BCQ)
-- LiyuanLucasLiu [Radam](https://github.com/LiyuanLucasLiu/RAdam)
-- Higgsfield's [RL Adventure 2](https://github.com/higgsfield/RL-Adventure-2)
-- Mpyrozhok's [adamwr](https://github.com/mpyrozhok/adamwr)
+- Sfujim's [BCQ](https://github.com/sfujim/BCQ) (not implemented yet)
+- Higgsfield's [RL Adventure 2](https://github.com/higgsfield/RL-Adventure-2) (great inspiration)
 
 ### 🤔 What is this? 
 
