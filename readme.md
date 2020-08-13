@@ -34,7 +34,7 @@ This is my school project. It focuses on Reinforcement Learning for personalized
     <a href="https://recnn.readthedocs.io">recnn.readthedocs.io</a>
 </p>
 
-### 📊 The features can be summed up to:
+### 📊 The features can be summed up to
 
 - Abstract as you decide: you can import the entire algorithm (say DDPG) and tell it to ddpg.learn(batch), you can import networks and the learning function separately, create a custom loader for your task, or can define everything by yourself.
 
@@ -50,13 +50,11 @@ This is my school project. It focuses on Reinforcement Learning for personalized
 
 - New datasets will be added in the future.
 
-- SOTA optimizers (RAdam, LookAhead, Ranger) come pre-packaged.
-
 ## 📚 Medium Articles
 
 The repo consists of two parts: the library (./recnn), and the playground (./examples) where I explain how to work with certain things. 
 
-- Pretty much what you need to get started with this library if you know recommenders but don't know much about
+ -  Pretty much what you need to get started with this library if you know recommenders but don't know much about
   reinforcement learning:
 
 <p align="center"> 
@@ -65,7 +63,7 @@ The repo consists of two parts: the library (./recnn), and the playground (./exa
     </a>
 </p>
 
-- Top-K Off-Policy Correction for a REINFORCE Recommender System:
+ -  Top-K Off-Policy Correction for a REINFORCE Recommender System:
 <p align="center"> 
    <a href="https://towardsdatascience.com/top-k-off-policy-correction-for-a-reinforce-recommender-system-e34381dceef8">
         <img src="./res/article_2.png" width="70%">
@@ -73,7 +71,7 @@ The repo consists of two parts: the library (./recnn), and the playground (./exa
 </p>
 
 
-## Algorithms that are/will be added:
+## Algorithms that are/will be added
 
 <p align="center"> 
     
@@ -88,12 +86,12 @@ The repo consists of two parts: the library (./recnn), and the playground (./exa
 
 </p>
 
-### ‍Repos I used code from:
+### ‍Repos I used code from
 
-- Sfujim's [BCQ](https://github.com/sfujim/BCQ) (not implemented yet)
-- Higgsfield's [RL Adventure 2](https://github.com/higgsfield/RL-Adventure-2) (great inspiration)
+ -  Sfujim's [BCQ](https://github.com/sfujim/BCQ) (not implemented yet)
+ -  Higgsfield's [RL Adventure 2](https://github.com/higgsfield/RL-Adventure-2) (great inspiration)
 
-### 🤔 What is this? 
+### 🤔 What is this
 
 <p align="center"> 
 This is my school project. It focuses on Reinforcement Learning for personalized news recommendation. The main distinction is that it tries to solve online off-policy learning with dynamically generated item embeddings. Also, there is no exploration, since we are working with a dataset. In the example section, I use Google's BERT on the ML20M dataset to extract contextual information from the movie description to form the latent vector representations. Later, you can use the same transformation on new, previously unseen items (hence, the embeddings are dynamically generated). If you don't want to bother with embeddings pipeline, I have a DQN embeddings generator as a proof of concept.
@@ -142,10 +140,10 @@ cd RecNN && streamlit run examples/streamlit_demo.py
 [Docker image is available here](https://github.com/awarebayes/recnn-demo)
 
 ## 📁 Downloads
-- [MovieLens 20M](https://grouplens.org/datasets/movielens/20m/)
-- [Movie Embeddings](https://drive.google.com/open?id=1EQ_zXBR3DKpmJR3jBgLvt-xoOvArGMsL)
-- [Misc Data](https://drive.google.com/open?id=1TclEmCnZN_Xkl3TfUXL5ivPYmLnIjQSu)
-- [Parsed (omdb,tmdb)](https://drive.google.com/open?id=1t0LNCbqLjiLkAMFwtP8OIYU-zPUCNAjK)
+ -  [MovieLens 20M](https://grouplens.org/datasets/movielens/20m/)
+ -  [Movie Embeddings](https://drive.google.com/open?id=1EQ_zXBR3DKpmJR3jBgLvt-xoOvArGMsL)
+ -  [Misc Data](https://drive.google.com/open?id=1TclEmCnZN_Xkl3TfUXL5ivPYmLnIjQSu)
+ -  [Parsed (omdb,tmdb)](https://drive.google.com/open?id=1t0LNCbqLjiLkAMFwtP8OIYU-zPUCNAjK)
 
 ## 📁 [Download the Models](https://drive.google.com/file/d/1goGa15XZmDAp2msZvRi2v_1h9xfmnhz7/view?usp=sharing)
 

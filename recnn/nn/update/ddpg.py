@@ -49,7 +49,7 @@ def ddpg_update(batch, params, nets, optimizer,
 
     """
 
-    state, action, reward, next_state, done = data.get_base_batch(batch, device=device)
+    state, action, reward, next_state, _ = data.get_base_batch(batch, device=device)
 
     # --------------------------------------------------------#
     # Value Learning

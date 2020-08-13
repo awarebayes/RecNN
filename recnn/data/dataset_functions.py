@@ -1,13 +1,12 @@
-from .utils import make_items_tensor
 from .pandas_backend import pd
 import numpy as np
 from typing import List, Dict, Callable
 
-"""     
+"""   
     What?
     +++++
 
-    RecNN is designed to work with your data flow. 
+    RecNN is designed to work with your data flow.
 
     Set kwargs in the beginning of prepare_dataset function.
     Kwargs you set are immutable.
@@ -93,7 +92,7 @@ def prepare_dataset(args_mut: DataFuncArgsMut, kwargs: DataFuncKwargs):
     # rating range mapped from [0, 5] to [-5, 5]
     df['rating'] = try_progress_apply(df['rating'], lambda i: 2 * (i - 2.5))
     # id's tend to be inconsistent and sparse so they are remapped here
-    df['movieId'] = try_progress_apply(df['movieId'], lambda i: key_to_id.get(i))
+    df['movieId'] = try_progress_apply(df['movieId'], key_to_id.get)
     users = df[['userId', 'movieId']].groupby(['userId']).size()
     users = users[users > frame_size].sort_values(ascending=False).index
 
@@ -133,19 +132,19 @@ def truncate_dataset(args_mut: DataFuncArgsMut, kwargs: DataFuncKwargs):
     to_keep_id = pd.get().Series(to_keep).apply(args_mut.base.key_to_id.get).values
     to_keep_mask = np.zeros(len(counts))
     to_keep_mask[to_keep_id] = 1
-    
+
     args_mut.df = df.drop(df[df['movieId'].isin(to_remove)].index)
 
     key_to_id_new = {}
     id_to_key_new = {}
     count = 0
-    
+
     for idx, i in enumerate(list(args_mut.base.key_to_id.keys())):
         if i in to_keep:
             key_to_id_new[i] = count
             id_to_key_new[idx] = i
             count += 1
-            
+
     args_mut.base.embeddings = args_mut.base.embeddings[to_keep_mask]
     args_mut.base.key_to_id = key_to_id_new
     args_mut.base.id_to_key = id_to_key_new

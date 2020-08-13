@@ -15,14 +15,13 @@ class PandasBackend:
             try:
                 from tqdm.auto import tqdm
                 tqdm.pandas()
-            except:
+            except ImportError:
                 print("Error in tqdm.pandas()")
                 print("Pandas progress is disabled")
             self.backend = pandas
         elif backend == "modin":
             from modin import pandas
             self.backend = pandas
-        assert self.backend is not None
 
     def get(self):
         return self.backend

@@ -81,7 +81,7 @@ class EnvBase:
 class DataPath:
 
     """
-    [New!] Path to yourd data. Note: cache is optional. It saves EnvBase as a pickle
+    [New!] Path to your data. Note: cache is optional. It saves EnvBase as a pickle
     """
 
     def __init__(self, base:str, ratings: str, embeddings:str, cache: str="", use_cache: bool=True):
@@ -120,7 +120,6 @@ class Env:
         self.base = EnvBase()
         self.embed_batch = embed_batch
         self.prepare_dataset = prepare_dataset
-        save_state = False
         if path.use_cache and os.path.isfile(path.cache):
             self.load_env(path.cache)
         else:
@@ -173,7 +172,6 @@ class Env:
         pickle.dump(self.base, open(where, "wb"))
 
 
-
 class FrameEnv(Env):
     """
     Static length user environment.
@@ -196,10 +194,10 @@ class FrameEnv(Env):
             env = FrameEnv(embed_dir, rating_dir, **pandas_conf)
 
         """
-        
+
         kwargs['frame_size'] = frame_size
         super(FrameEnv, self).__init__(path, min_seq_size=frame_size+1, *args, **kwargs)
-        
+
         self.frame_size = frame_size
         self.batch_size = batch_size
         self.num_workers = num_workers
