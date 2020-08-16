@@ -23,6 +23,10 @@
 <a href="https://colab.research.google.com/github/awarebayes/RecNN/">
     <img src="https://colab.research.google.com/assets/colab-badge.svg" />
 </a>
+
+<a href="https://github.com/psf/black">
+    <img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg">
+</a>
 </p>
 
 
