@@ -24,7 +24,9 @@ class ChooseREINFORCE:
     @staticmethod
     def reinforce_with_correction(policy, returns, *args, **kwargs):
         policy_loss = []
-        for corr, log_prob, R in zip(policy.correction, policy.saved_log_probs, returns):
+        for corr, log_prob, R in zip(
+            policy.correction, policy.saved_log_probs, returns
+        ):
             policy_loss.append(corr * -log_prob * R)  # <- this line here
         policy_loss = torch.cat(policy_loss).sum()
         return policy_loss
@@ -32,7 +34,9 @@ class ChooseREINFORCE:
     @staticmethod
     def reinforce_with_TopK_correction(policy, returns, *args, **kwargs):
         policy_loss = []
-        for l_k, corr, log_prob, R in zip(policy.lambda_k, policy.correction, policy.saved_log_probs, returns):
+        for l_k, corr, log_prob, R in zip(
+            policy.lambda_k, policy.correction, policy.saved_log_probs, returns
+        ):
             policy_loss.append(l_k * corr * -log_prob * R)  # <- this line here
         policy_loss = torch.cat(policy_loss).sum()
         return policy_loss
@@ -61,40 +65,64 @@ class ChooseREINFORCE:
         return policy_loss
 
 
-def reinforce_update(batch, params, nets, optimizer,
-                     device=torch.device('cpu'),
-                     debug=None, writer=utils.DummyWriter(),
-                     learn=True, step=-1):
+def reinforce_update(
+    batch,
+    params,
+    nets,
+    optimizer,
+    device=torch.device("cpu"),
+    debug=None,
+    writer=utils.DummyWriter(),
+    learn=True,
+    step=-1,
+):
 
     # Due to its mechanics, reinforce doesn't support testing!
     learn = True
 
     state, action, reward, next_state, done = data.get_base_batch(batch)
 
-    predicted_probs = nets['policy_net'].select_action(state=state, action=action, K=params['K'],
-                                                       learn=learn, writer=writer, step=step)
-    writer.add_histogram('predicted_probs_std', predicted_probs.std(), step)
-    writer.add_histogram('predicted_probs_mean', predicted_probs.mean(), step)
+    predicted_probs = nets["policy_net"].select_action(
+        state=state, action=action, K=params["K"], learn=learn, writer=writer, step=step
+    )
+    writer.add_histogram("predicted_probs_std", predicted_probs.std(), step)
+    writer.add_histogram("predicted_probs_mean", predicted_probs.mean(), step)
     mx = predicted_probs.max(dim=1).values
-    writer.add_histogram('predicted_probs_max_mean', mx.mean(), step)
-    writer.add_histogram('predicted_probs_max_std', mx.std(), step)
-    reward = nets['value_net'](state, predicted_probs).detach()
-    nets['policy_net'].rewards.append(reward.mean())
+    writer.add_histogram("predicted_probs_max_mean", mx.mean(), step)
+    writer.add_histogram("predicted_probs_max_std", mx.std(), step)
+    reward = nets["value_net"](state, predicted_probs).detach()
+    nets["policy_net"].rewards.append(reward.mean())
 
-    value_loss = value_update(batch, params, nets, optimizer,
-                              writer=writer, device=device,
-                              debug=debug, learn=True, step=step)
+    value_loss = value_update(
+        batch,
+        params,
+        nets,
+        optimizer,
+        writer=writer,
+        device=device,
+        debug=debug,
+        learn=True,
+        step=step,
+    )
 
-    if step % params['policy_step'] == 0 and step > 0:
-        policy_loss = params['reinforce'](nets['policy_net'], optimizer['policy_optimizer'],)
+    if step % params["policy_step"] == 0 and step > 0:
+        policy_loss = params["reinforce"](
+            nets["policy_net"], optimizer["policy_optimizer"],
+        )
 
-        utils.soft_update(nets['value_net'], nets['target_value_net'], soft_tau=params['soft_tau'])
-        utils.soft_update(nets['policy_net'], nets['target_policy_net'], soft_tau=params['soft_tau'])
+        utils.soft_update(
+            nets["value_net"], nets["target_value_net"], soft_tau=params["soft_tau"]
+        )
+        utils.soft_update(
+            nets["policy_net"], nets["target_policy_net"], soft_tau=params["soft_tau"]
+        )
 
-        losses = {'value': value_loss.item(),
-                  'policy': policy_loss.item(),
-                  'step': step}
+        losses = {
+            "value": value_loss.item(),
+            "policy": policy_loss.item(),
+            "step": step,
+        }
 
-        utils.write_losses(writer, losses, kind='train' if learn else 'test')
+        utils.write_losses(writer, losses, kind="train" if learn else "test")
 
         return losses

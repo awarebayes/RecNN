@@ -1,0 +1,147 @@
+2020-08-16 17:49:32 INFO Running as pid: 1908
+2020-08-16 17:49:32 INFO Version: 254e297a4983372cc892927884acc90d2d998ad2
+2020-08-16 17:49:32 INFO Build info: Linux x86_64 @ Mon Aug  3 11:10:05 PDT 2020
+2020-08-16 17:49:33 PERFORMANCE Module tracker built: 0.169520s
+2020-08-16 17:49:33 INFO Building type environment...
+2020-08-16 17:49:33 INFO Parsing 1015 stubs and sources...
+2020-08-16 17:49:34 PERFORMANCE Sources parsed: 1.431190s
+2020-08-16 17:49:35 ENVIRONMENT Updating is from empty stub result Environment
+2020-08-16 17:49:35 ENVIRONMENT Updating Alias Environment
+2020-08-16 17:49:35 ENVIRONMENT Updating Edges Environment
+2020-08-16 17:49:35 ENVIRONMENT Updating Class metadata Environment
+2020-08-16 17:49:35 ENVIRONMENT Updating parse annotation Environment
+2020-08-16 17:49:35 ENVIRONMENT Updating metaclasses Environment
+2020-08-16 17:49:35 ENVIRONMENT Updating attributes Environment
+2020-08-16 17:49:35 ENVIRONMENT Updating Global Environment
+2020-08-16 17:49:35 ENVIRONMENT Updating Global Locations Environment
+2020-08-16 17:49:35 PERFORMANCE Full environment built: 2.158607s
+2020-08-16 17:49:35 INFO Checking 165 functions...
+2020-08-16 17:49:35 ENVIRONMENT Superclass annotation torch.nn.Module is missing
+2020-08-16 17:49:35 ENVIRONMENT Superclass annotation torch.nn.Module is missing
+2020-08-16 17:49:35 ENVIRONMENT Superclass of top (unresolved name: typing.Generic[])
+2020-08-16 17:49:35 ENVIRONMENT Superclass of top (unresolved name: typing.Generic[])
+2020-08-16 17:49:35 ENVIRONMENT Superclass of top (unresolved name: typing.Generic[])
+2020-08-16 17:49:35 ENVIRONMENT Superclass of top (unresolved name: typing.Generic[])
+2020-08-16 17:49:35 ENVIRONMENT Superclass of top (unresolved name: typing.Generic[])
+2020-08-16 17:49:35 ENVIRONMENT Superclass of top (unresolved name: typing.Generic[])
+2020-08-16 17:49:35 ENVIRONMENT Superclass of top (unresolved name: typing.Generic[])
+2020-08-16 17:49:35 ENVIRONMENT Superclass of top (unresolved name: typing.Generic[])
+2020-08-16 17:49:35 ENVIRONMENT Superclass annotation torch.utils.data.Dataset is missing
+2020-08-16 17:49:35 ENVIRONMENT Superclass annotation torch.nn.Module is missing
+2020-08-16 17:49:35 ENVIRONMENT Superclass annotation torch.nn.Module is missing
+2020-08-16 17:49:35 ENVIRONMENT Superclass annotation torch.nn.Module is missing
+2020-08-16 17:49:35 ENVIRONMENT Superclass annotation torch.nn.Module is missing
+2020-08-16 17:49:35 PERFORMANCE Check_TypeCheck: 0.223723s
+2020-08-16 17:49:35 MEMORY Shared memory size post-typecheck (size: 10)
+2020-08-16 17:49:35 PERFORMANCE Initialization: 2.671526s
+2020-08-16 17:49:35 INFO Server started using incremental style Configuration.Analysis.FineGrained
+2020-08-16 17:49:35 INFO Enabled features = { Configuration.Features.click_to_fix = true; go_to_definition = false;
+  hover = false }
+2020-08-16 17:49:35 PERFORMANCE Server request: 0.000847s
+2020-08-16 17:49:35 INFO Request method: initialize
+2020-08-16 17:49:35 PERFORMANCE Server request: 0.000024s
+2020-08-16 17:49:35 PERFORMANCE Server request: 0.000082s
+2020-08-16 17:49:36 PERFORMANCE Server request: 0.000020s
+2020-08-16 17:49:46 PERFORMANCE Server request: 0.000039s
+2020-08-16 17:49:46 PERFORMANCE Server request: 0.000146s
+2020-08-16 17:49:46 PERFORMANCE Server request: 0.000208s
+2020-08-16 17:49:46 PERFORMANCE Server request: 0.000414s
+2020-08-16 17:49:46 PERFORMANCE Server request: 0.000112s
+2020-08-16 17:49:46 PERFORMANCE Server request: 0.000191s
+2020-08-16 17:49:46 PERFORMANCE Server request: 0.000003s
+2020-08-16 17:49:46 PERFORMANCE Server request: 0.000054s
+2020-08-16 17:49:47 PERFORMANCE Server request: 0.000019s
+2020-08-16 17:49:53 PERFORMANCE Server request: 0.000064s
+2020-08-16 17:49:53 PERFORMANCE Server request: 0.000183s
+2020-08-16 17:49:55 PERFORMANCE Server request: 0.000196s
+2020-08-16 17:49:55 PERFORMANCE Server request: 0.000416s
+2020-08-16 17:49:56 PERFORMANCE Server request: 0.000004s
+2020-08-16 17:49:56 PERFORMANCE Server request: 0.000118s
+2020-08-16 17:49:56 PERFORMANCE Server request: 0.000004s
+2020-08-16 17:50:14 PERFORMANCE Server request: 0.000063s
+2020-08-16 17:50:14 PERFORMANCE Server request: 0.000178s
+2020-08-16 17:50:15 PERFORMANCE Server request: 0.000161s
+2020-08-16 17:50:15 PERFORMANCE Server request: 0.000280s
+2020-08-16 17:50:15 PERFORMANCE Server request: 0.000002s
+2020-08-16 17:50:15 PERFORMANCE Server request: 0.000043s
+2020-08-16 17:50:15 PERFORMANCE Server request: 0.000004s
+2020-08-16 17:50:15 PERFORMANCE Server request: 0.000016s
+2020-08-16 17:50:19 PERFORMANCE Server request: 0.000065s
+2020-08-16 17:50:19 PERFORMANCE Server request: 0.000192s
+2020-08-16 17:50:20 PERFORMANCE Server request: 0.000162s
+2020-08-16 17:50:20 PERFORMANCE Server request: 0.000398s
+2020-08-16 17:50:20 PERFORMANCE Server request: 0.000002s
+2020-08-16 17:50:20 PERFORMANCE Server request: 0.000042s
+2020-08-16 17:50:20 PERFORMANCE Server request: 0.000004s
+2020-08-16 17:50:20 PERFORMANCE Server request: 0.000016s
+2020-08-16 17:50:37 PERFORMANCE Server request: 0.000083s
+2020-08-16 17:50:37 PERFORMANCE Server request: 0.000224s
+2020-08-16 17:50:38 PERFORMANCE Server request: 0.000223s
+2020-08-16 17:50:38 PERFORMANCE Server request: 0.000520s
+2020-08-16 17:50:38 PERFORMANCE Server request: 0.000004s
+2020-08-16 17:50:38 PERFORMANCE Server request: 0.000171s
+2020-08-16 17:50:38 PERFORMANCE Server request: 0.000006s
+2020-08-16 17:50:45 PERFORMANCE Server request: 0.000171s
+2020-08-16 17:50:45 PERFORMANCE Server request: 0.000321s
+2020-08-16 17:50:45 PERFORMANCE Server request: 0.000254s
+2020-08-16 17:50:45 PERFORMANCE Server request: 0.000397s
+2020-08-16 17:50:55 PERFORMANCE Server request: 0.000004s
+2020-08-16 17:50:55 PERFORMANCE Server request: 0.000152s
+2020-08-16 17:50:56 PERFORMANCE Server request: 0.000004s
+2020-08-16 17:50:56 PERFORMANCE Server request: 0.000153s
+2020-08-16 17:51:02 PERFORMANCE Server request: 0.000004s
+2020-08-16 17:51:02 PERFORMANCE Server request: 0.000153s
+2020-08-16 17:51:10 PERFORMANCE Server request: 0.000003s
+2020-08-16 17:51:10 PERFORMANCE Server request: 0.000107s
+2020-08-16 17:51:12 PERFORMANCE Server request: 0.000006s
+2020-08-16 17:51:12 PERFORMANCE Server request: 0.000161s
+2020-08-16 17:51:19 PERFORMANCE Server request: 0.000005s
+2020-08-16 17:51:19 PERFORMANCE Server request: 0.000145s
+2020-08-16 17:51:19 PERFORMANCE Server request: 0.000004s
+2020-08-16 17:51:19 PERFORMANCE Server request: 0.000128s
+2020-08-16 17:51:22 PERFORMANCE Server request: 0.000004s
+2020-08-16 17:51:22 PERFORMANCE Server request: 0.000149s
+2020-08-16 17:51:22 PERFORMANCE Server request: 0.000005s
+2020-08-16 17:51:22 PERFORMANCE Server request: 0.000157s
+2020-08-16 17:51:24 PERFORMANCE Server request: 0.000004s
+2020-08-16 17:51:24 PERFORMANCE Server request: 0.000140s
+2020-08-16 17:51:25 PERFORMANCE Server request: 0.000004s
+2020-08-16 17:51:25 PERFORMANCE Server request: 0.000137s
+2020-08-16 17:51:26 PERFORMANCE Server request: 0.000075s
+2020-08-16 17:51:27 PERFORMANCE Server request: 0.000012s
+2020-08-16 17:51:27 PERFORMANCE Server request: 0.000104s
+2020-08-16 17:51:27 PERFORMANCE Server request: 0.000578s
+2020-08-16 17:51:28 PERFORMANCE Server request: 0.000069s
+2020-08-16 17:51:28 PERFORMANCE Server request: 0.000373s
+2020-08-16 17:51:29 PERFORMANCE Server request: 0.000113s
+2020-08-16 17:51:29 PERFORMANCE Server request: 0.000458s
+2020-08-16 17:51:29 PERFORMANCE Server request: 0.000006s
+2020-08-16 17:51:29 PERFORMANCE Server request: 0.000189s
+2020-08-16 17:51:29 PERFORMANCE Server request: 0.000231s
+2020-08-16 17:51:29 PERFORMANCE Server request: 0.000581s
+2020-08-16 17:51:30 PERFORMANCE Module tracker updated: 0.000036s
+2020-08-16 17:51:30 INFO Repopulating the environment...
+2020-08-16 17:51:30 ENVIRONMENT Updating is from empty stub result Environment
+2020-08-16 17:51:30 ENVIRONMENT Updating Alias Environment
+2020-08-16 17:51:30 ENVIRONMENT Updating Edges Environment
+2020-08-16 17:51:30 ENVIRONMENT Updating Class metadata Environment
+2020-08-16 17:51:30 ENVIRONMENT Updating parse annotation Environment
+2020-08-16 17:51:30 ENVIRONMENT Updating metaclasses Environment
+2020-08-16 17:51:30 ENVIRONMENT Updating attributes Environment
+2020-08-16 17:51:30 ENVIRONMENT Updating Global Environment
+2020-08-16 17:51:30 ENVIRONMENT Updating Global Locations Environment
+2020-08-16 17:51:30 INFO Checking 5 functions...
+2020-08-16 17:51:30 PERFORMANCE Check_TypeCheck: 0.026769s
+2020-08-16 17:51:30 MEMORY Shared memory size (size: 10)
+2020-08-16 17:51:30 INFO Number of new errors = 10
+2020-08-16 17:51:30 PERFORMANCE Incremental check: 0.108115s
+2020-08-16 17:51:30 PERFORMANCE Server request: 0.108671s
+2020-08-16 17:51:30 PERFORMANCE Server request: 0.108750s
+2020-08-16 17:51:30 PERFORMANCE Server request: 0.000002s
+2020-08-16 17:51:30 PERFORMANCE Server request: 0.000051s
+2020-08-16 17:51:30 PERFORMANCE Server request: 0.000020s
+2020-08-16 17:51:30 PERFORMANCE Server request: 0.000004s
+2020-08-16 17:51:30 PERFORMANCE Server request: 0.000017s
+2020-08-16 17:51:30 PERFORMANCE Server request: 0.000002s
+2020-08-16 17:51:30 PERFORMANCE Server request: 0.000055s
+2020-08-16 17:51:31 PERFORMANCE Server request: 0.000014s

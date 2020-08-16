@@ -61,7 +61,9 @@ class DataFuncKwargs:
                     pipeline = [recnn.data.truncate_dataset, recnn.data.prepare_dataset]
                     recnn.data.build_data_pipeline(pipeline, args, args_mut)
             """
-            raise AttributeError("No kwarg with name {} found!\n{}".format(name, example.format(example)))
+            raise AttributeError(
+                "No kwarg with name {} found!\n{}".format(name, example.format(example))
+            )
         return self.kwargs[name]
 
     def set(self, name: str, value):
@@ -70,7 +72,9 @@ class DataFuncKwargs:
 
 # Used for returning, arguments are mutable
 class DataFuncArgsMut:
-    def __init__(self, df, base, users: List[int], user_dict: Dict[int, Dict[str, np.ndarray]]):
+    def __init__(
+        self, df, base, users: List[int], user_dict: Dict[int, Dict[str, np.ndarray]]
+    ):
         self.base = base
         self.users = users
         self.user_dict = user_dict
@@ -85,29 +89,34 @@ def prepare_dataset(args_mut: DataFuncArgsMut, kwargs: DataFuncKwargs):
     """
 
     # get args
-    frame_size = kwargs.get('frame_size')
+    frame_size = kwargs.get("frame_size")
     key_to_id = args_mut.base.key_to_id
     df = args_mut.df
 
     # rating range mapped from [0, 5] to [-5, 5]
-    df['rating'] = try_progress_apply(df['rating'], lambda i: 2 * (i - 2.5))
+    df["rating"] = try_progress_apply(df["rating"], lambda i: 2 * (i - 2.5))
     # id's tend to be inconsistent and sparse so they are remapped here
-    df['movieId'] = try_progress_apply(df['movieId'], key_to_id.get)
-    users = df[['userId', 'movieId']].groupby(['userId']).size()
+    df["movieId"] = try_progress_apply(df["movieId"], key_to_id.get)
+    users = df[["userId", "movieId"]].groupby(["userId"]).size()
     users = users[users > frame_size].sort_values(ascending=False).index
 
     if pd.get_type() == "modin":
-        df = df._to_pandas() # pandas groupby is sync and doesnt affect performance
-    ratings = df.sort_values(by='timestamp').set_index('userId').drop('timestamp', axis=1).groupby('userId')
+        df = df._to_pandas()  # pandas groupby is sync and doesnt affect performance
+    ratings = (
+        df.sort_values(by="timestamp")
+        .set_index("userId")
+        .drop("timestamp", axis=1)
+        .groupby("userId")
+    )
 
     # Groupby user
     user_dict = {}
 
     def app(x):
-        userid = (x.index[0])
+        userid = x.index[0]
         user_dict[userid] = {}
-        user_dict[userid]['items'] = x['movieId'].values
-        user_dict[userid]['ratings'] = x['rating'].values
+        user_dict[userid]["items"] = x["movieId"].values
+        user_dict[userid]["ratings"] = x["rating"].values
 
     try_progress_apply(ratings, app)
 
@@ -123,17 +132,17 @@ def truncate_dataset(args_mut: DataFuncArgsMut, kwargs: DataFuncKwargs):
     """
 
     # here are adjusted n items to keep
-    num_items = kwargs.get('reduce_items_to')
+    num_items = kwargs.get("reduce_items_to")
     df = args_mut.df
 
-    counts = df['movieId'].value_counts().sort_values()
+    counts = df["movieId"].value_counts().sort_values()
     to_remove = counts[:-num_items].index
     to_keep = counts[-num_items:].index
     to_keep_id = pd.get().Series(to_keep).apply(args_mut.base.key_to_id.get).values
     to_keep_mask = np.zeros(len(counts))
     to_keep_mask[to_keep_id] = 1
 
-    args_mut.df = df.drop(df[df['movieId'].isin(to_remove)].index)
+    args_mut.df = df.drop(df[df["movieId"].isin(to_remove)].index)
 
     key_to_id_new = {}
     id_to_key_new = {}
@@ -149,13 +158,18 @@ def truncate_dataset(args_mut: DataFuncArgsMut, kwargs: DataFuncKwargs):
     args_mut.base.key_to_id = key_to_id_new
     args_mut.base.id_to_key = id_to_key_new
 
-    print('action space is reduced to {} - {} = {}'.format(num_items + len(to_remove), len(to_remove),
-                                                           num_items))
+    print(
+        "action space is reduced to {} - {} = {}".format(
+            num_items + len(to_remove), len(to_remove), num_items
+        )
+    )
 
     return args_mut, kwargs
 
 
-def build_data_pipeline(chain: List[Callable], kwargs: DataFuncKwargs, args_mut: DataFuncArgsMut):
+def build_data_pipeline(
+    chain: List[Callable], kwargs: DataFuncKwargs, args_mut: DataFuncArgsMut
+):
     """
         Higher order function
         :param chain: array of callable

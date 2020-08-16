@@ -12,8 +12,10 @@ class PandasBackend:
         self.type = backend
         if backend == "pandas":
             import pandas
+
             try:
                 from tqdm.auto import tqdm
+
                 tqdm.pandas()
             except ImportError:
                 print("Error in tqdm.pandas()")
@@ -21,6 +23,7 @@ class PandasBackend:
             self.backend = pandas
         elif backend == "modin":
             from modin import pandas
+
             self.backend = pandas
 
     def get(self):

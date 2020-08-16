@@ -46,16 +46,16 @@ class Actor(nn.Module):
 
     def __init__(self, input_dim, action_dim, hidden_size, init_w=2e-1):
         super(Actor, self).__init__()
-        
+
         self.drop_layer = nn.Dropout(p=0.5)
-        
+
         self.linear1 = nn.Linear(input_dim, hidden_size)
         self.linear2 = nn.Linear(hidden_size, hidden_size)
         self.linear3 = nn.Linear(hidden_size, action_dim)
-        
+
         self.linear3.weight.data.uniform_(-init_w, init_w)
         self.linear3.bias.data.uniform_(-init_w, init_w)
-        
+
     def forward(self, state, tanh=False):
         """
         :param action: nothing should be provided here.
@@ -89,7 +89,7 @@ class DiscreteActor(nn.Module):
         # by default {pi: pi, beta: beta}
         # you can change it to be like {pi: beta, beta: beta} as miracle24 suggested
 
-        self.action_source = {'pi': 'pi', 'beta': 'beta'}
+        self.action_source = {"pi": "pi", "beta": "beta"}
         self.select_action = self._select_action
 
     def forward(self, inputs):
@@ -131,9 +131,12 @@ class DiscreteActor(nn.Module):
         # pi_action = pi_categorical.sample(); beta_action = beta_categorical.sample();
         # but changing the action_source to {pi: beta, beta: beta} can be configured to be:
         # pi_action = beta_categorical.sample(); beta_action = beta_categorical.sample();
-        available_actions = {'pi': pi_categorical.sample(), 'beta': beta_categorical.sample()}
-        pi_action = available_actions[self.action_source['pi']]
-        beta_action = available_actions[self.action_source['beta']]
+        available_actions = {
+            "pi": pi_categorical.sample(),
+            "beta": beta_categorical.sample(),
+        }
+        pi_action = available_actions[self.action_source["pi"]]
+        beta_action = available_actions[self.action_source["beta"]]
 
         # 4. calculate stuff we need
         pi_log_prob = pi_categorical.log_prob(pi_action)
@@ -141,34 +144,38 @@ class DiscreteActor(nn.Module):
 
         return pi_log_prob, beta_log_prob, pi_probs
 
-    def _select_action_with_correction(self, state, beta, action, writer, step, **kwargs):
+    def _select_action_with_correction(
+        self, state, beta, action, writer, step, **kwargs
+    ):
         pi_log_prob, beta_log_prob, pi_probs = self.pi_beta_sample(state, beta, action)
 
         # calculate correction
         corr = torch.exp(pi_log_prob) / torch.exp(beta_log_prob)
 
-        writer.add_histogram('correction', corr, step)
-        writer.add_histogram('pi_log_prob', pi_log_prob, step)
-        writer.add_histogram('beta_log_prob', beta_log_prob, step)
+        writer.add_histogram("correction", corr, step)
+        writer.add_histogram("pi_log_prob", pi_log_prob, step)
+        writer.add_histogram("beta_log_prob", beta_log_prob, step)
 
         self.correction.append(corr)
         self.saved_log_probs.append(pi_log_prob)
 
         return pi_probs
 
-    def _select_action_with_TopK_correction(self, state, beta, action, K, writer, step, **kwargs):
+    def _select_action_with_TopK_correction(
+        self, state, beta, action, K, writer, step, **kwargs
+    ):
         pi_log_prob, beta_log_prob, pi_probs = self.pi_beta_sample(state, beta, action)
 
         # calculate correction
         corr = torch.exp(pi_log_prob) / torch.exp(beta_log_prob)
 
         # calculate top K correction
-        l_k = K * (1 - torch.exp(pi_log_prob)) ** (K-1)
+        l_k = K * (1 - torch.exp(pi_log_prob)) ** (K - 1)
 
-        writer.add_histogram('correction', corr, step)
-        writer.add_histogram('l_k', l_k, step)
-        writer.add_histogram('pi_log_prob', pi_log_prob, step)
-        writer.add_histogram('beta_log_prob', beta_log_prob, step)
+        writer.add_histogram("correction", corr, step)
+        writer.add_histogram("l_k", l_k, step)
+        writer.add_histogram("pi_log_prob", pi_log_prob, step)
+        writer.add_histogram("beta_log_prob", beta_log_prob, step)
 
         self.correction.append(corr)
         self.lambda_k.append(l_k)
@@ -185,16 +192,16 @@ class Critic(nn.Module):
 
     def __init__(self, input_dim, action_dim, hidden_size, init_w=3e-5):
         super(Critic, self).__init__()
-        
+
         self.drop_layer = nn.Dropout(p=0.5)
-        
+
         self.linear1 = nn.Linear(input_dim + action_dim, hidden_size)
         self.linear2 = nn.Linear(hidden_size, hidden_size)
         self.linear3 = nn.Linear(hidden_size, 1)
-        
+
         self.linear3.weight.data.uniform_(-init_w, init_w)
         self.linear3.bias.data.uniform_(-init_w, init_w)
-        
+
     def forward(self, state, action):
         """"""
         value = torch.cat([state, action], 1)
@@ -214,16 +221,16 @@ class bcqPerturbator(nn.Module):
 
     def __init__(self, num_inputs, num_actions, hidden_size, init_w=3e-1):
         super(bcqPerturbator, self).__init__()
-        
+
         self.drop_layer = nn.Dropout(p=0.5)
-        
+
         self.linear1 = nn.Linear(num_inputs + num_actions, hidden_size)
         self.linear2 = nn.Linear(hidden_size, hidden_size)
         self.linear3 = nn.Linear(hidden_size, num_actions)
-        
+
         self.linear3.weight.data.uniform_(-init_w, init_w)
         self.linear3.bias.data.uniform_(-init_w, init_w)
-        
+
     def forward(self, state, action):
         """"""
         a = torch.cat([state, action], 1)
@@ -231,7 +238,7 @@ class bcqPerturbator(nn.Module):
         a = self.drop_layer(a)
         a = F.relu(self.linear2(a))
         a = self.drop_layer(a)
-        a = self.linear3(a) 
+        a = self.linear3(a)
         return a + action
 
 
@@ -249,12 +256,12 @@ class bcqGenerator(nn.Module):
 
         self.mean = nn.Linear(750, latent_dim)
         self.log_std = nn.Linear(750, latent_dim)
-        
+
         # decoder
         self.d1 = nn.Linear(state_dim + latent_dim, 750)
         self.d2 = nn.Linear(750, 750)
         self.d3 = nn.Linear(750, action_dim)
-        
+
         self.latent_dim = latent_dim
         self.normal = torch.distributions.Normal(0, 1)
 
@@ -265,16 +272,18 @@ class bcqGenerator(nn.Module):
         z = F.relu(self.e2(z))
 
         mean = self.mean(z)
-        # Clamped for numerical stability 
+        # Clamped for numerical stability
         log_std = self.log_std(z).clamp(-4, 15)
         std = torch.exp(log_std)
-        z = mean + std * self.normal.sample(std.size()).to(next(self.parameters()).device)
+        z = mean + std * self.normal.sample(std.size()).to(
+            next(self.parameters()).device
+        )
 
         # u is decoded action
         u = self.decode(state, z)
 
         return u, mean, std
-    
+
     def decode(self, state, z=None):
         # When sampling from the VAE, the latent vector is clipped to [-0.5, 0.5]
         if z is None:

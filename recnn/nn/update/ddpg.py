@@ -5,11 +5,17 @@ from recnn.utils import soft_update
 from recnn.nn.update import value_update
 
 
-def ddpg_update(batch, params, nets, optimizer,
-                device=torch.device('cpu'),
-                debug=None, writer=utils.DummyWriter(),
-                learn=False, step=-1):
-
+def ddpg_update(
+    batch,
+    params,
+    nets,
+    optimizer,
+    device=torch.device("cpu"),
+    debug=None,
+    writer=utils.DummyWriter(),
+    learn=False,
+    step=-1,
+):
 
     """
     :param batch: batch [state, action, reward, next_state] returned by environment.
@@ -54,32 +60,45 @@ def ddpg_update(batch, params, nets, optimizer,
     # --------------------------------------------------------#
     # Value Learning
 
-    value_loss = value_update(batch, params, nets, optimizer,
-                              writer=writer, device=device,
-                              debug=debug, learn=learn, step=step)
+    value_loss = value_update(
+        batch,
+        params,
+        nets,
+        optimizer,
+        writer=writer,
+        device=device,
+        debug=debug,
+        learn=learn,
+        step=step,
+    )
 
     # --------------------------------------------------------#
     # Policy learning
 
-    gen_action = nets['policy_net'](state)
-    policy_loss = -nets['value_net'](state, gen_action)
+    gen_action = nets["policy_net"](state)
+    policy_loss = -nets["value_net"](state, gen_action)
 
     if not learn:
-        debug['gen_action'] = gen_action
-        writer.add_histogram('policy_loss', policy_loss, step)
-        writer.add_figure('next_action',
-                          utils.pairwise_distances_fig(gen_action[:50]), step)
+        debug["gen_action"] = gen_action
+        writer.add_histogram("policy_loss", policy_loss, step)
+        writer.add_figure(
+            "next_action", utils.pairwise_distances_fig(gen_action[:50]), step
+        )
     policy_loss = policy_loss.mean()
 
-    if learn and step % params['policy_step'] == 0:
-        optimizer['policy_optimizer'].zero_grad()
+    if learn and step % params["policy_step"] == 0:
+        optimizer["policy_optimizer"].zero_grad()
         policy_loss.backward(retain_graph=True)
-        torch.nn.utils.clip_grad_norm_(nets['policy_net'].parameters(), -1, 1)
-        optimizer['policy_optimizer'].step()
+        torch.nn.utils.clip_grad_norm_(nets["policy_net"].parameters(), -1, 1)
+        optimizer["policy_optimizer"].step()
 
-        soft_update(nets['value_net'], nets['target_value_net'], soft_tau=params['soft_tau'])
-        soft_update(nets['policy_net'], nets['target_policy_net'], soft_tau=params['soft_tau'])
+        soft_update(
+            nets["value_net"], nets["target_value_net"], soft_tau=params["soft_tau"]
+        )
+        soft_update(
+            nets["policy_net"], nets["target_policy_net"], soft_tau=params["soft_tau"]
+        )
 
-    losses = {'value': value_loss.item(), 'policy': policy_loss.item(), 'step': step}
-    utils.write_losses(writer, losses, kind='train' if learn else 'test')
+    losses = {"value": value_loss.item(), "policy": policy_loss.item(), "step": step}
+    utils.write_losses(writer, losses, kind="train" if learn else "test")
     return losses
