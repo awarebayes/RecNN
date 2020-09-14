@@ -84,8 +84,8 @@ class DataFuncArgsMut:
 def prepare_dataset(args_mut: DataFuncArgsMut, kwargs: DataFuncKwargs):
 
     """
-        Basic prepare dataset function. Automatically makes index linear, in ml20 movie indices look like:
-        [1, 34, 123, 2000], recnn makes it look like [0,1,2,3] for you.
+    Basic prepare dataset function. Automatically makes index linear, in ml20 movie indices look like:
+    [1, 34, 123, 2000], recnn makes it look like [0,1,2,3] for you.
     """
 
     # get args
@@ -128,7 +128,7 @@ def prepare_dataset(args_mut: DataFuncArgsMut, kwargs: DataFuncKwargs):
 
 def truncate_dataset(args_mut: DataFuncArgsMut, kwargs: DataFuncKwargs):
     """
-        Truncate #items to reduce_items_to provided in kwargs
+    Truncate #items to reduce_items_to provided in kwargs
     """
 
     # here are adjusted n items to keep
@@ -171,9 +171,9 @@ def build_data_pipeline(
     chain: List[Callable], kwargs: DataFuncKwargs, args_mut: DataFuncArgsMut
 ):
     """
-        Higher order function
-        :param chain: array of callable
-        :param **kwargs: any kwargs you like
+    Higher order function
+    :param chain: array of callable
+    :param **kwargs: any kwargs you like
     """
     for call in chain:
         # note: returned kwargs are not utilized to guarantee immutability

@@ -122,7 +122,7 @@ class Env:
         :type test_size: int
         :param min_seq_size: (use as kwarg) filter users: len(user.items) > min seq size
         :type min_seq_size: int
-        :param prepare_dataset: (use as kwarg) function you provide. 
+        :param prepare_dataset: (use as kwarg) function you provide.
         :type prepare_dataset: function
         :param embed_batch: function to apply embeddings to batch. Can be set to yield continuous/discrete state/action
         :type embed_batch: function

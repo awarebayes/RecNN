@@ -417,7 +417,9 @@ def main():
 
         fig, ax = plt.subplots(figsize=(16, 9))
         ax.bar(
-            x_pos, CTEs, yerr=error,
+            x_pos,
+            CTEs,
+            yerr=error,
         )
         ax.set_xticks(x_pos)
         ax.grid(False)

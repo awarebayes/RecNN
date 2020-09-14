@@ -107,7 +107,8 @@ def reinforce_update(
 
     if step % params["policy_step"] == 0 and step > 0:
         policy_loss = params["reinforce"](
-            nets["policy_net"], optimizer["policy_optimizer"],
+            nets["policy_net"],
+            optimizer["policy_optimizer"],
         )
 
         utils.soft_update(
