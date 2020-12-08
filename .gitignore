@@ -1,6 +1,7 @@
 data/*
 !recnn/data/
 runs/
+envs/
 .vscode/
 models/
 recnn/.idea/

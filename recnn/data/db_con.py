@@ -2,6 +2,17 @@ from milvus import Milvus, MetricType
 import torch
 
 
+class SearchResult:
+    def __init__(self, data):
+        self.data = data
+
+    def id(self, device):
+        return torch.tensor(self.data.id_array).to(device)
+
+    def dist(self, device):
+        return torch.tensor(self.data.distance_array).to(device)
+
+
 class MilvusConnection:
     def __init__(self, env, name="movies_L2", port="19530", param=None):
 
@@ -42,7 +53,7 @@ class MilvusConnection:
             params=search_param,
         )
         self.statuses['last_search'] = status
-        return torch.tensor(results.id_array)
+        return SearchResult(results)
 
     def get_log(self):
         return self.statuses

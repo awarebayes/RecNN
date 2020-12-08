@@ -50,7 +50,7 @@ This is my school project. It focuses on Reinforcement Learning for personalized
 
 - Parallel data loading with Modin (Dask / Ray) and caching
 
-- Pytorch 1.5 support with Tensorboard visualization.
+- Pytorch 1.7 support with Tensorboard visualization.
 
 - New datasets will be added in the future.
 
